@@ -110,7 +110,7 @@ export default function LiveMatchPage() {
   const activeTeamName = isTeamA ? config.teamAName : config.teamBName;
 
   return (
-    <div className="min-h-screen w-full bg-surface-obsidian text-optic-white flex flex-col justify-between p-6 md:p-10 select-none overflow-hidden relative">
+    <div className="min-h-screen w-full bg-surface-obsidian text-optic-white flex flex-col justify-between projector-safe-margin select-none overflow-hidden relative">
       {/* Background ambient lighting */}
       <div
         className={`absolute top-0 left-0 w-96 h-96 rounded-full blur-[140px] pointer-events-none opacity-20 transition-all duration-700 ${
@@ -198,10 +198,10 @@ export default function LiveMatchPage() {
             <div className="w-full space-y-6 animate-in fade-in zoom-in-95 duration-300">
               {/* Question Text Prompt Card */}
               <div className="p-6 md:p-8 rounded-2xl bg-surface-carbon border border-white/20 shadow-[0_16px_32px_rgba(0,0,0,0.85)]">
-                <span className="font-mono text-xs uppercase tracking-widest text-text-muted-slate block mb-2">
+                <span className="label-caps text-text-muted-slate block mb-2">
                   QUESTION PROMPT
                 </span>
-                <h2 className="text-2xl md:text-3xl font-bold text-optic-white leading-relaxed tracking-tight">
+                <h2 className="text-headline-md md:text-headline-lg font-bold text-optic-white leading-relaxed tracking-tight">
                   {currentQuestion.text}
                 </h2>
               </div>

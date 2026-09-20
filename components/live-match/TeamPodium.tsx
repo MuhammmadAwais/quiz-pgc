@@ -82,11 +82,11 @@ export function TeamPodium({
 
       {/* Digital Tabular Score */}
       <div className="z-10 flex items-baseline justify-between pt-4 border-t border-white/10">
-        <span className="font-mono text-xs text-text-muted-slate uppercase tracking-wider">
+        <span className="label-caps text-text-muted-slate">
           POINTS
         </span>
         <span
-          className={`font-mono text-6xl md:text-7xl font-extrabold tracking-tight tabular-nums ${
+          className={`score-display ${
             isTeamA ? 'text-team-a-bright' : 'text-team-b-ice'
           }`}
         >

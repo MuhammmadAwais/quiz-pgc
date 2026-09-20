@@ -78,7 +78,7 @@ export function OptionCard({
 
       {/* Option Text */}
       <div className="flex-1">
-        <p className="text-base md:text-xl font-semibold tracking-wide leading-relaxed">
+        <p className="text-body-xl font-semibold tracking-wide leading-relaxed">
           {text}
         </p>
       </div>

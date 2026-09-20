@@ -36,7 +36,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
       />
 
       {/* Modal Dialog */}
-      <div className="relative w-full max-w-lg bg-surface-carbon border border-white/15 rounded-xl shadow-[0_24px_48px_-12px_rgba(0,0,0,0.95)] p-6 z-10 animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-lg bg-surface-carbon border border-border-medium rounded-xl shadow-modal-dialog p-6 z-10 animate-fade-in">
         <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
           <h2 className="text-lg font-bold text-optic-white tracking-tight">{title}</h2>
           <button

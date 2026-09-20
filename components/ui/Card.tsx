@@ -12,9 +12,9 @@ export function Card({
   ...props
 }: CardProps) {
   const variantClasses = {
-    carbon: 'bg-surface-carbon border-white/10 shadow-[0_12px_32px_-4px_rgba(0,0,0,0.85)]',
-    onyx: 'bg-surface-onyx border-white/8',
-    interactive: 'bg-surface-interactive border-white/15',
+    carbon: 'bg-surface-carbon border-border-subtle shadow-obsidian-card',
+    onyx: 'bg-surface-onyx border-border-subtle',
+    interactive: 'bg-surface-interactive border-border-medium',
   };
 
   return (

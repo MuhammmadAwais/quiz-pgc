@@ -51,7 +51,7 @@ export default function LoginPage() {
 
   const handleDemoFill = () => {
     setEmail('admin@pgc.edu');
-    setPassword('PGCarena2026!');
+    setPassword('Admin@PGC2026!');
   };
 
   return (
