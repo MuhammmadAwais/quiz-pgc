@@ -1,77 +1,285 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
-  /* Typography */
+  /* ==========================================================================
+     TYPOGRAPHY TOKENS
+     ========================================================================== */
   --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: var(--font-jetbrains-mono), monospace;
 
+  /* Font Scale & Line Heights */
+  --text-score: 72px;
+  --text-score--line-height: 72px;
+  --text-score--letter-spacing: -0.04em;
+  --text-score--font-weight: 800;
+
+  --text-score-mobile: 44px;
+  --text-score-mobile--line-height: 44px;
+  --text-score-mobile--letter-spacing: -0.03em;
+  --text-score-mobile--font-weight: 800;
+
+  --text-headline-xl: 48px;
+  --text-headline-xl--line-height: 56px;
+  --text-headline-xl--letter-spacing: -0.03em;
+  --text-headline-xl--font-weight: 800;
+
+  --text-headline-xl-mobile: 32px;
+  --text-headline-xl-mobile--line-height: 38px;
+  --text-headline-xl-mobile--letter-spacing: -0.02em;
+  --text-headline-xl-mobile--font-weight: 800;
+
+  --text-headline-lg: 36px;
+  --text-headline-lg--line-height: 44px;
+  --text-headline-lg--letter-spacing: -0.025em;
+  --text-headline-lg--font-weight: 700;
+
+  --text-headline-lg-mobile: 26px;
+  --text-headline-lg-mobile--line-height: 32px;
+  --text-headline-lg-mobile--letter-spacing: -0.02em;
+  --text-headline-lg-mobile--font-weight: 700;
+
+  --text-headline-md: 24px;
+  --text-headline-md--line-height: 32px;
+  --text-headline-md--letter-spacing: -0.015em;
+  --text-headline-md--font-weight: 700;
+
+  --text-body-xl: 20px;
+  --text-body-xl--line-height: 30px;
+  --text-body-xl--letter-spacing: -0.01em;
+  --text-body-xl--font-weight: 600;
+
+  --text-body-lg: 16px;
+  --text-body-lg--line-height: 24px;
+  --text-body-lg--letter-spacing: 0em;
+  --text-body-lg--font-weight: 500;
+
+  --text-body-md: 14px;
+  --text-body-md--line-height: 20px;
+  --text-body-md--letter-spacing: 0em;
+  --text-body-md--font-weight: 400;
+
+  --text-label-caps: 12px;
+  --text-label-caps--line-height: 16px;
+  --text-label-caps--letter-spacing: 0.12em;
+  --text-label-caps--font-weight: 700;
+
+  --text-label-mono: 14px;
+  --text-label-mono--line-height: 18px;
+  --text-label-mono--letter-spacing: -0.01em;
+  --text-label-mono--font-weight: 600;
+
+  /* ==========================================================================
+     COLOR TOKENS (ELECTRIC OBSIDIAN ARENA PALETTE)
+     ========================================================================== */
   /* Surfaces & Substrates */
   --color-surface-obsidian: #0A0A0F;
   --color-surface-onyx: #12111A;
   --color-surface-carbon: #1B1A26;
   --color-surface-interactive: #262436;
+  --color-surface: #131318;
+  --color-surface-dim: #131318;
+  --color-surface-bright: #39383E;
+  --color-surface-container: #1F1F25;
+  --color-surface-container-high: #2A292F;
+  --color-surface-container-highest: #35343A;
 
   /* Text Tiers */
   --color-text-optic-white: #FFFFFF;
   --color-text-bright-slate: #F1F5F9;
   --color-text-high-contrast: #E2E8F0;
   --color-text-muted-slate: #94A3B8;
+  --color-on-surface: #E4E1E9;
+  --color-on-surface-variant: #CBC3D7;
 
   /* Team A — Electric Violet */
   --color-team-a-core: #8B5CF6;
   --color-team-a-bright: #A78BFA;
   --color-team-a-deep: #7C3AED;
+  --color-primary: #D0BCFF;
+  --color-primary-container: #A078FF;
 
-  /* Team B — Bright Cyan & Coral Accent */
+  /* Team B — Bright Cyan & Ice */
   --color-team-b-cyan: #06B6D4;
   --color-team-b-ice: #38BDF8;
   --color-team-b-coral: #FB923C;
+  --color-secondary: #4CD7F6;
+  --color-secondary-container: #03B5D3;
 
-  /* Status Architecture (Zero Green, Red, Yellow) */
+  /* Status Architecture (Strictly Zero Green, Red, Yellow) */
   --color-state-success: #22D3EE;
   --color-state-success-indigo: #818CF8;
   --color-state-warning-rose: #E11D48;
   --color-state-warning-plum: #BE185D;
+  --color-error: #FFB4AB;
 
-  /* Border Utilities */
+  /* Projector Edge Boundaries & Outlines */
   --color-border-subtle: rgba(255, 255, 255, 0.08);
   --color-border-medium: rgba(255, 255, 255, 0.16);
   --color-border-bright: rgba(255, 255, 255, 0.35);
+  --color-outline: #958EA0;
+  --color-outline-variant: #494454;
 
-  /* Radius */
-  --radius-sm: 0.125rem;
-  --radius-md: 0.25rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
-  --radius-full: 9999px;
+  /* ==========================================================================
+     SHAPE & SPACING TOKENS
+     ========================================================================== */
+  --radius-sm: 0.125rem;  /* 2px */
+  --radius-md: 0.25rem;   /* 4px - standard buttons/inputs */
+  --radius-lg: 0.5rem;    /* 8px - modules/question bays */
+  --radius-xl: 0.75rem;   /* 12px - podiums & cards */
+  --radius-2xl: 1rem;     /* 16px - dialogs */
+  --radius-full: 9999px;  /* pills & status badges */
+
+  /* Stage Projector Spacing */
+  --spacing-gutter: 1.5rem;
+  --spacing-margin-projector: 2.5rem; /* 40px safe overscan margin */
+
+  /* ==========================================================================
+     SHADOWS & VOLUMETRIC STAGE GLOWS
+     ========================================================================== */
+  --shadow-obsidian-card: 0 12px 32px -4px rgba(0, 0, 0, 0.85);
+  --shadow-modal-dialog: 0 24px 48px -12px rgba(0, 0, 0, 0.95);
+  --shadow-team-a-glow: 0 0 36px -4px rgba(139, 92, 246, 0.45);
+  --shadow-team-b-glow: 0 0 36px -4px rgba(6, 182, 212, 0.45);
+  --shadow-success-glow: 0 0 36px -4px rgba(34, 211, 238, 0.45);
+  --shadow-miss-glow: 0 0 36px -4px rgba(225, 29, 72, 0.45);
+
+  /* Keyframe Animations */
+  --animate-fade-in: fade-in 0.25s ease-out;
+  --animate-pulse-glow: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.6;
+    }
+  }
 }
 
-/* Custom Volumetric Stage Glows */
-.glow-team-a {
+/* ==========================================================================
+   CUSTOM TAILWIND v4 UTILITIES
+   ========================================================================== */
+@utility glow-team-a {
   box-shadow: 0 0 36px -4px rgba(139, 92, 246, 0.45);
 }
 
-.glow-team-b {
+@utility glow-team-b {
   box-shadow: 0 0 36px -4px rgba(6, 182, 212, 0.45);
 }
 
-.glow-success {
+@utility glow-success {
   box-shadow: 0 0 36px -4px rgba(34, 211, 238, 0.45);
 }
 
-.glow-miss {
+@utility glow-miss {
   box-shadow: 0 0 36px -4px rgba(225, 29, 72, 0.45);
 }
 
-/* Projector Stage Display Rules */
+@utility score-display {
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 72px;
+  line-height: 72px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+@utility score-display-mobile {
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 44px;
+  line-height: 44px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+@utility label-caps {
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+@utility label-mono {
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+@utility tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   GLOBAL BASE STYLES & ACCESSIBILITY
+   ========================================================================== */
+*, ::after, ::before {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+}
+
 body {
   background-color: #0A0A0F;
   color: #FFFFFF;
+  font-family: var(--font-sans);
   min-height: 100vh;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Tabular Numbers */
-.tabular-nums {
-  font-variant-numeric: tabular-nums;
+::selection {
+  background-color: #8B5CF6;
+  color: #0A0A0F;
+}
+
+/* Projector Stage Safe Margin Utility */
+.projector-safe-margin {
+  padding: 2.5rem;
+}
+
+@media (max-width: 768px) {
+  .projector-safe-margin {
+    padding: 1rem;
+  }
+}
+
+/* Clean Dark Mode Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0A0A0F;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #262436;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
