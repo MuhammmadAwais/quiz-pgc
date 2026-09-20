@@ -139,7 +139,7 @@ export function AiStudioModal({
     }
   };
 
-  const handleCommitDone = async () => {
+  const handleSaveDone = async () => {
     await onSuccess();
     onClose();
   };
@@ -162,10 +162,10 @@ export function AiStudioModal({
             </div>
             <div>
               <h2 className="text-base font-bold font-mono uppercase tracking-wider text-optic-white flex items-center gap-2">
-                <span>AI MCQ Generation Studio</span>
+                <span>Create Questions with AI</span>
               </h2>
               <p className="text-xs text-text-muted-slate">
-                Syllabus-aligned item generation with server-side PDF slicing &amp; Rapid Review Deck
+                Generate multiple-choice questions directly from your textbooks
               </p>
             </div>
           </div>
@@ -182,7 +182,7 @@ export function AiStudioModal({
                     : 'text-text-muted-slate hover:text-optic-white'
                 }`}
               >
-                Generation Setup
+                1. Settings
               </button>
               <button
                 type="button"
@@ -194,7 +194,7 @@ export function AiStudioModal({
                     : 'text-text-muted-slate hover:text-optic-white'
                 }`}
               >
-                Review Deck ({stagedQuestions.length})
+                2. Review Questions ({stagedQuestions.length})
               </button>
             </div>
 
@@ -234,7 +234,7 @@ export function AiStudioModal({
                   <div className="flex items-center gap-2 text-team-b-cyan">
                     <RefreshCw className="w-4 h-4" />
                     <span>
-                      You have <strong>{stagedQuestions.length} uncommitted questions</strong> from a previous session preserved in local memory.
+                      You have <strong>{stagedQuestions.length} questions</strong> waiting for review.
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -243,14 +243,14 @@ export function AiStudioModal({
                       onClick={() => clearSession()}
                       className="px-2.5 py-1 rounded bg-surface-interactive hover:bg-white/10 text-text-muted-slate hover:text-state-warning-rose font-mono text-[11px]"
                     >
-                      Discard Them
+                      Clear Them
                     </button>
                     <button
                       type="button"
                       onClick={() => setActiveTab('REVIEW')}
                       className="px-3 py-1 rounded bg-team-b-cyan text-surface-obsidian font-mono font-bold text-[11px]"
                     >
-                      Open Review Deck ➔
+                      Review Questions ➔
                     </button>
                   </div>
                 </div>
@@ -262,7 +262,7 @@ export function AiStudioModal({
                   <div className="flex items-center gap-2">
                     <BookOpen className="w-4 h-4 text-team-b-cyan" />
                     <label className="text-xs font-mono font-bold uppercase tracking-wider text-optic-white">
-                      Source Textbook (Books Bank)
+                      Select Textbook:
                     </label>
                   </div>
                   <button
@@ -271,7 +271,7 @@ export function AiStudioModal({
                     className="text-xs text-team-b-cyan hover:underline font-mono flex items-center gap-1 cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
-                    <span>Upload New Book to Books Bank</span>
+                    <span>Upload New Book</span>
                   </button>
                 </div>
 
@@ -310,7 +310,7 @@ export function AiStudioModal({
 
                     {selectedBook && selectedBook.subject_tags && selectedBook.subject_tags.length > 0 && (
                       <div className="flex items-center gap-1.5 flex-wrap pt-1 text-[11px] text-text-muted-slate">
-                        <span className="font-mono">Textbook Tags:</span>
+                        <span className="font-mono">Tags:</span>
                         {selectedBook.subject_tags.map((tag, i) => (
                           <span
                             key={i}
@@ -325,12 +325,12 @@ export function AiStudioModal({
                 )}
               </div>
 
-              {/* 2. Page Slicing Verification & Canvas Preview */}
+              {/* 2. Page Range Selector */}
               {selectedBook && (
                 <div className="p-4 rounded-xl bg-surface-onyx border border-white/10 space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-mono font-bold uppercase tracking-wider text-optic-white">
-                      Page Slicing &amp; Range Selector
+                      Pages to Read from Book:
                     </span>
                     <span className="text-xs text-team-b-cyan font-mono font-bold">
                       {config.endPage - config.startPage + 1} Pages Selected
@@ -402,20 +402,20 @@ export function AiStudioModal({
                 <div className="flex items-center gap-2">
                   <Settings2 className="w-4 h-4 text-team-a-bright" />
                   <span className="text-xs font-mono font-bold uppercase tracking-wider text-optic-white">
-                    Generation Tuning
+                    Question Settings
                   </span>
                 </div>
 
                 {/* Topic Prompt */}
                 <div className="space-y-1">
                   <label className="text-xs font-mono text-text-muted-slate">
-                    Specific Syllabus Sub-Topic or Focus (Optional):
+                    Topic or Focus Area (Optional):
                   </label>
                   <input
                     type="text"
                     value={config.topicPrompt}
                     onChange={(e) => setConfig({ topicPrompt: e.target.value })}
-                    placeholder="e.g. Projectile Motion, Trajectory Equations, Air Resistance effects"
+                    placeholder="e.g. Projectile Motion, Laws of Motion, Work and Energy"
                     className="w-full bg-surface-carbon border border-white/15 rounded-lg px-3 py-2 text-xs text-optic-white placeholder-text-muted-slate focus:outline-none focus:border-team-a-core"
                   />
                 </div>
@@ -424,7 +424,7 @@ export function AiStudioModal({
                   {/* Count */}
                   <div className="space-y-1">
                     <label className="text-xs font-mono text-text-muted-slate">
-                      Questions Count ({config.count} MCQs):
+                      Number of Questions:
                     </label>
                     <select
                       value={config.count}
@@ -441,34 +441,34 @@ export function AiStudioModal({
                   {/* Difficulty */}
                   <div className="space-y-1">
                     <label className="text-xs font-mono text-text-muted-slate">
-                      Difficulty Bias:
+                      Difficulty Level:
                     </label>
                     <select
                       value={config.difficultyBias}
                       onChange={(e) => setConfig({ difficultyBias: e.target.value as any })}
                       className="w-full bg-surface-carbon border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-optic-white focus:outline-none focus:border-team-a-core"
                     >
-                      <option value="BALANCED">BALANCED (Mixed)</option>
-                      <option value="EASY">EASY (Foundational)</option>
-                      <option value="MEDIUM">MEDIUM (Standard Board)</option>
-                      <option value="HARD">HARD (Competitive / Advanced)</option>
+                      <option value="BALANCED">Mixed (Balanced)</option>
+                      <option value="EASY">Easy (Foundational)</option>
+                      <option value="MEDIUM">Medium (Standard)</option>
+                      <option value="HARD">Hard (Advanced)</option>
                     </select>
                   </div>
 
                   {/* Cognitive */}
                   <div className="space-y-1">
                     <label className="text-xs font-mono text-text-muted-slate">
-                      Cognitive Focus:
+                      Question Type:
                     </label>
                     <select
                       value={config.cognitiveBias}
                       onChange={(e) => setConfig({ cognitiveBias: e.target.value as any })}
                       className="w-full bg-surface-carbon border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-optic-white focus:outline-none focus:border-team-a-core"
                     >
-                      <option value="MIXED">MIXED (General Balance)</option>
-                      <option value="KNOWLEDGE">KNOWLEDGE (Recall &amp; SI Units)</option>
-                      <option value="CONCEPTUAL">CONCEPTUAL (Laws &amp; Principles)</option>
-                      <option value="APPLICATION">APPLICATION (Formulas &amp; Calculations)</option>
+                      <option value="MIXED">Mixed Balance</option>
+                      <option value="KNOWLEDGE">Facts &amp; Definitions</option>
+                      <option value="CONCEPTUAL">Concepts &amp; Principles</option>
+                      <option value="APPLICATION">Formulas &amp; Math</option>
                     </select>
                   </div>
                 </div>
@@ -492,12 +492,12 @@ export function AiStudioModal({
                   {isGenerating ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Slicing PDF &amp; Generating {config.count} MCQs...</span>
+                      <span>Reading Book &amp; Generating {config.count} Questions...</span>
                     </>
                   ) : (
                     <>
                       <Sparkles className="w-4 h-4" />
-                      <span>Generate {config.count} MCQs with AI</span>
+                      <span>Generate {config.count} Questions with AI</span>
                     </>
                   )}
                 </button>
@@ -508,7 +508,7 @@ export function AiStudioModal({
             <RapidReviewDeck
               subjects={subjects}
               chapters={chapters}
-              onCommitSuccess={handleCommitDone}
+              onSaveSuccess={handleSaveDone}
             />
           )}
         </div>

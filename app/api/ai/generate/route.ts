@@ -237,7 +237,7 @@ Output strictly valid JSON matching this exact structure:
             difficulty,
             cognitive_type: cognitiveType,
             explanation: q.explanation ? String(q.explanation) : null,
-            reviewStatus: 'INBOX' as const,
+            reviewStatus: 'PENDING' as const,
           };
         });
 

@@ -45,7 +45,7 @@ export function ReviewCardEditMode({ question, index }: ReviewCardEditModeProps)
     >
       <div className="flex items-center justify-between border-b border-white/10 pb-3">
         <span className="text-xs font-mono font-bold text-optic-white">
-          Editing Card #{index + 1}
+          Editing Question #{index + 1}
         </span>
         <div className="flex items-center gap-2">
           <button
@@ -69,7 +69,7 @@ export function ReviewCardEditMode({ question, index }: ReviewCardEditModeProps)
       {/* Prompt Field */}
       <div className="space-y-1">
         <label className="text-[10px] font-mono uppercase tracking-wider font-bold text-text-muted-slate">
-          Question Stem (wrap math in $...$):
+          Question Text (use $ for math formulas):
         </label>
         <textarea
           rows={3}
@@ -83,7 +83,7 @@ export function ReviewCardEditMode({ question, index }: ReviewCardEditModeProps)
       {/* 4 Options & Correct Radio Selection */}
       <div className="space-y-2">
         <label className="text-[10px] font-mono uppercase tracking-wider font-bold text-text-muted-slate block">
-          Options &amp; Correct Answer:
+          Options (click a letter to mark correct answer):
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           {options.map((opt, optIdx) => {
@@ -125,7 +125,7 @@ export function ReviewCardEditMode({ question, index }: ReviewCardEditModeProps)
         </div>
       </div>
 
-      {/* Metadata Selectors: Difficulty & Cognitive Type */}
+      {/* Metadata Selectors: Difficulty & Question Type */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
         <div className="space-y-1">
           <label className="text-[10px] font-mono uppercase font-bold text-text-muted-slate">
@@ -144,16 +144,16 @@ export function ReviewCardEditMode({ question, index }: ReviewCardEditModeProps)
 
         <div className="space-y-1">
           <label className="text-[10px] font-mono uppercase font-bold text-text-muted-slate">
-            Cognitive Type:
+            Question Type:
           </label>
           <select
             value={cognitiveType}
             onChange={(e) => setCognitiveType(e.target.value as CognitiveType)}
             className="w-full bg-surface-obsidian border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-optic-white focus:outline-none focus:border-team-a-core"
           >
-            <option value="KNOWLEDGE">KNOWLEDGE (Recall / Definitions)</option>
-            <option value="CONCEPTUAL">CONCEPTUAL (Principles / Reasoning)</option>
-            <option value="APPLICATION">APPLICATION (Numerical / Problems)</option>
+            <option value="KNOWLEDGE">Facts &amp; Definitions</option>
+            <option value="CONCEPTUAL">Concepts &amp; Principles</option>
+            <option value="APPLICATION">Formulas &amp; Math</option>
           </select>
         </div>
       </div>
@@ -161,13 +161,13 @@ export function ReviewCardEditMode({ question, index }: ReviewCardEditModeProps)
       {/* Explanation */}
       <div className="space-y-1 pt-1">
         <label className="text-[10px] font-mono uppercase tracking-wider font-bold text-text-muted-slate">
-          Pedagogical Explanation:
+          Explanation / Reason (Optional):
         </label>
         <textarea
           rows={2}
           value={explanation}
           onChange={(e) => setExplanation(e.target.value)}
-          placeholder="Step-by-step formula or reasoning proof..."
+          placeholder="Explanation for why this option is correct..."
           className="w-full bg-surface-obsidian border border-white/15 rounded-lg p-2.5 text-xs text-optic-white focus:outline-none focus:border-team-a-core font-sans"
         />
       </div>

@@ -54,8 +54,11 @@ Update this file after every completed feature. Any AI agent reading this should
 - [x] 18 Server-Side PDF Slicing & Google Gemini AI Pipeline (`/api/ai/generate`, `pdf-lib`, `gemini-3.6-flash` + fallbacks)
 - [x] 19 Visual Page Range Preview & Inspection Modal (`components/studio/PdfPagePreviewCard.tsx`, PDF.js CDN)
 - [x] 20 Resilient Local Storage Staging Deck (`lib/store/useAiStudioStore.ts`, `localStorage` vault)
-- [x] 21 Rapid Review Deck, KaTeX Math Support & Batch Database Commit (`ReviewCard`, `ReviewCardEditMode`, `StudioStickyFooter`, `MathRenderer`)
-- [x] 22 Books Bank Shelf Modal & Question Bank UI Integration (`components/books/BooksBankModal.tsx`, `/question-bank` triggers)
+- [x] 21 Rapid Review Deck, KaTeX Math Support & Batch Database Save (`ReviewCard`, `ReviewCardEditMode`, `StudioStickyFooter`, `MathRenderer`)
+- [x] 22 Dedicated Books Bank Route (`/books-bank`: search, tag filters, textbook cards, direct PDF viewer, AI Studio launch)
+- [x] 23 Anti-Hallucination & Quality Linter (`lib/utils/linter.ts`: catches duplicate options, broken LaTeX math syntax, out-of-range keys)
+- [x] 24 Plain English Wording & Bulk Actions (`Accept All`, `Reject All`, `Save to Question Bank` with zero technical jargon)
+- [x] 25 Schema Invariant Guarantee (strictly saves `{ text, options, correct_index }` to DB without bloat)
 
 ---
 

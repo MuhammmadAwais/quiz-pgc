@@ -5,6 +5,7 @@ import {
   Check,
   CheckCheck,
   X,
+  XCircle,
   Edit2,
   ChevronLeft,
   ChevronRight,
@@ -21,12 +22,14 @@ import { StudioStickyFooter } from './StudioStickyFooter';
 interface RapidReviewDeckProps {
   subjects: Subject[];
   chapters: Chapter[];
-  onCommitSuccess: () => void;
+  onSaveSuccess?: () => void;
+  onCommitSuccess?: () => void;
 }
 
 export function RapidReviewDeck({
   subjects,
   chapters,
+  onSaveSuccess,
   onCommitSuccess,
 }: RapidReviewDeckProps) {
   const {
@@ -35,15 +38,16 @@ export function RapidReviewDeck({
     setActiveCardIndex,
     editingQuestionId,
     setEditingQuestionId,
-    approveQuestion,
-    approveAll,
-    discardQuestion,
+    acceptQuestion,
+    acceptAll,
+    rejectQuestion,
+    rejectAll,
     resetQuestion,
   } = useAiStudioStore();
 
   const activeQuestion = stagedQuestions[activeCardIndex];
 
-  // Keyboard Shortcuts: Enter = Approve, Backspace = Discard, E = Edit, Arrows = Nav
+  // Keyboard Shortcuts: Enter = Accept, Backspace = Reject, E = Edit, Arrows = Nav
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
@@ -61,10 +65,10 @@ export function RapidReviewDeck({
 
       if (e.key === 'Enter') {
         e.preventDefault();
-        approveQuestion(activeQuestion.id);
+        acceptQuestion(activeQuestion.id);
       } else if (e.key === 'Backspace' || e.key === 'Delete') {
         e.preventDefault();
-        discardQuestion(activeQuestion.id);
+        rejectQuestion(activeQuestion.id);
       } else if (e.key.toLowerCase() === 'e') {
         e.preventDefault();
         setEditingQuestionId(activeQuestion.id);
@@ -83,8 +87,8 @@ export function RapidReviewDeck({
     activeQuestion,
     activeCardIndex,
     editingQuestionId,
-    approveQuestion,
-    discardQuestion,
+    acceptQuestion,
+    rejectQuestion,
     setActiveCardIndex,
     setEditingQuestionId,
   ]);
@@ -101,23 +105,23 @@ export function RapidReviewDeck({
           </div>
           <div>
             <h2 className="text-sm font-bold font-mono uppercase tracking-wider text-optic-white">
-              Review Generated MCQs ({stagedQuestions.length})
+              Review Generated Questions ({stagedQuestions.length})
             </h2>
             <p className="text-xs text-text-muted-slate font-sans">
-              Review each card, tweak if needed, and approve to commit into the database.
+              Accept good questions, reject or edit any that look off, then save them to your Question Bank.
             </p>
           </div>
         </div>
 
-        {/* Shortcuts & Approve All CTA */}
-        <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-          <div className="hidden md:flex items-center gap-2 text-[11px] text-text-muted-slate font-mono">
+        {/* Shortcuts & Bulk Accept/Reject Actions */}
+        <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end flex-wrap">
+          <div className="hidden md:flex items-center gap-2 text-[11px] text-text-muted-slate font-mono mr-1">
             <span>Shortcuts:</span>
             <span className="px-1.5 py-0.5 rounded bg-surface-interactive text-text-bright-slate font-bold">
-              ↵ Approve
+              ↵ Accept
             </span>
             <span className="px-1.5 py-0.5 rounded bg-surface-interactive text-text-bright-slate font-bold">
-              ⌫ Discard
+              ⌫ Reject
             </span>
             <span className="px-1.5 py-0.5 rounded bg-surface-interactive text-text-bright-slate font-bold">
               E Edit
@@ -126,12 +130,22 @@ export function RapidReviewDeck({
 
           <button
             type="button"
-            onClick={approveAll}
-            className="px-4 py-2 rounded-xl bg-state-success/15 hover:bg-state-success/25 border border-state-success/30 text-state-success text-xs font-bold font-mono uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer hover:scale-[1.02]"
-            title="Approve all questions at once"
+            onClick={rejectAll}
+            className="px-3.5 py-2 rounded-xl bg-state-warning-rose/15 hover:bg-state-warning-rose/25 border border-state-warning-rose/30 text-state-warning-rose text-xs font-bold font-mono uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
+            title="Reject all questions in this batch"
+          >
+            <XCircle className="w-4 h-4" />
+            <span>Reject All</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={acceptAll}
+            className="px-4 py-2 rounded-xl bg-state-success/15 hover:bg-state-success/25 border border-state-success/30 text-state-success text-xs font-bold font-mono uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02]"
+            title="Accept all questions at once"
           >
             <CheckCheck className="w-4 h-4" />
-            <span>Approve All ({stagedQuestions.length})</span>
+            <span>Accept All ({stagedQuestions.length})</span>
           </button>
         </div>
       </div>
@@ -167,7 +181,7 @@ export function RapidReviewDeck({
                     className="px-3 py-2 rounded-xl bg-surface-interactive hover:bg-white/10 disabled:opacity-40 text-xs font-semibold text-optic-white flex items-center gap-1 transition-all cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />
-                    <span>Prev</span>
+                    <span>Previous</span>
                   </button>
 
                   <span className="text-xs font-mono font-bold text-text-muted-slate px-1">
@@ -185,14 +199,14 @@ export function RapidReviewDeck({
                   </button>
                 </div>
 
-                {/* Status Toggles: Reset, Discard, Edit, Approve */}
+                {/* Status Toggles: Reset, Reject, Edit, Accept */}
                 <div className="flex items-center gap-2 flex-wrap">
-                  {activeQuestion.reviewStatus !== 'INBOX' && (
+                  {activeQuestion.reviewStatus !== 'PENDING' && (
                     <button
                       type="button"
                       onClick={() => resetQuestion(activeQuestion.id)}
                       className="px-3 py-2 rounded-xl bg-surface-interactive hover:bg-white/10 text-xs font-semibold text-text-muted-slate hover:text-optic-white flex items-center gap-1 transition-colors cursor-pointer"
-                      title="Reset status back to Inbox"
+                      title="Reset status back to Needs Review"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
                       <span>Reset</span>
@@ -201,11 +215,11 @@ export function RapidReviewDeck({
 
                   <button
                     type="button"
-                    onClick={() => discardQuestion(activeQuestion.id)}
+                    onClick={() => rejectQuestion(activeQuestion.id)}
                     className="px-3.5 py-2 rounded-xl bg-state-warning-rose/15 hover:bg-state-warning-rose/25 border border-state-warning-rose/30 text-state-warning-rose text-xs font-bold font-mono uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
                   >
                     <X className="w-4 h-4" />
-                    <span>Discard (⌫)</span>
+                    <span>Reject (⌫)</span>
                   </button>
 
                   <button
@@ -219,17 +233,17 @@ export function RapidReviewDeck({
                   >
                     <Edit2 className="w-3.5 h-3.5 text-team-b-cyan" />
                     <span>
-                      {editingQuestionId === activeQuestion.id ? 'Close' : 'Edit (E)'}
+                      {editingQuestionId === activeQuestion.id ? 'Close Edit' : 'Edit (E)'}
                     </span>
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => approveQuestion(activeQuestion.id)}
+                    onClick={() => acceptQuestion(activeQuestion.id)}
                     className="px-5 py-2 rounded-xl bg-state-success hover:bg-state-success/90 text-surface-obsidian text-xs font-bold font-mono uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-state-success/20 transition-all cursor-pointer hover:scale-[1.02]"
                   >
                     <Check className="w-4 h-4 stroke-[3]" />
-                    <span>Approve &amp; Next (↵)</span>
+                    <span>Accept &amp; Next (↵)</span>
                   </button>
                 </div>
               </div>
@@ -238,11 +252,11 @@ export function RapidReviewDeck({
         </div>
       </div>
 
-      {/* Sticky Bottom Commitment Footer */}
+      {/* Sticky Bottom Save Footer */}
       <StudioStickyFooter
         subjects={subjects}
         chapters={chapters}
-        onCommitSuccess={onCommitSuccess}
+        onSaveSuccess={onSaveSuccess || onCommitSuccess || (() => {})}
       />
     </section>
   );

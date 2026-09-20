@@ -69,6 +69,7 @@ export async function createBookRecord(data: {
   }
 
   revalidatePath('/question-bank');
+  revalidatePath('/books-bank');
   return {
     success: true,
     book: {
@@ -115,24 +116,26 @@ export async function deleteBook(
   }
 
   revalidatePath('/question-bank');
+  revalidatePath('/books-bank');
   return { success: true };
 }
 
-export async function commitApprovedQuestions(
+export async function saveAcceptedQuestions(
   subjectId: string,
   chapterId: string,
   questions: StagedQuestion[]
 ): Promise<{ success: boolean; insertedCount: number; error?: string }> {
   if (!subjectId || !chapterId) {
-    return { success: false, insertedCount: 0, error: 'Target Subject and Chapter must be selected.' };
+    return { success: false, insertedCount: 0, error: 'Please select both a Subject and a Topic.' };
   }
 
-  const approved = questions.filter((q) => q.reviewStatus === 'APPROVED');
-  if (approved.length === 0) {
-    return { success: false, insertedCount: 0, error: 'No approved questions to commit.' };
+  const accepted = questions.filter((q) => q.reviewStatus === 'ACCEPTED');
+  if (accepted.length === 0) {
+    return { success: false, insertedCount: 0, error: 'Please accept at least one question before saving.' };
   }
 
-  const rows = approved.map((q) => ({
+  // Only store text, options, and correct_index into questions table
+  const rows = accepted.map((q) => ({
     subject_id: subjectId,
     chapter_id: chapterId,
     text: q.prompt.trim(),
@@ -144,12 +147,17 @@ export async function commitApprovedQuestions(
   const { error } = await supabase.from('questions').insert(rows);
 
   if (error) {
-    console.error('Error committing questions batch:', error);
+    console.error('Error saving questions:', error);
     return { success: false, insertedCount: 0, error: error.message };
   }
 
   revalidatePath('/question-bank');
+  revalidatePath('/books-bank');
   revalidatePath('/match-setup');
   revalidatePath('/dashboard');
-  return { success: true, insertedCount: approved.length };
+  return { success: true, insertedCount: accepted.length };
 }
+
+// Alias for backward compatibility
+export const commitApprovedQuestions = saveAcceptedQuestions;
+

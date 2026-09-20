@@ -1,26 +1,28 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { StagedQuestion, StudioConfig, ReviewStatus } from '@/lib/types/studio';
+import { lintQuestion } from '@/lib/utils/linter';
 
 interface AiStudioStoreState {
   // Configuration
   config: StudioConfig;
   setConfig: (patch: Partial<StudioConfig>) => void;
 
-  // Staging Deck
+  // Question Review State
   stagedQuestions: StagedQuestion[];
   activeCardIndex: number;
   editingQuestionId: string | null;
 
-  // Lifecycle & Status
+  // Generation Lifecycle
   isGenerating: boolean;
   error: string | null;
 
-  // Actions
+  // Simple Action Verbs
   setStagedQuestions: (questions: StagedQuestion[]) => void;
-  approveQuestion: (id: string) => void;
-  approveAll: () => void;
-  discardQuestion: (id: string) => void;
+  acceptQuestion: (id: string) => void;
+  acceptAll: () => void;
+  rejectQuestion: (id: string) => void;
+  rejectAll: () => void;
   resetQuestion: (id: string) => void;
   updateQuestion: (id: string, patch: Partial<StagedQuestion>) => void;
   setActiveCardIndex: (index: number) => void;
@@ -59,18 +61,28 @@ export const useAiStudioStore = create<AiStudioStoreState>()(
       },
 
       setStagedQuestions: (questions) => {
+        // Run quality linter on every question
+        const linted = questions.map((q) => {
+          const report = lintQuestion(q.prompt, q.options, q.correct_option_index);
+          return {
+            ...q,
+            reviewStatus: 'PENDING' as ReviewStatus,
+            warnings: report.warnings,
+          };
+        });
+
         set({
-          stagedQuestions: questions,
+          stagedQuestions: linted,
           activeCardIndex: 0,
           editingQuestionId: null,
           error: null,
         });
       },
 
-      approveQuestion: (id) => {
+      acceptQuestion: (id) => {
         set((state) => {
           const updated = state.stagedQuestions.map((q) =>
-            q.id === id ? { ...q, reviewStatus: 'APPROVED' as ReviewStatus } : q
+            q.id === id ? { ...q, reviewStatus: 'ACCEPTED' as ReviewStatus } : q
           );
           const nextIndex = Math.min(state.activeCardIndex + 1, updated.length - 1);
           return {
@@ -81,19 +93,19 @@ export const useAiStudioStore = create<AiStudioStoreState>()(
         });
       },
 
-      approveAll: () => {
+      acceptAll: () => {
         set((state) => ({
           stagedQuestions: state.stagedQuestions.map((q) => ({
             ...q,
-            reviewStatus: 'APPROVED' as ReviewStatus,
+            reviewStatus: 'ACCEPTED' as ReviewStatus,
           })),
         }));
       },
 
-      discardQuestion: (id) => {
+      rejectQuestion: (id) => {
         set((state) => {
           const updated = state.stagedQuestions.map((q) =>
-            q.id === id ? { ...q, reviewStatus: 'DISCARDED' as ReviewStatus } : q
+            q.id === id ? { ...q, reviewStatus: 'REJECTED' as ReviewStatus } : q
           );
           const nextIndex = Math.min(state.activeCardIndex + 1, updated.length - 1);
           return {
@@ -102,21 +114,33 @@ export const useAiStudioStore = create<AiStudioStoreState>()(
             editingQuestionId: null,
           };
         });
+      },
+
+      rejectAll: () => {
+        set((state) => ({
+          stagedQuestions: state.stagedQuestions.map((q) => ({
+            ...q,
+            reviewStatus: 'REJECTED' as ReviewStatus,
+          })),
+        }));
       },
 
       resetQuestion: (id) => {
         set((state) => ({
           stagedQuestions: state.stagedQuestions.map((q) =>
-            q.id === id ? { ...q, reviewStatus: 'INBOX' as ReviewStatus } : q
+            q.id === id ? { ...q, reviewStatus: 'PENDING' as ReviewStatus } : q
           ),
         }));
       },
 
       updateQuestion: (id, patch) => {
         set((state) => ({
-          stagedQuestions: state.stagedQuestions.map((q) =>
-            q.id === id ? { ...q, ...patch } : q
-          ),
+          stagedQuestions: state.stagedQuestions.map((q) => {
+            if (q.id !== id) return q;
+            const merged = { ...q, ...patch };
+            const report = lintQuestion(merged.prompt, merged.options, merged.correct_option_index);
+            return { ...merged, warnings: report.warnings };
+          }),
           editingQuestionId: null,
         }));
       },

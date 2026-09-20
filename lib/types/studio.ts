@@ -1,6 +1,6 @@
 export type Difficulty = 'EASY' | 'MEDIUM' | 'HARD';
 export type CognitiveType = 'KNOWLEDGE' | 'CONCEPTUAL' | 'APPLICATION';
-export type ReviewStatus = 'INBOX' | 'APPROVED' | 'DISCARDED';
+export type ReviewStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED';
 
 export interface StagedQuestion {
   id: string;
@@ -11,6 +11,7 @@ export interface StagedQuestion {
   cognitive_type: CognitiveType;
   explanation: string | null;
   reviewStatus: ReviewStatus;
+  warnings?: string[];
 }
 
 export interface StudioConfig {

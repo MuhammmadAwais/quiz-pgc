@@ -30,3 +30,91 @@ After building any component — run `/imprint` to record the component name, fi
 | `StageHeader` | `components/live-match/StageHeader.tsx` | `border-b border-white/10 pb-6 px-10` | Active subject, round, and turn display |
 | `MysteryBoxGrid` | `components/live-match/MysteryBoxGrid.tsx` | `border-2 bg-surface-carbon hover:border-white/40 rounded-xl h-36` | Sudden-death mystery boxes |
 | `WinnerCelebration` | `components/live-match/WinnerCelebration.tsx` | `bg-surface-carbon border border-white/20 rounded-2xl shadow-modal-dialog p-8 md:p-12` | Grand victory podium with confetti VFX |
+| `BooksBankPage` | `app/books-bank/page.tsx` | `bg-surface-obsidian text-optic-white border-border-subtle rounded-2xl p-5 hover:border-team-b-cyan/50` | Digital textbook repository page |
+| `AiStudioModal` | `components/studio/AiStudioModal.tsx` | `bg-surface-carbon border-border-medium rounded-2xl shadow-2xl max-w-5xl` | AI question generator studio modal |
+| `RapidReviewDeck` | `components/studio/RapidReviewDeck.tsx` | `bg-surface-onyx border-white/10 rounded-2xl p-4 gap-5` | High-speed plain-English question review surface |
+| `ReviewCard` | `components/studio/ReviewCard.tsx` | `bg-surface-carbon border-border-medium rounded-2xl p-6 2x2 grid` | Single question inspection card with LaTeX math |
+| `StudioStickyFooter` | `components/studio/StudioStickyFooter.tsx` | `bg-surface-onyx/95 border-t border-white/10 backdrop-blur-xl p-4 shadow-2xl` | Bottom sticky action bar with plain-English save |
+
+---
+
+### BooksBankPage
+File: `app/books-bank/page.tsx`
+Last updated: 2026-09-21
+
+| Property | Class |
+|---|---|
+| Background | `bg-surface-obsidian` (page), `bg-surface-onyx` (top bar), `bg-surface-carbon` (cards) |
+| Border | `border-border-subtle`, `border-white/10`, `border-team-b-cyan/50` (hover) |
+| Border radius | `rounded-2xl` (book cards), `rounded-full` (tag pills) |
+| Text — primary | `text-optic-white` |
+| Text — secondary | `text-text-muted-slate`, `text-text-bright-slate` |
+| Spacing | `p-4 sm:p-6` (page), `p-5` (cards), `gap-5` (shelf grid) |
+| Hover state | `hover:border-team-b-cyan/50 hover:scale-[1.02]` |
+| Shadow | `shadow-lg`, `shadow-team-b-cyan/20` |
+| Accent usage | `text-team-b-cyan`, `bg-team-b-cyan` |
+
+**Pattern notes:**
+Dedicated repository view for curriculum textbooks. Uses 3-column responsive grid with tag filter pills, file metadata badges, and direct PDF proxy preview link.
+
+---
+
+### RapidReviewDeck
+File: `components/studio/RapidReviewDeck.tsx`
+Last updated: 2026-09-21
+
+| Property | Class |
+|---|---|
+| Background | `bg-surface-onyx` (top banner & quick action controls) |
+| Border | `border-white/10`, `border-state-warning-rose/30`, `border-state-success/30` |
+| Border radius | `rounded-2xl` |
+| Text — primary | `text-optic-white` |
+| Text — secondary | `text-text-muted-slate`, `text-text-bright-slate` |
+| Spacing | `p-4` (banner), `space-y-4` (vertical rhythm) |
+| Hover state | `hover:scale-[1.02]`, `hover:bg-state-success/90`, `hover:bg-state-warning-rose/25` |
+| Accent usage | `bg-state-success` (Accept All), `bg-state-warning-rose/15` (Reject All) |
+
+**Pattern notes:**
+Designed for non-technical users and teachers. Uses intuitive Plain-English actions ("Accept", "Reject", "Edit", "Reset") and bulk actions ("Accept All", "Reject All") with matching keyboard hotkeys (`Enter`, `Backspace`, `E`).
+
+---
+
+### ReviewCard
+File: `components/studio/ReviewCard.tsx`
+Last updated: 2026-09-21
+
+| Property | Class |
+|---|---|
+| Background | `bg-surface-carbon` (card), `bg-surface-onyx` (options), `bg-state-success/15` (correct option) |
+| Border | `border-border-medium` (card), `border-white/10` (option), `border-state-success/50 ring-1 ring-state-success/30` (correct option) |
+| Border radius | `rounded-2xl` (card), `rounded-xl` (option tiles) |
+| Text — primary | `text-optic-white` |
+| Text — secondary | `text-text-muted-slate`, `text-text-bright-slate` |
+| Spacing | `p-5 sm:p-6` (card padding), `gap-2.5` (2x2 landscape option grid) |
+| Hover state | `hover:text-team-b-cyan` |
+| Accent usage | `text-state-success` (correct check), `text-state-warning-rose` (quality notice alert) |
+
+**Pattern notes:**
+2x2 landscape option layout for maximum vertical density. Includes integrated KaTeX math rendering and automated quality check notice alert.
+
+---
+
+### StudioStickyFooter
+File: `components/studio/StudioStickyFooter.tsx`
+Last updated: 2026-09-21
+
+| Property | Class |
+|---|---|
+| Background | `bg-surface-onyx/95 backdrop-blur-xl` |
+| Border | `border-t border-white/10` |
+| Border radius | `rounded-xl` (action buttons), `rounded-lg` (dropdowns) |
+| Text — primary | `text-optic-white`, `text-state-success` (accepted count), `text-state-warning-rose` (rejected count) |
+| Text — secondary | `text-text-muted-slate` |
+| Spacing | `p-4 mt-6`, `gap-4` |
+| Hover state | `hover:scale-[1.02]`, `hover:bg-state-success/90` |
+| Shadow | `shadow-2xl`, `shadow-state-success/20` |
+| Accent usage | `bg-state-success` (Save Accepted to Question Bank CTA) |
+
+**Pattern notes:**
+Sticky footer pinned to the bottom of the review modal. Provides counters for review state, target Subject/Topic selectors, and single primary button saving only `{ subject_id, chapter_id, text, options, correct_index }` to the database.
+

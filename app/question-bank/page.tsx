@@ -1,8 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useTransition } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   BookOpen,
+  Library,
   Layers,
   HelpCircle,
   Plus,
@@ -18,7 +21,6 @@ import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Badge } from '@/components/ui/Badge';
 import { QuestionModal } from '@/components/question-bank/QuestionModal';
-import { BooksBankModal } from '@/components/books/BooksBankModal';
 import { AiStudioModal } from '@/components/studio/AiStudioModal';
 import { MathRenderer } from '@/components/ui/MathRenderer';
 import { Subject, Chapter, Question } from '@/lib/types/tournament';
@@ -41,6 +43,7 @@ import {
 } from '@/lib/actions/questions';
 
 export default function QuestionBankPage() {
+  const router = useRouter();
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -61,7 +64,6 @@ export default function QuestionBankPage() {
 
   // Books Bank & AI Studio state
   const [books, setBooks] = useState<Book[]>([]);
-  const [isBooksBankOpen, setIsBooksBankOpen] = useState(false);
   const [isAiStudioOpen, setIsAiStudioOpen] = useState(false);
   const [selectedBookForAi, setSelectedBookForAi] = useState<Book | null>(null);
 
@@ -199,16 +201,17 @@ export default function QuestionBankPage() {
           </div>
 
           <div className="flex items-center gap-2.5 flex-wrap">
-            {/* Books Bank Trigger */}
-            <Button
-              variant="console"
-              size="sm"
-              onClick={() => setIsBooksBankOpen(true)}
-              className="flex items-center gap-1.5"
-            >
-              <BookOpen className="w-4 h-4 text-team-b-cyan" />
-              <span>Books Bank ({books.length})</span>
-            </Button>
+            {/* Books Bank Dedicated Page Link */}
+            <Link href="/books-bank">
+              <Button
+                variant="console"
+                size="sm"
+                className="flex items-center gap-1.5"
+              >
+                <Library className="w-4 h-4 text-team-b-cyan" />
+                <span>Books Bank ({books.length})</span>
+              </Button>
+            </Link>
 
             {/* AI Generator Trigger */}
             <Button
@@ -627,18 +630,6 @@ export default function QuestionBankPage() {
         onSuccess={loadData}
       />
 
-      {/* Books Bank Modal */}
-      <BooksBankModal
-        isOpen={isBooksBankOpen}
-        onClose={() => setIsBooksBankOpen(false)}
-        books={books}
-        onRefreshBooks={refreshBooks}
-        onSelectBookForAi={(book) => {
-          setSelectedBookForAi(book);
-          setIsAiStudioOpen(true);
-        }}
-      />
-
       {/* AI Studio Modal */}
       <AiStudioModal
         isOpen={isAiStudioOpen}
@@ -649,7 +640,7 @@ export default function QuestionBankPage() {
         initialBookId={selectedBookForAi?.id}
         onOpenBooksBank={() => {
           setIsAiStudioOpen(false);
-          setIsBooksBankOpen(true);
+          router.push('/books-bank');
         }}
         onSuccess={loadData}
       />

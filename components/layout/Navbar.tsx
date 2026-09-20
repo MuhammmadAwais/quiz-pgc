@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Swords, BookOpen, LayoutDashboard, Settings, LogOut } from 'lucide-react';
+import { Swords, BookOpen, Library, LayoutDashboard, Settings, LogOut } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 export function Navbar() {
@@ -18,6 +18,7 @@ export function Navbar() {
   const navItems = [
     { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { label: 'Question Bank', href: '/question-bank', icon: BookOpen },
+    { label: 'Books Bank', href: '/books-bank', icon: Library },
     { label: 'New Match', href: '/match-setup', icon: Swords },
     { label: 'Settings', href: '/settings', icon: Settings },
   ];
