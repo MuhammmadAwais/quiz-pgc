@@ -6,54 +6,58 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ## Current Status
 
-**Phase:**
-**Last completed:**
-**Next:**
+**Phase:** Phase 0 — Planning & Context Configuration  
+**Last completed:** Context files & agent rules alignment for PGC Arena  
+**Next:** User confirmation on architecture, tech stack & flow; then Phase 1 implementation  
 
 ---
 
 ## Progress
 
-### Phase 1 — Foundation
+### Phase 1 — Foundation, Schema & Tokens
 
-- [ ] 01 Homepage
-- [ ] 02 Auth
-- [ ] 03 PostHog Initialization
-- [ ] 04 Database Schema
+- [ ] 01 Supabase Schema & MCP Migration
+- [ ] 02 Dependencies & Environment Setup (`@supabase/ssr`, `zustand`, `lucide-react`, `canvas-confetti`)
+- [ ] 03 Theme Tokens & Root Layout (`globals.css`, `layout.tsx`, `Navbar.tsx`)
 
-### Phase 2 — Profile Page
+### Phase 2 — Authentication & Settings
 
-- [ ] 05 Profile Page — Full UI
-- [ ] 06 Profile Save Logic
-- [ ] 07 AI Profile Extraction from Resume
-- [ ] 08 Resume PDF Generation from Profile
+- [ ] 04 Admin Authentication (`/` login page, Supabase Auth, middleware protection)
+- [ ] 05 Settings Page (`/settings`, password change, tournament defaults, data seeder)
 
-### Phase 3 — Find Jobs Page
+### Phase 3 — Question Bank (Three-Pane Console)
 
-- [ ] 09 Find Jobs Page — Full UI
-- [ ] 10 Adzuna Job Discovery
-- [ ] 11 Filter + Sort + Pagination
+- [ ] 06 Three-Pane Hierarchy UI (`/question-bank`: Subjects, Chapters/Topics, Questions)
+- [ ] 07 MCQ Editor Modal & Seeder (Create, edit, delete MCQs + sample questions seeder)
 
-### Phase 4 — Job Details Page
+### Phase 4 — Match Setup & Pool Validator
 
-- [ ] 12 Job Details Page — Full UI
-- [ ] 13 Company Research Agent
+- [ ] 08 Match Setup Interface (`/match-setup`: teams, subjects, question count, points, toggle)
+- [ ] 09 Real-time Question Pool Validator & Launch Action
 
-### Phase 5 — Dashboard
+### Phase 5 — Live Match Projector Arena (Zero-Network Live Loop)
 
-- [ ] 14 Dashboard Page — Full UI
-- [ ] 15 Stats Bar — Real Data
-- [ ] 16 Recent Activity — Real Data
-- [ ] 17 Analytics Charts — PostHog Data
+- [ ] 10 Projector Stage Arena Layout (`/live-match` 16:9 fullscreen, 2.5rem margins, podiums)
+- [ ] 11 Turn Matrix & Option Interaction (Reveal, answer select, Ice Cyan / Rose-Pink feedback)
+- [ ] 12 Fail-Safe Undo & Stage Controls (Zustand snapshot stack, 1-step undo)
+- [ ] 13 Sudden-Death Tie-Breaker ("Super Over" Mystery Box Grid)
+
+### Phase 6 — Victory Celebration, Persistence & Dashboard
+
+- [ ] 14 Winner Celebration & Single Batch Commit (`contests` + `contest_questions` atomic insert)
+- [ ] 15 Dashboard Overview & Contest History (`/dashboard` metrics & past match ledger)
 
 ---
 
 ## Decisions Made During Build
 
-_Add decisions here as they are made during implementation._
+- Using Supabase MCP server (`srkeqfibxaalkruubwlq`) for schema creation and migration execution.
+- Using Zustand for the Zero-Network Live Loop client store to guarantee 0ms latency and stage resilience.
+- Strictly following Electric Obsidian Arena design system: Zero standard green, red, or yellow.
 
 ---
 
 ## Notes
 
-_Add notes here as the build progresses — workarounds, patterns, anything that differs from the context files._
+- Live match must execute 100% offline in client browser memory once questions are loaded.
+- Single database write at match completion.

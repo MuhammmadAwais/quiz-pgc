@@ -2,240 +2,184 @@
 
 ## About the Project
 
-JobPilot is a full stack AI-powered job hunting assistant. The user sets up their profile once, uploads their resume, and the agent automatically discovers relevant jobs from Adzuna — scoring each one against the user's profile using GPT-4o. For jobs they're interested in, the agent researches the company across their public web pages and builds a structured dossier — company overview, tech stack, culture, why the role exists, and interview prep. The user reviews everything and applies with one click.
+**PGC Arena** is a full-stack, live-event quiz tournament application built specifically for college auditorium projector displays and live stage competitions. The application allows an administrator to manage a hierarchical question bank (Subjects > Chapters/Topics > MCQs), configure tournament match parameters, conduct matches in real time via a laptop connected to a 1080p/4K projector via HDMI, and review historical match results.
 
-The entire process is tracked on a dashboard with PostHog-powered analytics and a recent activity feed.
+To guarantee zero latency and eliminate any risk of college Wi-Fi or auditorium network interruptions during live events, PGC Arena uses a **"Zero-Network Live Loop"** architecture. Once questions are fetched at match launch, the entire competition—including alternating turns, question reveals, option selections, score evaluations, multi-step undo history, and sudden-death tie-breakers—runs 100% offline in client browser memory (via Zustand). The database is queried once to initiate the match and written to once when the match concludes.
 
 ---
 
 ## The Problem It Solves
 
-Job hunting is one of the most repetitive and time-consuming tasks a developer faces. Reading dozens of job descriptions, deciding if a role fits, researching each company from scratch — all of this before even clicking apply.
+Hosting live academic quiz competitions traditionally involves chaotic whiteboard scorekeeping, manual question tracking, dispute-prone turn calculations, and awkward pauses while operators verify answers. Furthermore, standard web-based quiz tools that rely on continuous client-server network requests frequently freeze or lag under spotty campus Wi-Fi, ruining stage pacing.
 
-JobPilot eliminates all of that preparation work. The agent finds the jobs, scores them intelligently against the user's actual skills, and researches each company so the user arrives at every application fully informed. The user just decides which ones to apply to and clicks.
+PGC Arena solves this by:
+1. Fully automating the alternating turn state machine without manual operator math.
+2. Providing a projector-safe, high-candela broadcast interface visible clearly from 30+ feet.
+3. Running the active match in an offline client loop (0ms latency, resilient to total network loss).
+4. Enforcing an append-only database question ledger to prevent question repetition across contests.
+5. Providing an instant, fail-safe "Undo" button to reverse accidental misclicks on stage without breaking turn order.
 
 ---
 
-## Pages
+## Pages & Routes
 
-```
-/                  → Homepage
-/login             → Auth page (Google + GitHub OAuth)
-/dashboard         → Overview, recent activity, analytics
-/find-jobs         → Search controls + full jobs list
-/find-jobs/[id]    → Individual job details page + company research
-/profile           → Profile form, resume management
+```text
+/                  → Auth page (Single Admin Login via Supabase Auth)
+/dashboard         → Tournament overview, global statistics, and contest history ledger
+/question-bank     → Three-pane UI for Subjects, Chapters/Topics, and MCQ management
+/match-setup       → Match configuration console (Teams, Subjects, Questions count, Pool verification)
+/live-match        → The projector-optimized live stage presentation arena (Full screen 16:9)
+/settings          → Administrator account settings, security, and tournament defaults
 ```
 
 ---
 
 ## Navigation
 
-Top navbar. Clean and minimal. Three navigation items:
+Top navbar designed for dark obsidian theme with subtle glow and clear route indicators:
 
-```
-Dashboard    Find Jobs    Profile
+```text
+PGC ARENA    Dashboard    Question Bank    New Match    Settings    [Logout]
 ```
 
-Full width layout on all pages. No sidebar.
+- Full-width layout across all administrative pages.
+- `/live-match` features a distraction-free, projector-optimized mode with full-screen focus, collapsible admin control drawer, and spectator safety margins.
 
 ---
 
-## Core User Flow
+## Core User Flows
 
-### Homepage
+### 1. Authentication
+- Administrator logs in with master credentials via Supabase Auth.
+- On login → redirects to `/dashboard`.
+- Protected route middleware redirects unauthenticated users to `/`.
 
-- Hero section
-- Logged in users → redirect to dashboard
-- Logged out users → redirect to login
+### 2. Question Bank Management
+- Administrator navigates to `/question-bank`.
+- **Three-Pane Hierarchy:**
+  1. **Subjects Pane:** Add, rename, delete Subjects (e.g., Computer Science, Physics, Mathematics, General Knowledge).
+  2. **Chapters / Topics Pane:** Add, edit, delete Chapters/Topics filtered by selected Subject.
+  3. **MCQs Pane:** Filter questions by Subject & Chapter. Modal or drawer to create/edit MCQs:
+     - Question Text
+     - 4 Options (Option A, B, C, D)
+     - Correct Option Index (0 to 3)
+     - Real-time preview of how the question card will appear on the projector
 
-### Onboarding
+### 3. Match Setup
+- Administrator navigates to `/match-setup`.
+- Inputs `Team A Name` (e.g., "Alpha Squad") and `Team B Name` (e.g., "Omega Minds").
+- Selects one or multiple `Subjects` via multi-select selector.
+- Sets `MCQs per Subject` (e.g., 5 questions per subject).
+- Sets `Points per MCQ` (e.g., 10 points).
+- Toggles `Include Used Questions` (Default: OFF. When OFF, questions recorded in `contest_questions` are excluded).
+- UI calculates and displays a real-time count of eligible questions in the selected pool.
+- Validates that sufficient questions exist (at least `MCQs per Subject * Number of Subjects` questions available).
+- Clicks `Start Match`.
 
-- User signs up via InsForge auth (Google or GitHub OAuth)
-- On login → redirect to /dashboard
-- Dashboard shows incomplete profile banner if profile not finished
+### 4. The Live Match (Zero-Network Live Loop)
+- The app fetches the question pool from Supabase, applies client-side Fisher-Yates shuffle, initializes the Zustand tournament store, and navigates to `/live-match`.
+- **Display Architecture:**
+  - High-contrast 12-column stage layout: Team A pod (left), Central Arena (subject, round, turn indicator), Team B pod (right).
+  - Optics: Optic white and bright slate text on obsidian canvas, Electric Violet for Team A, Bright Cyan for Team B, Ice Cyan for correct, Luminous Rose-Pink for misses.
+- **Turn Matrix:**
+  - Board announces active turn: *"Team A's Turn — Subject: Physics"*.
+  - Operator clicks "Reveal Question". Question prompt and 4 options appear with crisp animation.
+  - Team A answers verbally on stage. Operator clicks the option Team A chose.
+  - **Scoring & Resolution:**
+    - Correct: Selected option pulses Ice Cyan (`#22D3EE`), score immediately increments, celebratory visual chime.
+    - Miss: Option pulses Rose-Pink (`#E11D48`), correct answer is revealed, score receives 0 points (no negative marking).
+  - State machine transitions to Team B's turn automatically.
+  - Cycles back and forth until the subject's question quota is fulfilled, then advances to the next subject.
+- **Fail-Safe Undo:**
+  - An unobtrusive "Undo" button allows the operator to pop the local state back exactly one step if an option was clicked by mistake, restoring the exact previous turn, revealed state, and score.
 
-### Profile Setup
+### 5. Sudden-Death Tie-Breaker ("Super Over")
+- If all configured questions have been played and scores are tied:
+  - System initiates Tie-Breaker mode automatically.
+  - Projector renders a dramatic grid of "Mystery Boxes".
+  - Teams alternate selecting a mystery box.
+  - Clicking an unrevealed box pulls an unused question from a random subject.
+  - Sudden-death rules apply until the tie is broken.
 
-- User fills profile form — all standard resume fields
-- User uploads their existing resume PDF
-- Two options on upload:
-  - "Extract from Resume" → GPT-4o parses resume and auto-fills profile form fields
-  - "Skip" → resume stored as-is, profile unchanged
-- User can manually edit any profile field at any time
-- User can generate a clean professional PDF resume from their current profile data using GPT-4o
+### 6. Match Conclusion & Persistence
+- When all rounds finish (or sudden-death resolves a winner):
+  - Projector transitions to a Grand Winner Celebration screen with high-energy confetti VFX, winner podium, and final statistics.
+  - **The Single Batch Commit:** In the background, the client executes a single batch mutation to Supabase:
+    1. Records the contest into `contests` (`team_a_name`, `team_b_name`, `team_a_score`, `team_b_score`, `winner_name`, `status`).
+    2. Inserts all question IDs revealed during the match into `contest_questions`.
+  - Operator can return to `/dashboard` or launch a new match.
 
-### Finding Jobs — Adzuna Discovery
-
-- User goes to Find Jobs page
-- Enters job title and location
-- Clicks Find Jobs button
-- Agent calls Adzuna API with user's search criteria
-- GPT-4o scores each job 0-100 against user profile
-- Jobs appear in the job list below
-- After search completes a message shows: "Found 8 jobs and saved 4 strong matches"
-
-### Job Matching
-
-- GPT-4o scores each job 0-100 against user profile
-- Returns: score, match reason, matched skills array, missing skills array
-- All jobs visible in Find Jobs page regardless of score
-- High scoring jobs visually highlighted
-- Low scoring jobs still accessible — user decides what to do
-
-### Job Details Page
-
-- Full structured job information:
-  - Title, company, location, salary, job type, source, date found
-  - About the role
-  - Responsibilities (bullet points)
-  - Requirements (bullet points)
-  - Nice to have (if present)
-  - Benefits (if present)
-  - About the company
-- Match score section:
-  - Score number prominently displayed
-  - Visual score indicator
-  - Matched skills — green tags
-  - Missing skills — red tags
-  - Match reason paragraph from GPT-4o
-- Company Research section:
-  - Empty state with Research Company button
-  - After research: structured dossier showing company overview, tech stack, culture, why this role exists, interview prep talking points
-  - Powered by Browserbase + Stagehand browsing the company's public pages
-- Apply Now button — opens external apply URL in new tab
-
-### Company Research Flow
-
-- User clicks Research Company on job details page
-- Single Browserbase session opens with Stagehand
-- Agent navigates to company homepage — extracts overview, nav links, tech mentions
-- Agent visits About, Blog, Engineering pages if they exist
-- GPT-4o synthesizes all extracted content into structured dossier
-- Dossier displayed on job details page
-- If company site cannot be found — GPT-4o generates best dossier from company name and job description alone
-
-### Dashboard
-
-- Stats bar — 4 cards: Total Jobs Found, Avg. Match Rate, Companies Researched, Jobs This Week
-- Recent activity — list of last 5-10 user actions pulled from DB
-- Analytics section (PostHog powered):
-  - Jobs found over time — line chart
-  - Match score distribution — bar chart
-  - Company research activity — bar chart
-
-### Find Jobs Page
-
-- Search controls at top:
-  - Job title input
-  - Location input
-  - Find Jobs button
-  - Success message after search: "Found 8 jobs and saved 4 strong matches"
-- Full paginated job list below:
-  - Filter: All Matches / High Match / Low Match dropdown
-  - Sort dropdown: Match Score / Newest / Oldest
-  - Each job row: company, title, match score badge, salary, source badge, date found
-  - Click job row → opens job details page
-  - Pagination — 20 jobs per page
-  - "Jobs by Adzuna" credit displayed on job listings
+### 7. Account Settings
+- Administrator navigates to `/settings`.
+- Update admin credentials (email / password change via Supabase Auth).
+- Configure tournament defaults (default points per question, default questions per subject).
+- Data management (summary of total questions, subjects, contests, and export/reset utilities).
 
 ---
 
 ## Data Architecture
 
-### Main Profile Data
+### Supabase Tables (PostgreSQL)
 
-- Lives in `profiles` table
-- Only changes when user explicitly edits profile page or uploads resume and selects "Extract from Resume"
-- Used for job matching
-- Never modified by any agent operation
+- **`subjects`**:
+  - `id` (uuid, PK, default `gen_random_uuid()`)
+  - `name` (text, not null)
+  - `created_at` (timestamptz, default `now()`)
 
-### Company Research Data
+- **`chapters`**:
+  - `id` (uuid, PK, default `gen_random_uuid()`)
+  - `subject_id` (uuid, FK -> `subjects.id` ON DELETE CASCADE)
+  - `name` (text, not null)
+  - `created_at` (timestamptz, default `now()`)
 
-- Stored in `jobs.company_research` jsonb column
-- Generated per job when user clicks Research Company
-- Never affects profile data or match score
+- **`questions`**:
+  - `id` (uuid, PK, default `gen_random_uuid()`)
+  - `subject_id` (uuid, FK -> `subjects.id` ON DELETE CASCADE)
+  - `chapter_id` (uuid, FK -> `chapters.id` ON DELETE CASCADE)
+  - `text` (text, not null)
+  - `options` (jsonb, array of 4 strings, not null)
+  - `correct_index` (integer 0-3, not null)
+  - `created_at` (timestamptz, default `now()`)
+
+- **`contests`**:
+  - `id` (uuid, PK, default `gen_random_uuid()`)
+  - `team_a_name` (text, not null)
+  - `team_b_name` (text, not null)
+  - `team_a_score` (integer, not null, default 0)
+  - `team_b_score` (integer, not null, default 0)
+  - `winner_name` (text, nullable)
+  - `status` (text, default `'completed'`)
+  - `created_at` (timestamptz, default `now()`)
+
+- **`contest_questions`** (Append-only historical ledger):
+  - `id` (uuid, PK, default `gen_random_uuid()`)
+  - `contest_id` (uuid, FK -> `contests.id` ON DELETE CASCADE)
+  - `question_id` (uuid, FK -> `questions.id` ON DELETE CASCADE)
+  - `created_at` (timestamptz, default `now()`)
 
 ---
 
 ## Features In Scope
 
-- Homepage with hero, how it works, features, footer
-- Top navbar — Dashboard, Find Jobs, Profile
-- InsForge authentication (Google + GitHub OAuth)
-- Redirect to dashboard after login
-- Profile form with all standard resume fields
-- Resume PDF upload with optional profile auto-fill via GPT-4o
-- Resume PDF generation from profile data using GPT-4o
-- Adzuna API job discovery — searches by title and location, category filtered to IT jobs
-- GPT-4o job matching with score, reason, matched skills, missing skills
-- Job details page with full structured description
-- Company Research Agent — single Browserbase session browses company public pages, GPT-4o builds dossier
-- Find Jobs page with search controls, filter, sort dropdown, pagination
-- Dashboard with stats bar, recent activity, analytics charts
-- PostHog event tracking throughout
-- PostHog analytics charts on dashboard
-- Incomplete profile banner on dashboard
-- "Jobs by Adzuna" credit on all job listings
+- Single Admin authentication via Supabase Auth.
+- Full CRUD for Subjects, Chapters/Topics, and Questions.
+- Interactive question pool validator preventing invalid match starts.
+- "Include Used Questions" exclusion ledger toggle.
+- Client-side Fisher-Yates randomization.
+- Zero-Network Live Loop with deterministic turn machine.
+- Projector-first 16:9 UI with 30-foot stage readability.
+- Instant 1-step undo capability.
+- "Super Over" mystery box sudden-death tie-breaker.
+- Confetti celebration and victory presentation.
+- Single atomic batch-commit persistence to Supabase.
+- Dashboard with past contest ledger and stats.
+- Settings page for account preferences.
 
 ---
 
 ## Features Out of Scope
 
-- Auto apply — agent does not fill or submit application forms
-- URL input for manual job import
-- Cover letter generation
-- Resume tailoring per job
-- Score recalculation after tailoring
-- Previous Job + Next Job navigation
-- Sidebar navigation — top navbar only
-- Separate analytics page — charts live on dashboard
-- Live browser embed on dashboard
-- Live agent feed / realtime log
-- Job-specific profile form on job details page
-- Dismiss job feature
-- Email or push notifications
-- Mobile app
-- Team or multi-user accounts
-- Scheduled agent runs — manually triggered only
-- Multiple saved resume versions — one active resume per user at a time
-- Payment or subscription system
-- Browser extension
-
----
-
-## PostHog Events
-
-```typescript
-job_search_started; // { userId, jobTitle, location }
-job_found; // { userId, source, matchScore }
-profile_completed; // { userId }
-company_researched; // { userId, jobId, company }
-```
-
----
-
-## Target User
-
-A developer or technical job seeker who:
-
-- Is actively applying to jobs
-- Has an existing resume they want to use
-- Wants intelligent job matching based on their actual skills
-- Wants to research companies quickly before applying
-- Is comfortable with a modern web application
-
----
-
-## Success Criteria
-
-- User can sign up, fill profile, upload resume, and start finding jobs in under 5 minutes
-- Adzuna job discovery returns relevant tech jobs for any title and location search
-- GPT-4o match scores feel accurate and the reasoning makes sense
-- Company Research Agent returns a useful dossier for well-known tech companies
-- Company Research Agent gracefully handles companies with minimal web presence
-- Job details page displays clean structured job information
-- Dashboard analytics charts show meaningful data after several searches
-- All job data stored correctly in InsForge with full structured fields
-- PostHog events fire correctly for all key user actions
-- UI is visually consistent across all pages
+- Student self-registration or multi-tenant user accounts.
+- WebSocket live spectator broadcast / mobile buzzers (single operator control model).
+- Negative marking or question bounce to opposing team.
+- Multimedia questions (audio, video) — text MCQs only for MVP.

@@ -1,198 +1,97 @@
 # UI Rules
 
-Concise rules for building JobPilot UI. Design assets are available — use them as the source of truth for visual decisions. These rules cover the most important patterns and constraints to keep the UI consistent without over-specifying every detail.
+Concise rules for building the **PGC Arena** interface. Strictly follow the **Electric Obsidian Arena** specification (`DESIGN.md`).
 
 ---
 
-## Font
+## Typography Pairing
 
-Always import Inter via `next/font/google` in the root layout.
+1. **Inter (`font-sans`)**: Reserved for:
+   - Page navigation and brand headers
+   - Question prompts and option text
+   - Form inputs, modal copy, and settings controls
+   - Section subheadings
 
-```typescript
-import { Inter } from "next/font/google";
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
-```
+2. **JetBrains Mono (`font-mono`)**: Strictly enforced for:
+   - Live score boards (`tabular-nums`, 72px desktop / 44px mobile)
+   - Round timers and countdown clocks
+   - Telemetry tags, chips, and question counters (`Q 03 / 10`)
+   - Option indicators (`[A]`, `[B]`, `[C]`, `[D]`)
 
-The `--font-sans` variable is already declared in `@theme` in globals.css. Apply the font variable class to the `<html>` tag in root layout. Never use system fonts as the primary font.
-
----
-
-## Layout
-
-- Page max-width: 1440px, centered
-- Main content area padding: 32px on all sides
-- Gap between page sections: 24px
-- Header height: 64px, full width, white background, padding 0 24px
-- All pages use top navbar only — no sidebar, no drawer
-
----
-
-## Navbar
-
-Three nav items: Dashboard, Find Jobs, Profile.
-
-- Active item: `color: #7C5CFC`, font-weight 500, 14px
-- Inactive item: `color: #4A5565`, font-weight 500, 14px
-- No underline — active state is color change only
-- Navbar always white background, full viewport width
-
----
-
-## Cards
-
-Every content section lives in a card.
-
-```
-background: #FFFFFF
-border: 1px solid #E7EAF3
-border-radius: 16px
-padding: 24px
-box-shadow: 0px 1px 3px rgba(0,0,0,0.1), 0px 1px 2px -1px rgba(0,0,0,0.1)
-```
-
-Never use colored card backgrounds — always white. Color goes inside cards via badges, bars, and text, never on the card surface itself.
-
----
-
-## Typography Hierarchy
-
-Three levels used consistently throughout:
-
-**Section headings** — card titles, page section titles
-
-```
-font-size: 16px
-font-weight: 600
-color: #101828
-line-height: 24px
-```
-
-**Body / primary content text**
-
-```
-font-size: 14px
-font-weight: 500
-color: #101828
-line-height: 20px
-```
-
-**Secondary / muted text** — labels, timestamps, subtitles
-
-```
-font-size: 12px
-font-weight: 400
-color: #99A1AF
-line-height: 16px
-```
-
-Stat numbers on dashboard use 30px / weight 600 / color #101828.
-
----
-
-## Badges
-
-All badges use `border-radius: 9999px` (pill shape) unless specified otherwise.
-
-```
-padding: 2px 8px
-font-size: 12px
-font-weight: 500
-```
-
-Trend badges on stat cards use `border-radius: 4px` (not pill) with `#ECFDF5` background and `#009966` text.
-
----
-
-## Buttons
-
-**Primary button:**
-
-```
-background: #7C5CFC
-color: #FFFFFF
-border-radius: 8px
-padding: 8px 16px
-font-size: 14px
-font-weight: 500
-```
-
-**Secondary button:**
-
-```
-background: #FFFFFF
-border: 1px solid #E7EAF3
-color: #101828
-border-radius: 8px
-padding: 8px 16px
+```tsx
+// Score Board Example
+<div className="font-mono text-7xl font-extrabold tracking-tight tabular-nums text-optic-white">
+  {score}
+</div>
 ```
 
 ---
 
-## Form Inputs
+## Projector Safety & Layout Constraints
 
-```
-background: #FFFFFF
-border: 1px solid #E7EAF3
-border-radius: 8px
-padding: 8px 12px
-font-size: 14px
-color: #101828
-placeholder color: #99A1AF
-focus: ring-1 ring-accent border-accent
-```
+Live stage projector setups require strict layout and contrast safeguards:
 
----
+1. **2.5rem (40px) Margin Boundary (`p-10` or `px-10 py-8`)**:
+   - Every projector view must respect a 40px perimeter margin to prevent clipping caused by lens overscan or keystone adjustments on stage.
 
-## Table (Jobs List)
+2. **30-Foot Viewing Range Rule**:
+   - Questions must be legible from 30+ feet away under ambient stage lights.
+   - Question prompts: minimum `text-2xl` (24px) or `text-3xl` (30px) with `leading-relaxed font-semibold text-optic-white`.
+   - Option cards: minimum `text-lg` (18px) or `text-xl` (20px) with high contrast.
+   - Scores: `text-6xl` to `text-7xl font-extrabold`.
 
-- No alternating row colors — white rows only, separated by border
-- Row border: `1px solid #E7EAF3` between rows
-- Column headers: uppercase, 12px, font-weight 500, color `#6A7282`
-- Row text: 14px, color `#101828`
-- Hover state: `background: #F9FAFB`
+3. **No Low-Contrast Grays**:
+   - Never use low-contrast text colors (`text-zinc-600`, `text-gray-500`) for meaningful data.
+   - Text colors must be `#FFFFFF` (optic white), `#F1F5F9` (bright slate), or `#E2E8F0` (high contrast).
 
----
-
-## Match Score Bar
-
-Inline progress bar shown next to the percentage number.
-
-```
-height: 4px
-border-radius: 9999px
-background track: #E7EAF3
-```
-
-Fill color by score:
-
-- 80-100%: `#10B981` (green)
-- 60-79%: `#61A8FF` (blue)
-- Below 60%: `#FF8904` (orange)
+4. **Zero Traffic-Light Colors**:
+   - Never use standard green (`#22c55e`), red (`#ef4444`), or yellow (`#eab308`).
+   - Use **Electric Ice Cyan (`#22D3EE`)** for correct answers and score increases.
+   - Use **Luminous Rose-Pink (`#E11D48`)** for misses, timeouts, or errors.
 
 ---
 
-## Empty States
+## Component Visual Rules
 
-Every section that can be empty must have an empty state. Keep it minimal:
+### 1. Structural Cards
+- Background: `bg-surface-carbon` (`#1B1A26`)
+- Border: `border border-white/10`
+- Radius: `rounded-lg` (`0.5rem` / 8px)
+- Padding: `p-6`
 
-- Short descriptive text in `color: #99A1AF`
-- Optional icon above text
-- CTA button if there's a logical next action
+### 2. Live Match Option Cards
+- Grid: 2 columns × 2 rows grid on desktop stage display.
+- Layout: Recessed container with letter badge (`[A]`, `[B]`, `[C]`, `[D]`) in `JetBrains Mono`.
+- Idle State: `bg-surface-carbon border border-white/10 text-bright-slate hover:bg-surface-interactive hover:border-white/25`.
+- Selected Correct State: `border-state-success bg-state-success/10 text-optic-white glow-success`.
+- Selected Miss State: `border-state-warning-rose bg-state-warning-rose/10 text-optic-white glow-miss`.
 
----
+### 3. Team Score Podiums
+- **Team A Pod**:
+  - Border accent: `border-team-a-core/40`
+  - Active turn glow: `glow-team-a`
+  - Name badge: `text-team-a-bright font-mono uppercase tracking-widest`
+  - Score display: Optic white 72px `JetBrains Mono`
+- **Team B Pod**:
+  - Border accent: `border-team-b-cyan/40`
+  - Active turn glow: `glow-team-b`
+  - Name badge: `text-team-b-ice font-mono uppercase tracking-widest`
+  - Score display: Optic white 72px `JetBrains Mono`
 
-## Tailwind v4 Note
+### 4. Interactive Buttons
+- **Team A Action**: `bg-team-a-core hover:bg-team-a-bright text-surface-obsidian font-semibold rounded-md px-5 py-2.5 transition-all`.
+- **Team B Action**: `bg-team-b-cyan hover:bg-team-b-ice text-surface-obsidian font-semibold rounded-md px-5 py-2.5 transition-all`.
+- **Console Trigger (Neutral)**: `bg-surface-carbon border border-white/20 hover:border-white/40 text-optic-white font-medium rounded-md px-4 py-2 transition-all`.
 
-This project uses Tailwind v4. Tokens are defined with `@theme` in globals.css — no `tailwind.config.ts` needed. Never define colors in a config file. Always use `@theme` for new tokens.
+### 5. Chips & Badges
+- Uppercase `font-mono text-xs font-bold tracking-wider rounded px-2.5 py-1 border`.
+- Success: `bg-state-success/15 border-state-success text-state-success`
+- Miss: `bg-state-warning-rose/15 border-state-warning-rose text-state-warning-rose`
+- Team A: `bg-team-a-core/15 border-team-a-core text-team-a-bright`
+- Team B: `bg-team-b-cyan/15 border-team-b-cyan text-team-b-ice`
+- Neutral: `bg-surface-onyx border-white/15 text-text-high-contrast`
 
----
-
-## Do Nots
-
-- Never use Tailwind's built-in color classes (`bg-purple-500`, `text-gray-600`) — use project tokens only
-- Never define colors in `tailwind.config.ts` — use `@theme` in globals.css
-- Never add gradients to card backgrounds
-- Never use more than one font weight in a single UI element
-- Never show raw error messages to users — always show human readable text
-- Never stack more than 2 levels of border radius inside each other
-- Never use `position: fixed` for UI elements — use normal flow layout
+### 6. Sudden-Death Mystery Box
+- 3D-styled carbon box with numeric index in `JetBrains Mono`.
+- Unrevealed: `bg-surface-carbon border-2 border-white/20 hover:border-team-a-bright hover:scale-105 transition-transform cursor-pointer`.
+- Opened: Displays subject tag and reveals the sudden death question prompt.
