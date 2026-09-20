@@ -11,7 +11,6 @@ import {
 } from 'lucide-react';
 import { Subject, Chapter } from '@/lib/types/tournament';
 import { useAiStudioStore } from '@/lib/store/useAiStudioStore';
-import { saveAcceptedQuestions } from '@/lib/actions/books';
 
 interface StudioStickyFooterProps {
   subjects: Subject[];
@@ -57,14 +56,19 @@ export function StudioStickyFooter({
     setError(null);
 
     try {
-      const res = await saveAcceptedQuestions(
-        config.targetSubjectId,
-        config.targetChapterId,
-        stagedQuestions
-      );
+      const response = await fetch('/api/ai/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subjectId: config.targetSubjectId,
+          chapterId: config.targetChapterId,
+          questions: stagedQuestions,
+        }),
+      });
 
-      if (!res.success) {
-        throw new Error(res.error || 'Failed to save questions to database.');
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to save questions to database.');
       }
 
       clearSession();
