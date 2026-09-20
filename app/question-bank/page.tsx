@@ -18,7 +18,12 @@ import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Badge } from '@/components/ui/Badge';
 import { QuestionModal } from '@/components/question-bank/QuestionModal';
+import { BooksBankModal } from '@/components/books/BooksBankModal';
+import { AiStudioModal } from '@/components/studio/AiStudioModal';
+import { MathRenderer } from '@/components/ui/MathRenderer';
 import { Subject, Chapter, Question } from '@/lib/types/tournament';
+import { Book } from '@/lib/types/books';
+import { getBooks } from '@/lib/actions/books';
 import {
   getSubjects,
   createSubject,
@@ -54,17 +59,25 @@ export default function QuestionBankPage() {
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [seedLoading, setSeedLoading] = useState(false);
 
+  // Books Bank & AI Studio state
+  const [books, setBooks] = useState<Book[]>([]);
+  const [isBooksBankOpen, setIsBooksBankOpen] = useState(false);
+  const [isAiStudioOpen, setIsAiStudioOpen] = useState(false);
+  const [selectedBookForAi, setSelectedBookForAi] = useState<Book | null>(null);
+
   const loadData = async () => {
     setLoading(true);
     try {
-      const [subs, chaps, qs] = await Promise.all([
+      const [subs, chaps, qs, bks] = await Promise.all([
         getSubjects(),
         getChapters(),
         getQuestions(),
+        getBooks(),
       ]);
       setSubjects(subs);
       setChapters(chaps);
       setQuestions(qs);
+      setBooks(bks);
 
       if (!selectedSubjectId && subs.length > 0) {
         setSelectedSubjectId(subs[0].id);
@@ -72,6 +85,11 @@ export default function QuestionBankPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const refreshBooks = async () => {
+    const bks = await getBooks();
+    setBooks(bks);
   };
 
   useEffect(() => {
@@ -180,7 +198,32 @@ export default function QuestionBankPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            {/* Books Bank Trigger */}
+            <Button
+              variant="console"
+              size="sm"
+              onClick={() => setIsBooksBankOpen(true)}
+              className="flex items-center gap-1.5"
+            >
+              <BookOpen className="w-4 h-4 text-team-b-cyan" />
+              <span>Books Bank ({books.length})</span>
+            </Button>
+
+            {/* AI Generator Trigger */}
+            <Button
+              variant="team-b"
+              size="sm"
+              onClick={() => {
+                setSelectedBookForAi(null);
+                setIsAiStudioOpen(true);
+              }}
+              className="flex items-center gap-1.5 shadow-sm hover:scale-[1.02] transition-transform"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>Generate with AI</span>
+            </Button>
+
             {questions.length === 0 && (
               <Button
                 variant="team-b"
@@ -435,9 +478,9 @@ export default function QuestionBankPage() {
                         <span className="font-mono text-xs text-team-a-bright font-bold mt-0.5">
                           {String(idx + 1).padStart(2, '0')}.
                         </span>
-                        <p className="text-sm font-medium text-optic-white leading-relaxed">
-                          {q.text}
-                        </p>
+                        <div className="text-sm font-medium text-optic-white leading-relaxed">
+                          <MathRenderer content={q.text} />
+                        </div>
                       </div>
 
                       <div className="flex items-center gap-1 shrink-0">
@@ -479,7 +522,9 @@ export default function QuestionBankPage() {
                             <span className="font-mono font-bold text-[11px] opacity-70">
                               [{letter}]
                             </span>
-                            <span className="truncate">{opt}</span>
+                            <span className="truncate">
+                              <MathRenderer content={opt} inline />
+                            </span>
                             {isCorrect && (
                               <CheckCircle2 className="w-3.5 h-3.5 ml-auto shrink-0" />
                             )}
@@ -579,6 +624,33 @@ export default function QuestionBankPage() {
         selectedSubjectId={selectedSubjectId || undefined}
         selectedChapterId={selectedChapterId || undefined}
         editingQuestion={editingQuestion}
+        onSuccess={loadData}
+      />
+
+      {/* Books Bank Modal */}
+      <BooksBankModal
+        isOpen={isBooksBankOpen}
+        onClose={() => setIsBooksBankOpen(false)}
+        books={books}
+        onRefreshBooks={refreshBooks}
+        onSelectBookForAi={(book) => {
+          setSelectedBookForAi(book);
+          setIsAiStudioOpen(true);
+        }}
+      />
+
+      {/* AI Studio Modal */}
+      <AiStudioModal
+        isOpen={isAiStudioOpen}
+        onClose={() => setIsAiStudioOpen(false)}
+        subjects={subjects}
+        chapters={chapters}
+        books={books}
+        initialBookId={selectedBookForAi?.id}
+        onOpenBooksBank={() => {
+          setIsAiStudioOpen(false);
+          setIsBooksBankOpen(true);
+        }}
         onSuccess={loadData}
       />
     </div>

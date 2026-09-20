@@ -6,9 +6,9 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ## Current Status
 
-**Phase:** Phase 6 — Winner Celebration, Persistence & Dashboard (Complete)  
-**Last completed:** Full-stack build, Zero-Network Live Loop, Supabase schema & MCP integration, 3-Pane Question Bank, Match Setup, Stage Arena, and Dashboard  
-**Next:** User testing and stage rehearsal  
+**Phase:** Phase 7 — Books Bank & AI MCQ Generation Studio (Complete)  
+**Last completed:** Backblaze B2 PDF upload & proxy routes, server-side PDF slicing with pdf-lib, Google Gemini 3.6 Flash pipeline with fallback matrix, Books Bank shelf modal, PDF.js page range preview with inspect zoom modal, persistent Rapid Review Deck with KaTeX math rendering, and 1-click batch commit to database  
+**Next:** User stage testing and textbook upload  
 
 ---
 
@@ -46,6 +46,16 @@ Update this file after every completed feature. Any AI agent reading this should
 
 - [x] 14 Winner Celebration & Single Batch Commit (`contests` + `contest_questions` atomic insert)
 - [x] 15 Dashboard Overview & Contest History (`/dashboard` metrics & past match ledger)
+
+### Phase 7 — Books Bank & AI MCQ Generation Studio
+
+- [x] 16 Backblaze B2 S3 Storage Client & Upload Route (`lib/b2/client.ts`, `/api/library/upload`, `/api/library/proxy`)
+- [x] 17 Books Bank Database Schema & Server Actions (`public.books`, `lib/actions/books.ts`)
+- [x] 18 Server-Side PDF Slicing & Google Gemini AI Pipeline (`/api/ai/generate`, `pdf-lib`, `gemini-3.6-flash` + fallbacks)
+- [x] 19 Visual Page Range Preview & Inspection Modal (`components/studio/PdfPagePreviewCard.tsx`, PDF.js CDN)
+- [x] 20 Resilient Local Storage Staging Deck (`lib/store/useAiStudioStore.ts`, `localStorage` vault)
+- [x] 21 Rapid Review Deck, KaTeX Math Support & Batch Database Commit (`ReviewCard`, `ReviewCardEditMode`, `StudioStickyFooter`, `MathRenderer`)
+- [x] 22 Books Bank Shelf Modal & Question Bank UI Integration (`components/books/BooksBankModal.tsx`, `/question-bank` triggers)
 
 ---
 
