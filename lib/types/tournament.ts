@@ -59,6 +59,7 @@ export interface TurnSnapshot {
   isAnswerSubmitted: boolean;
   isTieBreaker: boolean;
   tieBreakerQuestionIndex: number;
+  selectedMysteryBox?: number | null;
   revealedQuestionIds: string[];
 }
 
@@ -88,6 +89,7 @@ export interface TournamentState {
   revealQuestion: () => void;
   selectOption: (index: number) => void;
   confirmAnswer: () => void;
+  nextTurn: () => void;
   undoLastAction: () => void;
   selectMysteryBox: (boxIndex: number) => void;
   finishMatch: () => void;

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   RotateCcw,
@@ -26,6 +26,11 @@ export default function LiveMatchPage() {
   const router = useRouter();
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [exitModalOpen, setExitModalOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const {
     config,
@@ -50,10 +55,30 @@ export default function LiveMatchPage() {
     revealQuestion,
     selectOption,
     confirmAnswer,
+    nextTurn,
     undoLastAction,
     selectMysteryBox,
     resetMatch,
   } = useTournamentStore();
+
+  // Bulletproof auto-advance: 1800ms after answer confirmation, smoothly advance
+  useEffect(() => {
+    if (isAnswerSubmitted && !isMatchFinished) {
+      const timer = setTimeout(() => {
+        nextTurn();
+      }, 1800);
+      return () => clearTimeout(timer);
+    }
+  }, [isAnswerSubmitted, isMatchFinished, nextTurn]);
+
+  // Loading state during initial client hydration
+  if (!isMounted) {
+    return (
+      <div className="min-h-screen bg-surface-obsidian flex items-center justify-center">
+        <div className="w-10 h-10 border-2 border-team-a-core border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   // If no match initialized, prompt operator to start
   if (!config || subjects.length === 0) {
@@ -85,7 +110,10 @@ export default function LiveMatchPage() {
   let currentQuestion: Question | undefined;
 
   if (isTieBreaker) {
-    currentQuestion = tieBreakerQuestions[tieBreakerQuestionIndex];
+    currentQuestion =
+      tieBreakerQuestions.length > 0
+        ? tieBreakerQuestions[tieBreakerQuestionIndex % tieBreakerQuestions.length]
+        : undefined;
   } else {
     const subjectPool = questionPool[activeSubject?.id] || [];
     currentQuestion = subjectPool[currentQuestionIndex];
@@ -110,7 +138,7 @@ export default function LiveMatchPage() {
   const activeTeamName = isTeamA ? config.teamAName : config.teamBName;
 
   return (
-    <div className="min-h-screen w-full bg-surface-obsidian text-optic-white flex flex-col justify-between projector-safe-margin select-none overflow-hidden relative">
+    <div className="min-h-screen w-full bg-surface-obsidian text-optic-white flex flex-col justify-between projector-safe-margin select-none overflow-y-auto relative py-6 px-4 md:px-8">
       {/* Background ambient lighting */}
       <div
         className={`absolute top-0 left-0 w-96 h-96 rounded-full blur-[140px] pointer-events-none opacity-20 transition-all duration-700 ${
@@ -134,6 +162,27 @@ export default function LiveMatchPage() {
           teamBName={config.teamBName}
           isTieBreaker={isTieBreaker}
         />
+
+        {/* Top Active Turn Advance Status Banner */}
+        {isAnswerSubmitted && (
+          <div className="w-full max-w-4xl mx-auto mt-3 px-6 py-2.5 rounded-xl bg-surface-carbon/90 border border-state-success/40 shadow-[0_0_24px_rgba(34,211,238,0.2)] flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="flex items-center gap-3">
+              <span className="w-2.5 h-2.5 rounded-full bg-state-success animate-ping" />
+              <span className="font-mono text-xs md:text-sm font-bold text-optic-white uppercase tracking-wider">
+                Verbal Answer Recorded • Advancing Turn...
+              </span>
+            </div>
+            <Button
+              variant={isTeamA ? 'team-a' : 'team-b'}
+              size="sm"
+              onClick={nextTurn}
+              className="text-xs font-mono font-bold px-4 py-1"
+            >
+              <span>SKIP (NEXT TURN)</span>
+              <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Main 12-Column Projector Stage Grid */}
@@ -243,6 +292,21 @@ export default function LiveMatchPage() {
                   </Button>
                 </div>
               )}
+
+              {/* Proceed to Next Turn Button (Visible when answer is submitted) */}
+              {isAnswerSubmitted && (
+                <div className="flex justify-center pt-2 animate-in fade-in zoom-in-95 duration-200">
+                  <Button
+                    variant={isTeamA ? 'team-a' : 'team-b'}
+                    size="lg"
+                    onClick={nextTurn}
+                    className="font-bold text-base px-10 shadow-[0_0_24px_rgba(255,255,255,0.25)]"
+                  >
+                    <span>PROCEED TO NEXT TURN</span>
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </div>
+              )}
             </div>
           ) : (
             <div className="text-center p-6 text-text-muted-slate font-mono text-xs">
@@ -277,6 +341,19 @@ export default function LiveMatchPage() {
             <RotateCcw className="w-3.5 h-3.5" />
             <span>UNDO MISCLICK ({historyStack.length})</span>
           </Button>
+
+          {/* Quick Proceed button in control bar */}
+          {isAnswerSubmitted && (
+            <Button
+              variant={isTeamA ? 'team-a' : 'team-b'}
+              size="sm"
+              onClick={nextTurn}
+              className="text-xs font-mono font-bold"
+            >
+              <span>NEXT TURN</span>
+              <ArrowRight className="w-3.5 h-3.5 ml-1" />
+            </Button>
+          )}
 
           {/* Quick Reveal shortcut if hidden */}
           {!isQuestionRevealed && (

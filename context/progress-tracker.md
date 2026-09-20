@@ -55,6 +55,8 @@ Update this file after every completed feature. Any AI agent reading this should
 - Fully implemented the Zero-Network Live Loop in `lib/store/tournament-store.ts` via Zustand. Once a match is launched, 100% of the tournament state runs offline in memory.
 - Strictly implemented Electric Obsidian Arena design system: Zero standard green, red, or yellow. Ice Cyan (`#22D3EE`) for correct answers, Luminous Rose-Pink (`#E11D48`) for misses.
 - Pre-seeded 18 collegiate tournament questions across Computer Science, Physics, and Mathematics.
+- Integrated Zustand `persist` middleware with `localStorage` so in-progress live matches and sudden-death states survive browser refreshes without losing score or round progress.
+- Implemented deterministic 1.8s auto-advance and manual skip triggers for both regular rounds and Super Over sudden-death cycles.
 
 ---
 

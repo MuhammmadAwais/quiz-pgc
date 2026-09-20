@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import {
   TournamentState,
   TournamentConfig,
@@ -17,7 +18,9 @@ function shuffleArray<T>(array: T[]): T[] {
   return result;
 }
 
-export const useTournamentStore = create<TournamentState>((set, get) => ({
+export const useTournamentStore = create<TournamentState>()(
+  persist(
+    (set, get) => ({
   config: null,
   questionPool: {},
   subjects: [],
@@ -57,6 +60,13 @@ export const useTournamentStore = create<TournamentState>((set, get) => ({
       allRemainingQuestions.push(...reserve);
     });
 
+    // Fallback: If no extra questions for reserve, pool all questions across subjects
+    if (allRemainingQuestions.length === 0) {
+      Object.values(shuffledPool).forEach((qs) => {
+        allRemainingQuestions.push(...qs);
+      });
+    }
+
     set({
       config,
       questionPool: shuffledPool,
@@ -87,7 +97,9 @@ export const useTournamentStore = create<TournamentState>((set, get) => ({
     // Determine current active question
     let currentQ: Question | undefined;
     if (state.isTieBreaker) {
-      currentQ = state.tieBreakerQuestions[state.tieBreakerQuestionIndex];
+      if (state.tieBreakerQuestions.length > 0) {
+        currentQ = state.tieBreakerQuestions[state.tieBreakerQuestionIndex % state.tieBreakerQuestions.length];
+      }
     } else {
       const activeSub = state.subjects[state.currentSubjectIndex];
       const subjectPool = state.questionPool[activeSub?.id] || [];
@@ -106,6 +118,7 @@ export const useTournamentStore = create<TournamentState>((set, get) => ({
       isAnswerSubmitted: state.isAnswerSubmitted,
       isTieBreaker: state.isTieBreaker,
       tieBreakerQuestionIndex: state.tieBreakerQuestionIndex,
+      selectedMysteryBox: state.selectedMysteryBox,
       revealedQuestionIds: [...state.revealedQuestionIds],
     };
 
@@ -142,7 +155,9 @@ export const useTournamentStore = create<TournamentState>((set, get) => ({
     // Determine current question to check correctness
     let currentQ: Question | undefined;
     if (state.isTieBreaker) {
-      currentQ = state.tieBreakerQuestions[state.tieBreakerQuestionIndex];
+      if (state.tieBreakerQuestions.length > 0) {
+        currentQ = state.tieBreakerQuestions[state.tieBreakerQuestionIndex % state.tieBreakerQuestions.length];
+      }
     } else {
       const activeSub = state.subjects[state.currentSubjectIndex];
       const subjectPool = state.questionPool[activeSub?.id] || [];
@@ -163,6 +178,7 @@ export const useTournamentStore = create<TournamentState>((set, get) => ({
       isAnswerSubmitted: state.isAnswerSubmitted,
       isTieBreaker: state.isTieBreaker,
       tieBreakerQuestionIndex: state.tieBreakerQuestionIndex,
+      selectedMysteryBox: state.selectedMysteryBox,
       revealedQuestionIds: [...state.revealedQuestionIds],
     };
 
@@ -174,122 +190,117 @@ export const useTournamentStore = create<TournamentState>((set, get) => ({
     const newTeamBScore =
       state.teamTurn === 'TEAM_B' ? state.teamBScore + pointsAwarded : state.teamBScore;
 
-    // Handle Tie-Breaker (Super Over) Sudden Death
+    // Mark answer as submitted and update score
+    set({
+      teamAScore: newTeamAScore,
+      teamBScore: newTeamBScore,
+      isAnswerSubmitted: true,
+      historyStack: [...state.historyStack, snapshot],
+    });
+
+    // Automatically advance after a brief visual reveal on stage (1600ms)
+    // Can also be advanced immediately via nextTurn()
+    setTimeout(() => {
+      const current = get();
+      if (current.isAnswerSubmitted && !current.isMatchFinished) {
+        get().nextTurn();
+      }
+    }, 1600);
+  },
+
+  nextTurn: () => {
+    const state = get();
+    if (!state.config) return;
+
+    // ----------------------------------------------------
+    // CASE 1: TIE-BREAKER (SUPER OVER SUDDEN DEATH)
+    // ----------------------------------------------------
     if (state.isTieBreaker) {
-      // In sudden death, each pair of turns constitutes an over.
       if (state.teamTurn === 'TEAM_A') {
-        // Switch to Team B
+        // Team A just finished. Switch to Team B for their sudden-death question
         set({
-          teamAScore: newTeamAScore,
           teamTurn: 'TEAM_B',
-          isAnswerSubmitted: true,
-          historyStack: [...state.historyStack, snapshot],
+          isQuestionRevealed: false,
+          selectedOptionIndex: null,
+          isAnswerSubmitted: false,
+          selectedMysteryBox: null,
+          tieBreakerQuestionIndex: state.tieBreakerQuestionIndex + 1,
         });
       } else {
-        // Team B just finished turn — check if tie broken
-        if (newTeamAScore !== newTeamBScore) {
-          const winner = newTeamAScore > newTeamBScore ? state.config.teamAName : state.config.teamBName;
+        // Team B just finished. Both teams had their chance this sudden-death over.
+        if (state.teamAScore !== state.teamBScore) {
+          // Tie broken!
+          const winner = state.teamAScore > state.teamBScore ? state.config.teamAName : state.config.teamBName;
           set({
-            teamBScore: newTeamBScore,
-            isAnswerSubmitted: true,
             isMatchFinished: true,
             winnerName: winner,
-            historyStack: [...state.historyStack, snapshot],
           });
         } else {
-          // Still tied, advance tie breaker question
+          // Still tied! Advance to another sudden death round
           set({
-            teamBScore: newTeamBScore,
             teamTurn: 'TEAM_A',
-            isAnswerSubmitted: true,
-            tieBreakerQuestionIndex: state.tieBreakerQuestionIndex + 1,
-            selectedMysteryBox: null,
             isQuestionRevealed: false,
             selectedOptionIndex: null,
-            historyStack: [...state.historyStack, snapshot],
+            isAnswerSubmitted: false,
+            selectedMysteryBox: null,
+            tieBreakerQuestionIndex: state.tieBreakerQuestionIndex + 1,
           });
         }
       }
       return;
     }
 
-    // Normal Round: Alternate turn ping-pong
+    // ----------------------------------------------------
+    // CASE 2: REGULAR TOURNAMENT ROUND
+    // ----------------------------------------------------
     const nextTurn = state.teamTurn === 'TEAM_A' ? 'TEAM_B' : 'TEAM_A';
     const nextQuestionIndex = state.currentQuestionIndex + 1;
 
-    // Check if subject questions limit reached
+    // Check if subject question limit reached
     if (nextQuestionIndex >= state.config.mcqsPerSubject) {
       const nextSubjectIndex = state.currentSubjectIndex + 1;
 
       if (nextSubjectIndex < state.subjects.length) {
-        // Move to next subject
+        // Advance to next subject
         set({
-          teamAScore: newTeamAScore,
-          teamBScore: newTeamBScore,
-          isAnswerSubmitted: true,
-          historyStack: [...state.historyStack, snapshot],
-        });
-
-        // Delay state flip for visual satisfaction on stage
-        setTimeout(() => {
-          set({
-            currentSubjectIndex: nextSubjectIndex,
-            currentQuestionIndex: 0,
-            teamTurn: nextTurn,
-            isQuestionRevealed: false,
-            selectedOptionIndex: null,
-            isAnswerSubmitted: false,
-          });
-        }, 1200);
-      } else {
-        // All subjects exhausted! Check if tied
-        set({
-          teamAScore: newTeamAScore,
-          teamBScore: newTeamBScore,
-          isAnswerSubmitted: true,
-          historyStack: [...state.historyStack, snapshot],
-        });
-
-        setTimeout(() => {
-          if (newTeamAScore === newTeamBScore) {
-            // Sudden death tie breaker
-            set({
-              isTieBreaker: true,
-              teamTurn: 'TEAM_A',
-              isQuestionRevealed: false,
-              selectedOptionIndex: null,
-              isAnswerSubmitted: false,
-              selectedMysteryBox: null,
-            });
-          } else {
-            // Match Won
-            const winner =
-              newTeamAScore > newTeamBScore ? state.config?.teamAName || 'Team A' : state.config?.teamBName || 'Team B';
-            set({
-              isMatchFinished: true,
-              winnerName: winner,
-            });
-          }
-        }, 1200);
-      }
-    } else {
-      // Advance to next question within same subject
-      set({
-        teamAScore: newTeamAScore,
-        teamBScore: newTeamBScore,
-        isAnswerSubmitted: true,
-        historyStack: [...state.historyStack, snapshot],
-      });
-
-      setTimeout(() => {
-        set({
-          currentQuestionIndex: nextQuestionIndex,
+          currentSubjectIndex: nextSubjectIndex,
+          currentQuestionIndex: 0,
           teamTurn: nextTurn,
           isQuestionRevealed: false,
           selectedOptionIndex: null,
           isAnswerSubmitted: false,
         });
-      }, 1200);
+      } else {
+        // All subjects exhausted! Check if score is tied
+        if (state.teamAScore === state.teamBScore) {
+          // Trigger Sudden Death Tie-Breaker
+          set({
+            isTieBreaker: true,
+            teamTurn: 'TEAM_A',
+            isQuestionRevealed: false,
+            selectedOptionIndex: null,
+            isAnswerSubmitted: false,
+            selectedMysteryBox: null,
+            tieBreakerQuestionIndex: 0,
+          });
+        } else {
+          // Match Won
+          const winner = state.teamAScore > state.teamBScore ? state.config.teamAName : state.config.teamBName;
+          set({
+            isMatchFinished: true,
+            winnerName: winner,
+          });
+        }
+      }
+    } else {
+      // Advance to next question within the current subject
+      set({
+        currentQuestionIndex: nextQuestionIndex,
+        teamTurn: nextTurn,
+        isQuestionRevealed: false,
+        selectedOptionIndex: null,
+        isAnswerSubmitted: false,
+      });
     }
   },
 
@@ -316,6 +327,7 @@ export const useTournamentStore = create<TournamentState>((set, get) => ({
       isAnswerSubmitted: previousSnapshot.isAnswerSubmitted,
       isTieBreaker: previousSnapshot.isTieBreaker,
       tieBreakerQuestionIndex: previousSnapshot.tieBreakerQuestionIndex,
+      selectedMysteryBox: previousSnapshot.selectedMysteryBox ?? null,
       revealedQuestionIds: previousSnapshot.revealedQuestionIds,
       isMatchFinished: false,
       winnerName: null,
@@ -365,4 +377,11 @@ export const useTournamentStore = create<TournamentState>((set, get) => ({
       historyStack: [],
     });
   },
-}));
+    }),
+    {
+      name: 'pgc_arena_active_match',
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);
+
