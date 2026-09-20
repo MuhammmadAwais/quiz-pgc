@@ -4,13 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Swords,
-  Layers,
-  Settings2,
-  AlertTriangle,
-  CheckCircle2,
   Play,
   RotateCcw,
   Sparkles,
+  CheckCircle2,
+  AlertCircle,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -28,7 +26,7 @@ export default function MatchSetupPage() {
   const [launching, setLaunching] = useState(false);
   const [seedLoading, setSeedLoading] = useState(false);
 
-  // Active in-progress match detection from persisted store
+  // Active in-progress match detection
   const activeMatch = useTournamentStore((s) => s.config);
   const isMatchFinished = useTournamentStore((s) => s.isMatchFinished);
   const teamAScore = useTournamentStore((s) => s.teamAScore);
@@ -41,7 +39,7 @@ export default function MatchSetupPage() {
   const [selectedSubjectIds, setSelectedSubjectIds] = useState<string[]>([]);
   const [subjectQuestionCounts, setSubjectQuestionCounts] = useState<Record<string, number>>({});
   const [pointsPerMcq, setPointsPerMcq] = useState(10);
-  const [includeUsedQuestions, setIncludeUsedQuestions] = useState(false);
+  const [includeUsedQuestions, setIncludeUsedQuestions] = useState(true);
 
   // Pool Validation State
   const [poolTotal, setPoolTotal] = useState(0);
@@ -55,7 +53,7 @@ export default function MatchSetupPage() {
 
       const defaultCounts: Record<string, number> = {};
       subs.forEach((s) => {
-        defaultCounts[s.id] = 2; // Default 2 MCQs per team
+        defaultCounts[s.id] = 2; // Default 2 questions per team
       });
       setSubjectQuestionCounts(defaultCounts);
 
@@ -107,15 +105,17 @@ export default function MatchSetupPage() {
     });
   };
 
-  // Total required: Sum of (Count per team * 2 teams) for each selected subject
-  const totalRequiredQuestions = selectedSubjectIds.reduce(
-    (sum, id) => sum + (subjectQuestionCounts[id] || 2) * 2,
+  const totalQuestionsPerTeam = selectedSubjectIds.reduce(
+    (sum, id) => sum + (subjectQuestionCounts[id] || 2),
     0
   );
+  const totalMatchQuestions = totalQuestionsPerTeam * 2;
 
   const isPoolSufficient =
     selectedSubjectIds.length > 0 &&
-    selectedSubjectIds.every((id) => (poolBreakdown[id] || 0) >= (subjectQuestionCounts[id] || 2) * 2);
+    selectedSubjectIds.every(
+      (id) => (poolBreakdown[id] || 0) >= (subjectQuestionCounts[id] || 2) * 2
+    );
 
   const handleStartMatch = async () => {
     if (!isPoolSufficient || launching) return;
@@ -135,7 +135,6 @@ export default function MatchSetupPage() {
       const selectedSubjectsList = subjects.filter((s) => selectedSubjectIds.includes(s.id));
       const questionsGrouped = await fetchEligibleQuestions(config);
 
-      // Hydrate offline Zustand Store
       useTournamentStore
         .getState()
         .initializeMatch(config, questionsGrouped, selectedSubjectsList);
@@ -169,302 +168,225 @@ export default function MatchSetupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-obsidian p-6 md:p-10 max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen bg-surface-obsidian p-6 md:p-10 max-w-5xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-surface-carbon border border-white/15 flex items-center justify-center shadow-[0_0_16px_rgba(139,92,246,0.3)]">
-            <Swords className="w-5 h-5 text-team-a-bright" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold font-mono tracking-wide text-optic-white">
-              MATCH SETUP CONSOLE
-            </h1>
-            <p className="text-xs text-text-muted-slate mt-0.5">
-              Configure team factions, per-subject question quotas, and verify pool readiness
-            </p>
-          </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-white/10">
+        <div>
+          <h1 className="text-xl font-bold font-mono tracking-wide text-optic-white">
+            Match Setup
+          </h1>
+          <p className="text-xs text-text-muted-slate mt-0.5">
+            Configure teams, select subjects, and set question quotas
+          </p>
         </div>
 
-        {subjects.length === 0 && (
-          <Button
-            variant="team-b"
-            size="sm"
-            onClick={handleSeedQuick}
-            disabled={seedLoading}
-          >
-            <Sparkles className="w-4 h-4" />
-            <span>{seedLoading ? 'Loading Sample MCQs...' : 'Seed Sample MCQs'}</span>
-          </Button>
-        )}
-      </div>
-
-      {/* Disaster Recovery Banner: Active Match Detected */}
-      {activeMatch && !isMatchFinished && (
-        <div className="p-4 rounded-xl bg-surface-carbon border-2 border-team-a-core/60 shadow-[0_0_24px_rgba(139,92,246,0.25)] flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-in fade-in duration-300">
-          <div className="space-y-1">
-            <span className="font-mono text-xs uppercase font-extrabold text-team-a-bright flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-team-a-core animate-ping" />
-              ACTIVE LIVE TOURNAMENT IN PROGRESS
-            </span>
-            <p className="text-sm font-semibold text-optic-white">
-              {activeMatch.teamAName} ({teamAScore}) vs {activeMatch.teamBName} ({teamBScore})
-            </p>
-            <p className="text-xs text-text-muted-slate">
-              Your stage session is 100% preserved in browser storage. You can jump back into the arena
-              without losing any score or turn progress.
-            </p>
-          </div>
-          <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-3">
+          {subjects.length === 0 && (
             <Button
-              variant="danger"
+              variant="team-b"
               size="sm"
-              onClick={() => {
-                if (confirm('Discard the current active match and start a new setup?')) {
-                  resetMatch();
-                }
-              }}
+              onClick={handleSeedQuick}
+              disabled={seedLoading}
             >
-              Discard Match
+              <Sparkles className="w-4 h-4 mr-1.5" />
+              <span>{seedLoading ? 'Loading...' : 'Seed Sample MCQs'}</span>
             </Button>
+          )}
+
+          {activeMatch && !isMatchFinished && (
             <Button
               variant="team-a"
               size="sm"
               onClick={() => router.push('/live-match')}
-              className="font-bold font-mono"
+              className="font-mono text-xs font-bold"
             >
-              RESUME LIVE MATCH →
+              RESUME ACTIVE MATCH ({teamAScore} - {teamBScore}) →
             </Button>
-          </div>
+          )}
         </div>
-      )}
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column: Match Parameters Form (7 cols) */}
-        <div className="lg:col-span-7 space-y-6">
-          {/* Team Factions */}
-          <Card variant="carbon" className="space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-white/10">
-              <span className="font-mono text-xs font-bold uppercase tracking-wider text-optic-white">
-                Team Faction Designations
-              </span>
-            </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left Column: Form (7 cols) */}
+        <div className="lg:col-span-7 space-y-5">
+          {/* 1. Teams */}
+          <Card variant="carbon" className="p-5 space-y-3">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted-slate block">
+              Teams
+            </span>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-4 rounded-lg bg-surface-onyx border border-team-a-core/30 space-y-2">
-                <span className="text-xs font-mono font-bold text-team-a-bright uppercase tracking-wider flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-team-a-core animate-pulse" />
-                  Team Alpha (Violet)
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <span className="text-[11px] font-mono text-team-a-bright font-semibold flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-team-a-core" />
+                  Team A (Violet)
                 </span>
                 <Input
                   value={teamAName}
                   onChange={(e) => setTeamAName(e.target.value)}
                   placeholder="Team A Name"
-                  className="font-semibold text-optic-white"
+                  className="text-sm font-semibold"
                 />
               </div>
 
-              <div className="p-4 rounded-lg bg-surface-onyx border border-team-b-cyan/30 space-y-2">
-                <span className="text-xs font-mono font-bold text-team-b-ice uppercase tracking-wider flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-team-b-cyan animate-pulse" />
-                  Team Beta (Cyan)
+              <div className="space-y-1.5">
+                <span className="text-[11px] font-mono text-team-b-ice font-semibold flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-team-b-cyan" />
+                  Team B (Cyan)
                 </span>
                 <Input
                   value={teamBName}
                   onChange={(e) => setTeamBName(e.target.value)}
                   placeholder="Team B Name"
-                  className="font-semibold text-optic-white"
+                  className="text-sm font-semibold"
                 />
               </div>
             </div>
           </Card>
 
-          {/* Subject Selection & Custom MCQ Counts Per Team */}
-          <Card variant="carbon" className="space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
-              <span className="font-mono text-xs font-bold uppercase tracking-wider text-optic-white">
-                Tournament Subjects & Per-Team Quotas
+          {/* 2. Subjects & Question Quotas (Clean Unified List) */}
+          <Card variant="carbon" className="p-5 space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-white/10">
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted-slate">
+                Subjects & Questions per Team
               </span>
               <span className="text-[11px] font-mono text-text-muted-slate">
-                Sequential Blocks: Team A finishes subject, then Team B
+                {selectedSubjectIds.length} selected
               </span>
             </div>
 
             {subjects.length === 0 ? (
-              <p className="text-xs text-text-muted-slate p-4 text-center">
-                No subjects found in Question Bank. Click &quot;Seed Sample MCQs&quot; above to get started.
+              <p className="text-xs text-text-muted-slate py-4 text-center">
+                No subjects found in Question Bank. Click &quot;Seed Sample MCQs&quot; above to begin.
               </p>
             ) : (
-              <div className="space-y-3">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {subjects.map((sub) => {
-                    const isSelected = selectedSubjectIds.includes(sub.id);
-                    const availableCount = poolBreakdown[sub.id] || 0;
-                    const countPerTeam = subjectQuestionCounts[sub.id] || 2;
-                    const needed = countPerTeam * 2;
+              <div className="space-y-2">
+                {subjects.map((sub) => {
+                  const isSelected = selectedSubjectIds.includes(sub.id);
+                  const count = subjectQuestionCounts[sub.id] || 2;
+                  const available = poolBreakdown[sub.id] || 0;
+                  const needed = count * 2;
+                  const isShort = isSelected && available < needed;
 
-                    return (
+                  return (
+                    <div
+                      key={sub.id}
+                      className={`p-3 rounded-xl border transition-all flex items-center justify-between gap-3 ${
+                        isSelected
+                          ? 'bg-surface-onyx border-team-a-core/40 shadow-sm'
+                          : 'bg-surface-onyx/40 border-white/5 opacity-60 hover:opacity-100 hover:border-white/15'
+                      }`}
+                    >
+                      {/* Checkbox & Subject info */}
                       <div
-                        key={sub.id}
                         onClick={() => toggleSubject(sub.id)}
-                        className={`p-3 rounded-lg border cursor-pointer transition-all flex items-center justify-between ${
-                          isSelected
-                            ? 'bg-team-a-core/15 border-team-a-core text-optic-white shadow-[0_0_12px_rgba(139,92,246,0.25)]'
-                            : 'bg-surface-onyx border-white/8 hover:bg-surface-interactive text-text-bright-slate'
-                        }`}
+                        className="flex items-center gap-3 cursor-pointer select-none flex-1 min-w-0"
                       >
-                        <div className="flex items-center gap-2.5">
-                          <div
-                            className={`w-4 h-4 rounded border flex items-center justify-center text-[10px] ${
-                              isSelected
-                                ? 'bg-team-a-core border-team-a-core text-surface-obsidian'
-                                : 'border-white/20 bg-surface-carbon'
+                        <div
+                          className={`w-5 h-5 rounded border flex items-center justify-center text-xs shrink-0 transition-colors ${
+                            isSelected
+                              ? 'bg-team-a-core border-team-a-core text-surface-obsidian font-bold'
+                              : 'border-white/20 bg-surface-carbon'
+                          }`}
+                        >
+                          {isSelected && '✓'}
+                        </div>
+                        <div className="min-w-0">
+                          <span className="text-sm font-semibold text-optic-white block truncate">
+                            {sub.name}
+                          </span>
+                          <span
+                            className={`text-[11px] font-mono block ${
+                              isShort ? 'text-state-warning-rose' : 'text-text-muted-slate'
                             }`}
                           >
-                            {isSelected && '✓'}
-                          </div>
-                          <span className="text-xs font-medium">{sub.name}</span>
+                            {available} in bank {isShort && `(need ${needed})`}
+                          </span>
                         </div>
-
-                        <Badge
-                          variant={availableCount >= needed ? 'success' : 'warning'}
-                          className="text-[10px]"
-                        >
-                          {availableCount} eligible
-                        </Badge>
                       </div>
-                    );
-                  })}
-                </div>
 
-                {/* Individual Subject MCQs Steppers */}
-                {selectedSubjectIds.length > 0 && (
-                  <div className="pt-4 border-t border-white/10 space-y-3">
-                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-optic-white block">
-                      Custom MCQs Per Team (Each Team Answers)
-                    </span>
-                    <p className="text-[11px] text-text-muted-slate">
-                      Configure how many questions each team answers for each selected subject. Team A answers their set, followed by Team B.
-                    </p>
-
-                    <div className="space-y-2.5">
-                      {selectedSubjectIds.map((id) => {
-                        const sub = subjects.find((s) => s.id === id);
-                        if (!sub) return null;
-                        const count = subjectQuestionCounts[id] || 2;
-                        const available = poolBreakdown[id] || 0;
-                        const needed = count * 2;
-                        const hasEnough = available >= needed;
-
-                        return (
-                          <div
-                            key={id}
-                            className="p-3 rounded-lg bg-surface-onyx border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                          >
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <span className="font-semibold text-sm text-optic-white">{sub.name}</span>
-                                <Badge variant={hasEnough ? 'success' : 'warning'} className="text-[10px]">
-                                  {hasEnough ? `${available} in pool` : `Shortage: need ${needed - available} more`}
-                                </Badge>
-                              </div>
-                              <span className="text-[11px] font-mono text-text-muted-slate block mt-0.5">
-                                Match needs {needed} distinct MCQs ({count} for {teamAName || 'Team A'}, {count} for {teamBName || 'Team B'})
-                              </span>
-                            </div>
-
-                            <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                              <span className="text-xs font-mono text-text-muted-slate mr-1">Per team:</span>
-                              <button
-                                type="button"
-                                onClick={() => updateSubjectCount(id, -1)}
-                                className="w-7 h-7 rounded bg-surface-interactive border border-white/20 text-optic-white flex items-center justify-center hover:bg-white/20 font-mono text-sm active:scale-95"
-                              >
-                                -
-                              </button>
-                              <span className="w-8 text-center font-mono text-sm font-bold text-optic-white">
-                                {count}
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() => updateSubjectCount(id, 1)}
-                                className="w-7 h-7 rounded bg-surface-interactive border border-white/20 text-optic-white flex items-center justify-center hover:bg-white/20 font-mono text-sm active:scale-95"
-                              >
-                                +
-                              </button>
-                            </div>
+                      {/* Stepper (only shown when selected) */}
+                      {isSelected && (
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className="text-xs font-mono text-text-muted-slate hidden sm:inline">
+                            Per team:
+                          </span>
+                          <div className="flex items-center border border-white/15 rounded-lg bg-surface-carbon overflow-hidden">
+                            <button
+                              type="button"
+                              onClick={() => updateSubjectCount(sub.id, -1)}
+                              className="w-8 h-8 flex items-center justify-center text-text-bright-slate hover:text-optic-white hover:bg-surface-interactive active:scale-95 font-mono text-sm"
+                            >
+                              -
+                            </button>
+                            <span className="w-8 text-center font-mono text-sm font-bold text-optic-white">
+                              {count}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => updateSubjectCount(sub.id, 1)}
+                              className="w-8 h-8 flex items-center justify-center text-text-bright-slate hover:text-optic-white hover:bg-surface-interactive active:scale-95 font-mono text-sm"
+                            >
+                              +
+                            </button>
                           </div>
-                        );
-                      })}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                )}
+                  );
+                })}
               </div>
             )}
           </Card>
 
-          {/* Scoring & History Exclusion Rules */}
-          <Card variant="carbon" className="space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-white/10">
-              <Settings2 className="w-4 h-4 text-team-b-ice" />
-              <span className="font-mono text-xs font-bold uppercase tracking-wider text-optic-white">
-                Match Scoring & History Rules
-              </span>
-            </div>
+          {/* 3. Scoring & Past Questions */}
+          <Card variant="carbon" className="p-5 space-y-4">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted-slate block">
+              Match Rules
+            </span>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex items-center justify-between gap-4">
               <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-text-high-contrast mb-1.5">
-                  Points per Correct MCQ
-                </label>
+                <span className="text-xs font-mono font-semibold text-optic-white block">
+                  Points per correct MCQ
+                </span>
+                <span className="text-[11px] text-text-muted-slate">
+                  Awarded immediately on correct answer
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
                 <input
                   type="number"
                   min={1}
-                  max={100}
+                  max={50}
                   step={5}
                   value={pointsPerMcq}
                   onChange={(e) => setPointsPerMcq(Math.max(1, parseInt(e.target.value) || 10))}
-                  className="w-full bg-surface-obsidian border border-white/20 rounded-md px-4 py-2 text-optic-white text-sm font-mono focus:border-team-a-core focus:outline-none"
+                  className="w-16 bg-surface-obsidian border border-white/20 rounded-lg px-2.5 py-1.5 text-optic-white text-sm font-mono text-center focus:border-team-a-core focus:outline-none"
                 />
-                <p className="mt-1 text-[11px] text-text-muted-slate">
-                  Awarded instantly upon correct answer on stage. Zero for misses.
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-xs font-mono uppercase tracking-wider text-text-high-contrast mb-1.5">
-                  Question Repetition
-                </label>
-                <div className="p-3 rounded bg-surface-onyx border border-white/10 text-xs font-mono text-state-success flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-state-success shrink-0" />
-                  <span>Zero intra-match repetition strictly enforced</span>
-                </div>
+                <span className="text-xs font-mono text-text-muted-slate">pts</span>
               </div>
             </div>
 
-            {/* Toggle: Include Used Questions */}
-            <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+            <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-4">
               <div>
-                <span className="text-xs font-mono font-bold text-optic-white block">
-                  Include Previously Used Questions
+                <span className="text-xs font-mono font-semibold text-optic-white block">
+                  Allow questions from past matches
                 </span>
                 <span className="text-[11px] text-text-muted-slate">
-                  {includeUsedQuestions
-                    ? 'Questions played in previous tournament contests are eligible to be asked again.'
-                    : 'Questions played in past contests are strictly excluded from the pool.'}
+                  Enable if your question bank is running low
                 </span>
               </div>
-
               <button
                 type="button"
                 onClick={() => setIncludeUsedQuestions(!includeUsedQuestions)}
-                className={`w-12 h-6 rounded-full transition-colors relative cursor-pointer ${
+                className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
                   includeUsedQuestions ? 'bg-team-a-core' : 'bg-surface-interactive border border-white/20'
                 }`}
               >
                 <div
                   className={`w-4 h-4 rounded-full bg-optic-white absolute top-1 transition-transform ${
-                    includeUsedQuestions ? 'translate-x-7' : 'translate-x-1'
+                    includeUsedQuestions ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
               </button>
@@ -472,126 +394,98 @@ export default function MatchSetupPage() {
           </Card>
         </div>
 
-        {/* Right Column: Live Pool Verification Card (5 cols) */}
-        <div className="lg:col-span-5 space-y-6">
-          <Card variant="carbon" className="space-y-6 sticky top-24">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
-              <span className="font-mono text-xs font-bold uppercase tracking-wider text-optic-white">
-                Live Pool Readiness
-              </span>
-              {validatingPool ? (
-                <span className="text-xs font-mono text-text-muted-slate animate-pulse">
-                  Querying...
-                </span>
-              ) : isPoolSufficient ? (
-                <Badge variant="success">STAGE READY</Badge>
-              ) : (
-                <Badge variant="warning">INSUFFICIENT</Badge>
-              )}
-            </div>
+        {/* Right Column: Match Summary & Launch (5 cols) */}
+        <div className="lg:col-span-5">
+          <Card variant="carbon" className="p-5 space-y-4 sticky top-24">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted-slate block pb-2 border-b border-white/10">
+              Match Summary
+            </span>
 
-            {/* Telemetry Summary */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-3.5 rounded-lg bg-surface-onyx border border-white/10 text-center">
-                <span className="font-mono text-[10px] text-text-muted-slate uppercase block">
-                  Total Match MCQs
-                </span>
-                <span className="font-mono text-3xl font-bold text-optic-white tabular-nums">
-                  {totalRequiredQuestions}
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-text-muted-slate">Selected Subjects</span>
+                <span className="font-mono font-bold text-optic-white">
+                  {selectedSubjectIds.length}
                 </span>
               </div>
 
-              <div className="p-3.5 rounded-lg bg-surface-onyx border border-white/10 text-center">
-                <span className="font-mono text-[10px] text-text-muted-slate uppercase block">
-                  Eligible in Pool
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-text-muted-slate">Questions per Team</span>
+                <span className="font-mono font-bold text-optic-white">
+                  {totalQuestionsPerTeam} questions
                 </span>
+              </div>
+
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-text-muted-slate">Total Match Questions</span>
+                <span className="font-mono font-bold text-optic-white">
+                  {totalMatchQuestions} questions
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-text-muted-slate">Questions Available</span>
                 <span
-                  className={`font-mono text-3xl font-bold tabular-nums ${
+                  className={`font-mono font-bold ${
                     isPoolSufficient ? 'text-state-success' : 'text-state-warning-rose'
                   }`}
                 >
-                  {poolTotal}
+                  {poolTotal} available
                 </span>
               </div>
             </div>
 
-            {/* Subject Breakdown List */}
-            <div className="space-y-2">
-              <span className="text-[11px] font-mono text-text-muted-slate uppercase tracking-wider block">
-                Subject Quota Breakdown
-              </span>
-
-              {selectedSubjectIds.length === 0 ? (
-                <p className="text-xs text-text-muted-slate py-2">
-                  Select at least one subject to verify question quotas.
+            {/* Shortage Helper with 1-click resolve */}
+            {!isPoolSufficient && selectedSubjectIds.length > 0 && (
+              <div className="p-3 rounded-xl bg-state-warning-rose/10 border border-state-warning-rose/30 space-y-2">
+                <p className="text-xs text-state-warning-rose font-mono">
+                  Need {totalMatchQuestions - poolTotal} more questions.
                 </p>
-              ) : (
-                selectedSubjectIds.map((id) => {
-                  const sub = subjects.find((s) => s.id === id);
-                  const countPerTeam = subjectQuestionCounts[id] || 2;
-                  const needed = countPerTeam * 2;
-                  const available = poolBreakdown[id] || 0;
-                  const satisfied = available >= needed;
+                {!includeUsedQuestions && (
+                  <Button
+                    variant="console"
+                    size="sm"
+                    onClick={() => setIncludeUsedQuestions(true)}
+                    className="w-full text-xs font-mono"
+                  >
+                    Allow Past Questions
+                  </Button>
+                )}
+              </div>
+            )}
 
-                  return (
-                    <div
-                      key={id}
-                      className="flex items-center justify-between p-2 rounded bg-surface-onyx text-xs"
-                    >
-                      <span className="text-text-bright-slate truncate mr-2">
-                        {sub?.name || 'Unknown'}
-                      </span>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span className="font-mono text-[11px] text-text-muted-slate">
-                          {available} / {needed} needed
-                        </span>
-                        {satisfied ? (
-                          <CheckCircle2 className="w-3.5 h-3.5 text-state-success" />
-                        ) : (
-                          <AlertTriangle className="w-3.5 h-3.5 text-state-warning-rose" />
-                        )}
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-
-            {/* Launch Call-To-Action */}
-            <div className="pt-4 border-t border-white/10 space-y-3">
-              {!isPoolSufficient && selectedSubjectIds.length > 0 && (
-                <p className="text-xs text-state-warning-rose font-mono flex items-start gap-1.5">
-                  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-                  <span>
-                    Some selected subjects do not have enough eligible questions. Reduce MCQs per
-                    team, add questions in Question Bank, or enable &quot;Include Used Questions&quot;.
-                  </span>
-                </p>
-              )}
-
+            {/* Start Match Button */}
+            <div className="pt-2 border-t border-white/10 space-y-2">
               <Button
                 variant="team-a"
                 size="lg"
                 onClick={handleStartMatch}
                 disabled={!isPoolSufficient || launching}
-                className="w-full text-base font-bold shadow-[0_0_24px_rgba(139,92,246,0.4)]"
+                className="w-full font-bold text-sm tracking-wider py-3 shadow-[0_0_24px_rgba(139,92,246,0.35)]"
               >
                 {launching ? (
-                  <span className="flex items-center gap-2">
-                    <span className="w-4 h-4 border-2 border-surface-obsidian border-t-transparent rounded-full animate-spin" />
-                    Partitioning Zero-Network Loop...
-                  </span>
+                  'Starting Match...'
                 ) : (
-                  <span className="flex items-center gap-2">
-                    <Play className="w-5 h-5 fill-surface-obsidian" />
-                    <span>LAUNCH TO LIVE MATCH STAGE</span>
+                  <span className="flex items-center justify-center gap-2">
+                    <Play className="w-4 h-4 fill-current" />
+                    <span>START LIVE MATCH</span>
                   </span>
                 )}
               </Button>
 
-              <p className="text-[10px] font-mono text-center text-text-muted-slate">
-                100% Offline Zero-Network Loop with persistent auto-recovery.
-              </p>
+              {activeMatch && !isMatchFinished && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (confirm('Discard the current active match?')) {
+                      resetMatch();
+                    }
+                  }}
+                  className="w-full text-[11px] font-mono text-text-muted-slate hover:text-state-warning-rose py-1 text-center transition-colors"
+                >
+                  Discard Saved Match
+                </button>
+              )}
             </div>
           </Card>
         </div>
