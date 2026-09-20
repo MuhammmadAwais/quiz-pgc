@@ -43,7 +43,8 @@ export interface TournamentConfig {
   teamAName: string;
   teamBName: string;
   selectedSubjectIds: string[];
-  mcqsPerSubject: number;
+  subjectQuestionCounts: Record<string, number>; // subject_id -> questions per team
+  mcqsPerSubject?: number; // fallback total
   pointsPerMcq: number;
   includeUsedQuestions: boolean;
 }
@@ -65,7 +66,9 @@ export interface TurnSnapshot {
 
 export interface TournamentState {
   config: TournamentConfig | null;
-  questionPool: Record<string, Question[]>; // subject_id -> Question[]
+  questionPool: Record<string, Question[]>; // Full pool for reference
+  teamAQuestionPool: Record<string, Question[]>; // Non-overlapping questions for Team A
+  teamBQuestionPool: Record<string, Question[]>; // Non-overlapping questions for Team B
   subjects: Subject[];
   currentSubjectIndex: number;
   currentQuestionIndex: number;

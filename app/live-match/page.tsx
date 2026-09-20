@@ -51,6 +51,8 @@ export default function LiveMatchPage() {
     isMatchFinished,
     winnerName,
     questionPool,
+    teamAQuestionPool,
+    teamBQuestionPool,
     historyStack,
     revealQuestion,
     selectOption,
@@ -105,7 +107,7 @@ export default function LiveMatchPage() {
     );
   }
 
-  // Active Subject & Active Question
+  // Active Subject & Active Question (from the active team's unique pool)
   const activeSubject = subjects[currentSubjectIndex];
   let currentQuestion: Question | undefined;
 
@@ -115,7 +117,8 @@ export default function LiveMatchPage() {
         ? tieBreakerQuestions[tieBreakerQuestionIndex % tieBreakerQuestions.length]
         : undefined;
   } else {
-    const subjectPool = questionPool[activeSubject?.id] || [];
+    const pool = teamTurn === 'TEAM_A' ? teamAQuestionPool : teamBQuestionPool;
+    const subjectPool = pool?.[activeSubject?.id] || [];
     currentQuestion = subjectPool[currentQuestionIndex];
   }
 
@@ -136,6 +139,7 @@ export default function LiveMatchPage() {
 
   const isTeamA = teamTurn === 'TEAM_A';
   const activeTeamName = isTeamA ? config.teamAName : config.teamBName;
+  const currentSubjectQuota = config.subjectQuestionCounts?.[activeSubject?.id] || config.mcqsPerSubject || 2;
 
   return (
     <div className="min-h-screen w-full bg-surface-obsidian text-optic-white flex flex-col justify-between projector-safe-margin select-none overflow-y-auto relative py-6 px-4 md:px-8">
@@ -156,7 +160,9 @@ export default function LiveMatchPage() {
         <StageHeader
           subjectName={activeSubject?.name || 'Tournament Subject'}
           currentQuestionIndex={currentQuestionIndex}
-          totalQuestionsInSubject={config.mcqsPerSubject}
+          totalQuestionsInSubject={currentSubjectQuota}
+          subjectIndex={currentSubjectIndex}
+          totalSubjects={subjects.length}
           teamTurn={teamTurn}
           teamAName={config.teamAName}
           teamBName={config.teamBName}

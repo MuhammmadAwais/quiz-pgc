@@ -57,10 +57,14 @@ Update this file after every completed feature. Any AI agent reading this should
 - Pre-seeded 18 collegiate tournament questions across Computer Science, Physics, and Mathematics.
 - Integrated Zustand `persist` middleware with `localStorage` so in-progress live matches and sudden-death states survive browser refreshes without losing score or round progress.
 - Implemented deterministic 1.8s auto-advance and manual skip triggers for both regular rounds and Super Over sudden-death cycles.
+- Implemented Sequential Team Block turn machine: Team A answers all assigned MCQs for a subject in a row, followed by Team B answering all assigned MCQs for that subject, before advancing to the next round.
+- Implemented dynamic per-subject MCQ counts with partitioned, mutually exclusive team question pools guaranteeing zero in-match duplicates and strict history exclusion.
+- Added Disaster Recovery banner to Match Setup detecting active in-memory matches with 1-click stage resume.
 
 ---
 
 ## Notes
 
 - Live match executes 100% offline in client browser memory once questions are loaded.
+- Persistent storage auto-rehydrates on reboot or power loss at the exact question, turn, and score.
 - Single atomic database write occurs automatically upon match completion.

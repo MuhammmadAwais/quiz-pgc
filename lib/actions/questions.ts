@@ -149,7 +149,7 @@ export async function getPoolStats(
   if (!includeUsed) {
     const { data: used } = await supabase.from('contest_questions').select('question_id');
     if (used && used.length > 0) {
-      usedQuestionIds = used.map((u) => u.question_id);
+      usedQuestionIds = Array.from(new Set(used.map((u) => u.question_id).filter(Boolean)));
     }
   }
 
@@ -187,10 +187,11 @@ export async function fetchEligibleQuestions(
   if (!config.includeUsedQuestions) {
     const { data: used } = await supabase.from('contest_questions').select('question_id');
     if (used && used.length > 0) {
-      usedQuestionIds = used.map((u) => u.question_id);
+      usedQuestionIds = Array.from(new Set(used.map((u) => u.question_id).filter(Boolean)));
     }
   }
 
+  // 1. Fetch Primary Fresh Questions
   let query = supabase
     .from('questions')
     .select(`
@@ -209,15 +210,15 @@ export async function fetchEligibleQuestions(
     query = query.not('id', 'in', `(${usedQuestionIds.join(',')})`);
   }
 
-  const { data, error } = await query;
-  if (error || !data) {
+  const { data: freshData, error } = await query;
+  if (error || !freshData) {
     console.error('Failed to load eligible questions:', error);
     return {};
   }
 
   // Group by subject
   const grouped: Record<string, Question[]> = {};
-  data.forEach((item: any) => {
+  freshData.forEach((item: any) => {
     const q: Question = {
       id: item.id,
       subject_id: item.subject_id,
@@ -233,6 +234,42 @@ export async function fetchEligibleQuestions(
     }
     grouped[item.subject_id].push(q);
   });
+
+  // 2. Fallback for Super Over reserve if database has no fresh reserve questions
+  if (!config.includeUsedQuestions && usedQuestionIds.length > 0) {
+    const { data: fallbackData } = await supabase
+      .from('questions')
+      .select(`
+        id,
+        subject_id,
+        chapter_id,
+        text,
+        options,
+        correct_index,
+        subjects ( name ),
+        chapters ( name )
+      `)
+      .in('id', usedQuestionIds);
+
+    if (fallbackData) {
+      fallbackData.forEach((item: any) => {
+        const q: Question = {
+          id: item.id,
+          subject_id: item.subject_id,
+          chapter_id: item.chapter_id,
+          text: item.text,
+          options: item.options as [string, string, string, string],
+          correct_index: item.correct_index,
+          subject_name: item.subjects?.name,
+          chapter_name: item.chapters?.name,
+        };
+        // Append to grouped list so store can use as backup tie-breaker reserve
+        if (grouped[item.subject_id]) {
+          grouped[item.subject_id].push(q);
+        }
+      });
+    }
+  }
 
   return grouped;
 }

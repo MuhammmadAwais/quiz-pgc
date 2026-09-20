@@ -23,6 +23,8 @@ export const useTournamentStore = create<TournamentState>()(
     (set, get) => ({
   config: null,
   questionPool: {},
+  teamAQuestionPool: {},
+  teamBQuestionPool: {},
   subjects: [],
   currentSubjectIndex: 0,
   currentQuestionIndex: 0,
@@ -46,30 +48,51 @@ export const useTournamentStore = create<TournamentState>()(
     questionsBySubject: Record<string, Question[]>,
     subjects: Subject[]
   ) => {
-    // Shuffle questions within each subject
-    const shuffledPool: Record<string, Question[]> = {};
-    const allRemainingQuestions: Question[] = [];
+    const teamAPool: Record<string, Question[]> = {};
+    const teamBPool: Record<string, Question[]> = {};
+    const fullPool: Record<string, Question[]> = {};
+    const tieBreakerReserve: Question[] = [];
 
+    // Slice non-overlapping questions for Team A and Team B based on per-subject counts
     subjects.forEach((sub) => {
       const qs = questionsBySubject[sub.id] || [];
       const shuffled = shuffleArray(qs);
-      shuffledPool[sub.id] = shuffled;
+      fullPool[sub.id] = shuffled;
 
-      // Unused questions that can serve as tie-breaker reserve
-      const reserve = shuffled.slice(config.mcqsPerSubject);
-      allRemainingQuestions.push(...reserve);
+      const quota = config.subjectQuestionCounts?.[sub.id] || config.mcqsPerSubject || 2;
+      teamAPool[sub.id] = shuffled.slice(0, quota);
+      teamBPool[sub.id] = shuffled.slice(quota, quota * 2);
+
+      // Remaining unused questions are reserved for tie-breakers
+      const remaining = shuffled.slice(quota * 2);
+      tieBreakerReserve.push(...remaining);
     });
 
-    // Fallback: If no extra questions for reserve, pool all questions across subjects
-    if (allRemainingQuestions.length === 0) {
-      Object.values(shuffledPool).forEach((qs) => {
-        allRemainingQuestions.push(...qs);
+    // Fallback: If no extra questions for reserve, pool unused questions across subjects
+    if (tieBreakerReserve.length === 0) {
+      const usedIds = new Set<string>();
+      Object.values(teamAPool).forEach((list) => list.forEach((q) => usedIds.add(q.id)));
+      Object.values(teamBPool).forEach((list) => list.forEach((q) => usedIds.add(q.id)));
+
+      Object.values(questionsBySubject).forEach((list) => {
+        list.forEach((q) => {
+          if (!usedIds.has(q.id)) {
+            tieBreakerReserve.push(q);
+          }
+        });
       });
+
+      // Extreme fallback: if database has zero extra questions
+      if (tieBreakerReserve.length === 0) {
+        Object.values(fullPool).forEach((list) => tieBreakerReserve.push(...list));
+      }
     }
 
     set({
       config,
-      questionPool: shuffledPool,
+      questionPool: fullPool,
+      teamAQuestionPool: teamAPool,
+      teamBQuestionPool: teamBPool,
       subjects,
       currentSubjectIndex: 0,
       currentQuestionIndex: 0,
@@ -80,7 +103,7 @@ export const useTournamentStore = create<TournamentState>()(
       selectedOptionIndex: null,
       isAnswerSubmitted: false,
       isTieBreaker: false,
-      tieBreakerQuestions: shuffleArray(allRemainingQuestions),
+      tieBreakerQuestions: shuffleArray(tieBreakerReserve),
       tieBreakerQuestionIndex: 0,
       selectedMysteryBox: null,
       revealedQuestionIds: [],
@@ -94,7 +117,7 @@ export const useTournamentStore = create<TournamentState>()(
     const state = get();
     if (state.isQuestionRevealed || state.isMatchFinished) return;
 
-    // Determine current active question
+    // Determine current active question from the active team's non-overlapping pool
     let currentQ: Question | undefined;
     if (state.isTieBreaker) {
       if (state.tieBreakerQuestions.length > 0) {
@@ -102,8 +125,8 @@ export const useTournamentStore = create<TournamentState>()(
       }
     } else {
       const activeSub = state.subjects[state.currentSubjectIndex];
-      const subjectPool = state.questionPool[activeSub?.id] || [];
-      currentQ = subjectPool[state.currentQuestionIndex];
+      const pool = state.teamTurn === 'TEAM_A' ? state.teamAQuestionPool : state.teamBQuestionPool;
+      currentQ = pool[activeSub?.id]?.[state.currentQuestionIndex];
     }
 
     // Capture snapshot for Undo
@@ -160,8 +183,8 @@ export const useTournamentStore = create<TournamentState>()(
       }
     } else {
       const activeSub = state.subjects[state.currentSubjectIndex];
-      const subjectPool = state.questionPool[activeSub?.id] || [];
-      currentQ = subjectPool[state.currentQuestionIndex];
+      const pool = state.teamTurn === 'TEAM_A' ? state.teamAQuestionPool : state.teamBQuestionPool;
+      currentQ = pool[activeSub?.id]?.[state.currentQuestionIndex];
     }
 
     if (!currentQ) return;
@@ -199,7 +222,6 @@ export const useTournamentStore = create<TournamentState>()(
     });
 
     // Automatically advance after a brief visual reveal on stage (1600ms)
-    // Can also be advanced immediately via nextTurn()
     setTimeout(() => {
       const current = get();
       if (current.isAnswerSubmitted && !current.isMatchFinished) {
@@ -251,56 +273,81 @@ export const useTournamentStore = create<TournamentState>()(
     }
 
     // ----------------------------------------------------
-    // CASE 2: REGULAR TOURNAMENT ROUND
+    // CASE 2: REGULAR TOURNAMENT ROUND (Sequential Team Block)
+    // Team A completes all questions for Subject 1, then Team B completes all questions for Subject 1, etc.
     // ----------------------------------------------------
-    const nextTurn = state.teamTurn === 'TEAM_A' ? 'TEAM_B' : 'TEAM_A';
-    const nextQuestionIndex = state.currentQuestionIndex + 1;
+    const activeSub = state.subjects[state.currentSubjectIndex];
+    const subjectQuota = state.config.subjectQuestionCounts?.[activeSub?.id] || state.config.mcqsPerSubject || 2;
 
-    // Check if subject question limit reached
-    if (nextQuestionIndex >= state.config.mcqsPerSubject) {
-      const nextSubjectIndex = state.currentSubjectIndex + 1;
-
-      if (nextSubjectIndex < state.subjects.length) {
-        // Advance to next subject
+    if (state.teamTurn === 'TEAM_A') {
+      const nextIndex = state.currentQuestionIndex + 1;
+      if (nextIndex < subjectQuota) {
+        // Team A still has questions remaining in this subject
         set({
-          currentSubjectIndex: nextSubjectIndex,
-          currentQuestionIndex: 0,
-          teamTurn: nextTurn,
+          currentQuestionIndex: nextIndex,
           isQuestionRevealed: false,
           selectedOptionIndex: null,
           isAnswerSubmitted: false,
         });
       } else {
-        // All subjects exhausted! Check if score is tied
-        if (state.teamAScore === state.teamBScore) {
-          // Trigger Sudden Death Tie-Breaker
+        // Team A finished all questions in this subject! Hand off to Team B!
+        set({
+          teamTurn: 'TEAM_B',
+          currentQuestionIndex: 0,
+          isQuestionRevealed: false,
+          selectedOptionIndex: null,
+          isAnswerSubmitted: false,
+        });
+      }
+    } else {
+      // Team B is currently answering
+      const nextIndex = state.currentQuestionIndex + 1;
+      if (nextIndex < subjectQuota) {
+        // Team B still has questions remaining in this subject
+        set({
+          currentQuestionIndex: nextIndex,
+          isQuestionRevealed: false,
+          selectedOptionIndex: null,
+          isAnswerSubmitted: false,
+        });
+      } else {
+        // Team B finished all questions in this subject! Subject round is complete!
+        const nextSubjectIndex = state.currentSubjectIndex + 1;
+
+        if (nextSubjectIndex < state.subjects.length) {
+          // Advance to next subject, starting with Team A
           set({
-            isTieBreaker: true,
+            currentSubjectIndex: nextSubjectIndex,
+            currentQuestionIndex: 0,
             teamTurn: 'TEAM_A',
             isQuestionRevealed: false,
             selectedOptionIndex: null,
             isAnswerSubmitted: false,
-            selectedMysteryBox: null,
-            tieBreakerQuestionIndex: 0,
           });
         } else {
-          // Match Won
-          const winner = state.teamAScore > state.teamBScore ? state.config.teamAName : state.config.teamBName;
-          set({
-            isMatchFinished: true,
-            winnerName: winner,
-          });
+          // All subjects exhausted! Check if score is tied
+          if (state.teamAScore === state.teamBScore) {
+            // Trigger Sudden Death Tie-Breaker
+            set({
+              isTieBreaker: true,
+              teamTurn: 'TEAM_A',
+              currentQuestionIndex: 0,
+              isQuestionRevealed: false,
+              selectedOptionIndex: null,
+              isAnswerSubmitted: false,
+              selectedMysteryBox: null,
+              tieBreakerQuestionIndex: 0,
+            });
+          } else {
+            // Match Won
+            const winner = state.teamAScore > state.teamBScore ? state.config.teamAName : state.config.teamBName;
+            set({
+              isMatchFinished: true,
+              winnerName: winner,
+            });
+          }
         }
       }
-    } else {
-      // Advance to next question within the current subject
-      set({
-        currentQuestionIndex: nextQuestionIndex,
-        teamTurn: nextTurn,
-        isQuestionRevealed: false,
-        selectedOptionIndex: null,
-        isAnswerSubmitted: false,
-      });
     }
   },
 
@@ -358,6 +405,8 @@ export const useTournamentStore = create<TournamentState>()(
     set({
       config: null,
       questionPool: {},
+      teamAQuestionPool: {},
+      teamBQuestionPool: {},
       subjects: [],
       currentSubjectIndex: 0,
       currentQuestionIndex: 0,

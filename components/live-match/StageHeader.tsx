@@ -8,6 +8,8 @@ interface StageHeaderProps {
   subjectName: string;
   currentQuestionIndex: number;
   totalQuestionsInSubject: number;
+  subjectIndex?: number;
+  totalSubjects?: number;
   teamTurn: 'TEAM_A' | 'TEAM_B';
   teamAName: string;
   teamBName: string;
@@ -18,6 +20,8 @@ export function StageHeader({
   subjectName,
   currentQuestionIndex,
   totalQuestionsInSubject,
+  subjectIndex = 0,
+  totalSubjects = 1,
   teamTurn,
   teamAName,
   teamBName,
@@ -38,10 +42,15 @@ export function StageHeader({
               SUDDEN-DEATH SUPER OVER
             </Badge>
           ) : (
-            <Badge variant="neutral" className="px-3 py-1 text-xs">
-              QUESTION {String(currentQuestionIndex + 1).padStart(2, '0')} /{' '}
-              {String(totalQuestionsInSubject).padStart(2, '0')}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant="team-a" className="px-2.5 py-1 text-xs font-mono">
+                ROUND {subjectIndex + 1}/{totalSubjects}
+              </Badge>
+              <Badge variant="neutral" className="px-3 py-1 text-xs font-mono">
+                QUESTION {String(currentQuestionIndex + 1).padStart(2, '0')} /{' '}
+                {String(totalQuestionsInSubject).padStart(2, '0')}
+              </Badge>
+            </div>
           )}
         </div>
 
