@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Swords,
   Clock,
@@ -9,11 +10,16 @@ import {
   ChevronRight,
   Search,
   Trophy,
+  CheckCircle2,
+  PauseCircle,
+  XCircle,
+  Play,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Contest } from '@/lib/types/tournament';
+import { useTournamentStore } from '@/lib/store/tournament-store';
 
 interface ContestLedgerProps {
   contests: Contest[];
@@ -21,25 +27,129 @@ interface ContestLedgerProps {
 
 const MATCHES_PER_PAGE = 8;
 
+export function renderContestStatus(status: string) {
+  const norm = (status || 'completed').toLowerCase().trim();
+
+  if (norm === 'postponed' || norm === 'paused') {
+    return (
+      <span className="inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-[11px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-team-b-cyan/15 border border-team-b-cyan/40 text-team-b-cyan shadow-sm animate-pulse">
+        <PauseCircle className="w-3 h-3 text-team-b-cyan shrink-0" />
+        <span>POSTPONED</span>
+      </span>
+    );
+  }
+
+  if (norm === 'ongoing' || norm === 'in_progress' || norm === 'active') {
+    return (
+      <span className="inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-[11px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md bg-surface-interactive border border-state-success/40 text-optic-white shadow-sm">
+        <span className="w-1.5 h-1.5 rounded-full bg-state-success animate-ping shrink-0" />
+        <span>ONGOING</span>
+      </span>
+    );
+  }
+
+  if (norm === 'cancelled' || norm === 'abandoned') {
+    return (
+      <span className="inline-flex items-center gap-1 font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-state-warning-rose/10 border border-state-warning-rose/30 text-state-warning-rose">
+        <XCircle className="w-3 h-3 text-state-warning-rose shrink-0" />
+        <span>CANCELLED</span>
+      </span>
+    );
+  }
+
+  // Default completed
+  return (
+    <span className="inline-flex items-center gap-1 font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-state-success/10 border border-state-success/20 text-state-success">
+      <CheckCircle2 className="w-3 h-3 text-state-success shrink-0" />
+      <span>COMPLETED</span>
+    </span>
+  );
+}
+
+function renderWinnerBadge(c: Contest) {
+  const norm = (c.status || '').toLowerCase().trim();
+
+  if (norm === 'postponed' || norm === 'paused') {
+    return (
+      <Badge variant="warning" className="text-[11px] font-mono">
+        PAUSED
+      </Badge>
+    );
+  }
+
+  if (norm === 'ongoing' || norm === 'in_progress' || norm === 'active') {
+    return (
+      <Badge variant="team-b" className="text-[11px] font-mono animate-pulse">
+        IN PLAY
+      </Badge>
+    );
+  }
+
+  return (
+    <Badge variant="success">
+      {c.winner_name || 'Tie'}
+    </Badge>
+  );
+}
+
 export function ContestLedger({ contests }: ContestLedgerProps) {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Filter contests based on team names or winner name
+  // Active match state from local tournament store
+  const activeConfig = useTournamentStore((s) => s.config);
+  const activeTeams = useTournamentStore((s) => s.teams);
+  const isMatchFinished = useTournamentStore((s) => s.isMatchFinished);
+  const isPostponed = useTournamentStore((s) => s.isPostponed);
+  const revealedQuestionIds = useTournamentStore((s) => s.revealedQuestionIds);
+
+  // Synthesize active live/postponed match session if active in app
+  const activeContest: Contest | null = useMemo(() => {
+    if (!activeConfig || isMatchFinished || activeTeams.length === 0) {
+      return null;
+    }
+
+    const teamAName = activeTeams[0]?.name || 'Team 1';
+    const teamBName = activeTeams.length > 2
+      ? `${activeTeams[1]?.name || 'Team 2'} (+${activeTeams.length - 2} teams)`
+      : activeTeams[1]?.name || 'Team 2';
+
+    return {
+      id: 'active-live-match',
+      team_a_name: teamAName,
+      team_b_name: teamBName,
+      team_a_score: activeTeams[0]?.score || 0,
+      team_b_score: activeTeams[1]?.score || 0,
+      winner_name: null,
+      status: isPostponed ? 'postponed' : 'ongoing',
+      created_at: new Date().toISOString(),
+      revealed_count: revealedQuestionIds.length,
+    };
+  }, [activeConfig, isMatchFinished, activeTeams, isPostponed, revealedQuestionIds]);
+
+  // Merge active session with recorded database history
+  const allContests = useMemo(() => {
+    if (activeContest) {
+      return [activeContest, ...contests];
+    }
+    return contests;
+  }, [activeContest, contests]);
+
+  // Filter contests based on team names, winner, or status
   const filteredContests = useMemo(() => {
-    if (!searchQuery.trim()) return contests;
+    if (!searchQuery.trim()) return allContests;
     const query = searchQuery.toLowerCase().trim();
-    return contests.filter(
+    return allContests.filter(
       (c) =>
         c.team_a_name.toLowerCase().includes(query) ||
         c.team_b_name.toLowerCase().includes(query) ||
+        c.status.toLowerCase().includes(query) ||
         (c.winner_name && c.winner_name.toLowerCase().includes(query))
     );
-  }, [contests, searchQuery]);
+  }, [allContests, searchQuery]);
 
   const totalPages = Math.max(1, Math.ceil(filteredContests.length / MATCHES_PER_PAGE));
-
-  // Reset to page 1 if search query changes and causes page out of bounds
   const safeCurrentPage = Math.min(currentPage, totalPages);
 
   const paginatedContests = useMemo(() => {
@@ -58,13 +168,14 @@ export function ContestLedger({ contests }: ContestLedgerProps) {
               Tournament Contest Ledger
             </h2>
             <span className="text-xs font-mono text-text-muted-slate block">
-              {contests.length} Completed Matches Recorded
+              {allContests.length} {allContests.length === 1 ? 'Match' : 'Matches'} Recorded
+              {activeContest && ' • 1 Active Stage Session'}
             </span>
           </div>
         </div>
 
         {/* Search & Filter Bar */}
-        {contests.length > 0 && (
+        {allContests.length > 0 && (
           <div className="relative w-full sm:w-64 shrink-0">
             <Search className="w-3.5 h-3.5 text-text-muted-slate absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
@@ -74,14 +185,14 @@ export function ContestLedger({ contests }: ContestLedgerProps) {
                 setSearchQuery(e.target.value);
                 setCurrentPage(1);
               }}
-              placeholder="Filter by team or winner..."
+              placeholder="Filter by team, status, or winner..."
               className="w-full bg-surface-onyx border border-border-medium rounded-lg pl-8 pr-3 py-1.5 text-xs font-mono text-optic-white placeholder-text-muted-slate focus:outline-none focus:border-brand-primary transition-colors"
             />
           </div>
         )}
       </div>
 
-      {contests.length === 0 ? (
+      {allContests.length === 0 ? (
         /* Empty State: Zero matches recorded in database */
         <div className="text-center py-12 border border-dashed border-border-medium rounded-2xl space-y-3">
           <Swords className="w-10 h-10 text-text-muted-slate mx-auto opacity-40" />
@@ -102,7 +213,7 @@ export function ContestLedger({ contests }: ContestLedgerProps) {
         /* Empty State: Search filter yielded 0 matches */
         <div className="text-center py-10 border border-dashed border-border-medium rounded-xl space-y-2">
           <p className="text-xs font-mono text-text-muted-slate">
-            No completed matches match your search &ldquo;{searchQuery}&rdquo;.
+            No matches match your filter &ldquo;{searchQuery}&rdquo;.
           </p>
           <button
             type="button"
@@ -128,6 +239,7 @@ export function ContestLedger({ contests }: ContestLedgerProps) {
               </thead>
               <tbody className="divide-y divide-border-subtle">
                 {paginatedContests.map((c) => {
+                  const isLiveSession = c.id === 'active-live-match';
                   const dateStr = new Date(c.created_at).toLocaleDateString(undefined, {
                     month: 'short',
                     day: 'numeric',
@@ -139,13 +251,33 @@ export function ContestLedger({ contests }: ContestLedgerProps) {
                   return (
                     <tr
                       key={c.id}
-                      className="hover:bg-surface-interactive/60 transition-colors"
+                      onClick={() => {
+                        if (isLiveSession) {
+                          router.push('/live-match');
+                        }
+                      }}
+                      className={`transition-colors ${
+                        isLiveSession
+                          ? 'bg-team-b-cyan/10 hover:bg-team-b-cyan/15 border-y border-team-b-cyan/30 cursor-pointer'
+                          : 'hover:bg-surface-interactive/60'
+                      }`}
                     >
                       <td className="py-4 px-4 text-text-muted-slate">
-                        <div className="flex items-center gap-2">
-                          <Clock className="w-3.5 h-3.5 shrink-0" />
-                          <span>{dateStr}</span>
-                        </div>
+                        {isLiveSession ? (
+                          <div className="flex items-center gap-2">
+                            <span className="px-2 py-0.5 rounded bg-team-b-cyan/20 border border-team-b-cyan/40 text-[10px] font-mono font-bold text-team-b-cyan uppercase animate-pulse">
+                              ACTIVE NOW
+                            </span>
+                            <span className="text-optic-white font-semibold">
+                              {c.status === 'postponed' ? 'Postponed Session' : 'Live Arena Session'}
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-3.5 h-3.5 shrink-0" />
+                            <span>{dateStr}</span>
+                          </div>
+                        )}
                       </td>
 
                       <td className="py-4 px-4">
@@ -157,13 +289,16 @@ export function ContestLedger({ contests }: ContestLedgerProps) {
                           <span className="font-bold text-team-b-cyan">
                             {c.team_b_name} ({c.team_b_score})
                           </span>
+                          {isLiveSession && (
+                            <span className="text-[10px] font-mono font-bold text-team-b-cyan ml-1">
+                              (Resume &rarr;)
+                            </span>
+                          )}
                         </div>
                       </td>
 
                       <td className="py-4 px-4">
-                        <Badge variant="success">
-                          {c.winner_name || 'Tie'}
-                        </Badge>
+                        {renderWinnerBadge(c)}
                       </td>
 
                       <td className="py-4 px-4 text-center tabular-nums text-optic-white font-bold">
@@ -171,9 +306,7 @@ export function ContestLedger({ contests }: ContestLedgerProps) {
                       </td>
 
                       <td className="py-4 px-4 text-right">
-                        <span className="text-state-success font-bold text-[11px] uppercase font-mono">
-                          COMPLETED
-                        </span>
+                        {renderContestStatus(c.status)}
                       </td>
                     </tr>
                   );
@@ -185,6 +318,7 @@ export function ContestLedger({ contests }: ContestLedgerProps) {
           {/* Mobile Card View — shown only on mobile */}
           <div className="md:hidden space-y-3">
             {paginatedContests.map((c) => {
+              const isLiveSession = c.id === 'active-live-match';
               const dateStr = new Date(c.created_at).toLocaleDateString(undefined, {
                 month: 'short',
                 day: 'numeric',
@@ -198,17 +332,31 @@ export function ContestLedger({ contests }: ContestLedgerProps) {
               return (
                 <div
                   key={c.id}
-                  className="p-4 rounded-xl bg-surface-onyx border border-border-subtle space-y-3"
+                  onClick={() => {
+                    if (isLiveSession) {
+                      router.push('/live-match');
+                    }
+                  }}
+                  className={`p-4 rounded-xl border space-y-3 ${
+                    isLiveSession
+                      ? 'bg-surface-carbon border-team-b-cyan/40 shadow-sm cursor-pointer'
+                      : 'bg-surface-onyx border-border-subtle'
+                  }`}
                 >
                   {/* Date & Status row */}
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5 text-[11px] font-mono text-text-muted-slate">
-                      <Clock className="w-3 h-3 shrink-0" />
-                      <span>{dateStr} • {timeStr}</span>
-                    </div>
-                    <span className="text-state-success font-bold text-[10px] uppercase font-mono">
-                      ✓ COMPLETED
-                    </span>
+                    {isLiveSession ? (
+                      <div className="flex items-center gap-1.5 text-[11px] font-mono text-team-b-cyan font-bold">
+                        <span className="w-2 h-2 rounded-full bg-team-b-cyan animate-ping shrink-0" />
+                        <span>ACTIVE STAGE SESSION</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5 text-[11px] font-mono text-text-muted-slate">
+                        <Clock className="w-3 h-3 shrink-0" />
+                        <span>{dateStr} • {timeStr}</span>
+                      </div>
+                    )}
+                    {renderContestStatus(c.status)}
                   </div>
 
                   {/* Teams */}
@@ -228,9 +376,7 @@ export function ContestLedger({ contests }: ContestLedgerProps) {
                   <div className="flex items-center justify-between pt-2 border-t border-border-subtle/50">
                     <div className="flex items-center gap-1.5">
                       <Trophy className="w-3.5 h-3.5 text-team-b-cyan shrink-0" />
-                      <Badge variant="success" className="text-[11px]">
-                        {c.winner_name || 'Tie'}
-                      </Badge>
+                      {renderWinnerBadge(c)}
                     </div>
                     <span className="text-[11px] font-mono text-text-muted-slate">
                       {c.revealed_count || 0} questions used

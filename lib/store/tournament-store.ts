@@ -51,6 +51,7 @@ export const useTournamentStore = create<TournamentState>()(
       timerStartedAt: null,
       isTimerPaused: false,
       isTimeExpired: false,
+      isPostponed: false,
 
       initializeMatch: (
         config: TournamentConfig,
@@ -536,7 +537,12 @@ export const useTournamentStore = create<TournamentState>()(
           timerStartedAt: null,
           isTimerPaused: false,
           isTimeExpired: false,
+          isPostponed: false,
         });
+      },
+
+      postponeMatch: () => {
+        set({ isTimerPaused: true, isPostponed: true });
       },
 
       startTimer: () => {
@@ -544,6 +550,7 @@ export const useTournamentStore = create<TournamentState>()(
           timerStartedAt: Date.now(),
           isTimerPaused: false,
           isTimeExpired: false,
+          isPostponed: false,
         });
       },
 
@@ -552,7 +559,7 @@ export const useTournamentStore = create<TournamentState>()(
       },
 
       resumeTimer: () => {
-        set({ isTimerPaused: false });
+        set({ isTimerPaused: false, isPostponed: false });
       },
 
       expireTimer: () => {

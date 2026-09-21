@@ -70,6 +70,7 @@ export default function LiveMatchPage() {
     undoLastAction,
     selectMysteryBox,
     resetMatch,
+    postponeMatch,
     pauseTimer,
     resumeTimer,
     expireTimer,
@@ -154,7 +155,7 @@ export default function LiveMatchPage() {
   };
 
   const handlePostponeMatch = () => {
-    pauseTimer();
+    postponeMatch();
     setPostponeModalOpen(false);
     router.push('/dashboard');
   };
@@ -533,6 +534,10 @@ export default function LiveMatchPage() {
           onPlayAgain={() => {
             resetMatch();
             router.push('/match-setup');
+          }}
+          onReturnToDashboard={() => {
+            resetMatch();
+            router.push('/dashboard');
           }}
         />
       )}

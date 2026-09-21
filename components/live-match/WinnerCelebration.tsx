@@ -18,6 +18,7 @@ interface WinnerCelebrationProps {
   revealedQuestionIds: string[];
   teams?: Team[];
   onPlayAgain: () => void;
+  onReturnToDashboard?: () => void;
 }
 
 export function WinnerCelebration({
@@ -29,48 +30,60 @@ export function WinnerCelebration({
   revealedQuestionIds,
   teams,
   onPlayAgain,
+  onReturnToDashboard,
 }: WinnerCelebrationProps) {
   const router = useRouter();
   const [committing, setCommitting] = useState(false);
   const [committed, setCommitted] = useState(false);
+  const hasCelebratedRef = React.useRef(false);
 
-  // Sorted leaderboard of all participating teams
-  const rankedTeams = teams && teams.length > 0
-    ? [...teams].sort((a, b) => b.score - a.score)
-    : [
-        { id: '1', name: teamAName, color: '#8B5CF6', score: teamAScore },
-        { id: '2', name: teamBName, color: '#06B6D4', score: teamBScore },
-      ].sort((a, b) => b.score - a.score);
+  // Memoized leaderboard of all participating teams
+  const rankedTeams = React.useMemo(() => {
+    if (teams && teams.length > 0) {
+      return [...teams].sort((a, b) => b.score - a.score);
+    }
+    return [
+      { id: '1', name: teamAName, color: '#8B5CF6', score: teamAScore },
+      { id: '2', name: teamBName, color: '#06B6D4', score: teamBScore },
+    ].sort((a, b) => b.score - a.score);
+  }, [teams, teamAName, teamBName, teamAScore, teamBScore]);
 
   useEffect(() => {
-    // Play zero-network victory fanfare
+    // Strictly execute victory fanfare and atomic ledger commit ONCE
+    if (hasCelebratedRef.current) return;
+    hasCelebratedRef.current = true;
+
+    // Play zero-network victory fanfare once
     soundFX.playVictory();
 
-    // Stage fireworks celebration
-    const end = Date.now() + 3.5 * 1000;
-    const colors = ['#3D52A0', '#7091E6', '#0E7490', '#124E66', '#9ACDEA'];
+    // Stage fireworks celebration with clean cancellation
+    let animId: number | null = null;
+    let isCancelled = false;
+    const end = Date.now() + 2500;
+    const colors = ['#3D52A0', '#7091E6', '#0E7490', '#124E66', '#9ACDEA', '#8B5CF6', '#22D3EE'];
 
     const frame = () => {
+      if (isCancelled) return;
       confetti({
-        particleCount: 4,
+        particleCount: 3,
         angle: 60,
         spread: 55,
         origin: { x: 0, y: 0.7 },
         colors,
       });
       confetti({
-        particleCount: 4,
+        particleCount: 3,
         angle: 120,
         spread: 55,
         origin: { x: 1, y: 0.7 },
         colors,
       });
 
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
+      if (Date.now() < end && !isCancelled) {
+        animId = requestAnimationFrame(frame);
       }
     };
-    frame();
+    animId = requestAnimationFrame(frame);
 
     // Automatically trigger single background atomic commit
     const handleCommit = async () => {
@@ -85,16 +98,48 @@ export function WinnerCelebration({
           revealed_question_ids: revealedQuestionIds,
           teams: rankedTeams,
         });
-        setCommitted(true);
+        if (!isCancelled) {
+          setCommitted(true);
+        }
       } catch (err) {
         console.error('Error committing match:', err);
       } finally {
-        setCommitting(false);
+        if (!isCancelled) {
+          setCommitting(false);
+        }
       }
     };
 
     handleCommit();
-  }, [teamAName, teamBName, teamAScore, teamBScore, winnerName, revealedQuestionIds, rankedTeams]);
+
+    return () => {
+      isCancelled = true;
+      if (animId !== null) {
+        cancelAnimationFrame(animId);
+      }
+      try {
+        confetti.reset();
+      } catch {}
+    };
+  }, []);
+
+  const handleDashboardExit = () => {
+    try {
+      confetti.reset();
+    } catch {}
+    if (onReturnToDashboard) {
+      onReturnToDashboard();
+    } else {
+      router.push('/dashboard');
+    }
+  };
+
+  const handlePlayAgainAction = () => {
+    try {
+      confetti.reset();
+    } catch {}
+    onPlayAgain();
+  };
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-6 animate-in fade-in duration-300">
@@ -187,7 +232,7 @@ export function WinnerCelebration({
           <Button
             variant="console"
             size="md"
-            onClick={onPlayAgain}
+            onClick={handlePlayAgainAction}
             className="w-full sm:w-auto"
           >
             <RotateCcw className="w-4 h-4" />
@@ -197,7 +242,7 @@ export function WinnerCelebration({
           <Button
             variant="team-a"
             size="md"
-            onClick={() => router.push('/dashboard')}
+            onClick={handleDashboardExit}
             className="w-full sm:w-auto font-bold"
           >
             <span>Return to Dashboard</span>

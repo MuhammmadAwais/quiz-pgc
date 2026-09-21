@@ -82,6 +82,7 @@ export async function commitContestResult(payload: {
   team_b_score: number;
   winner_name: string | null;
   revealed_question_ids: string[];
+  status?: string;
   teams?: { id: string; name: string; color: string; score: number }[];
 }): Promise<{ success: boolean; contestId?: string; error?: string }> {
   const supabase = await createClient();
@@ -101,7 +102,7 @@ export async function commitContestResult(payload: {
       team_a_score: payload.team_a_score,
       team_b_score: payload.team_b_score,
       winner_name: payload.winner_name,
-      status: 'completed',
+      status: payload.status || 'completed',
     })
     .select('id')
     .single();

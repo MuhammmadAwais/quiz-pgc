@@ -111,6 +111,9 @@ export interface TournamentState {
   isTimerPaused: boolean;
   isTimeExpired: boolean;
 
+  // Postpone State
+  isPostponed: boolean;
+
   // Actions
   initializeMatch: (config: TournamentConfig, questionsBySubject: Record<string, Question[]>, subjects: Subject[]) => void;
   revealQuestion: () => void;
@@ -121,6 +124,7 @@ export interface TournamentState {
   selectMysteryBox: (boxIndex: number) => void;
   finishMatch: () => void;
   resetMatch: () => void;
+  postponeMatch: () => void;
 
   // Timer Actions
   startTimer: () => void;

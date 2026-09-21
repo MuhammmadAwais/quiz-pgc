@@ -30,7 +30,8 @@ After building any component — run `/imprint` to record the component name, fi
 | `OptionCard` | `components/live-match/OptionCard.tsx` | `text-body-xl bg-surface-carbon border border-border-subtle hover:border-border-medium rounded-xl p-5 cursor-pointer` | Live MCQ option choice with RTL & Math |
 | `TimerBar` | `components/live-match/TimerBar.tsx` | `bg-surface-carbon border border-border-medium rounded-xl p-3.5 shadow-sm font-mono` | Resilient wall-clock stage timer with 3 color phases |
 | `TeamFlank` | `components/live-match/TeamFlank.tsx` | `rounded-xl bg-surface-carbon border-2 shadow-sm font-mono` | Symmetrical multi-team podium cards (left & right flanks) |
-| `StageHeader` | `components/live-match/StageHeader.tsx` | `border-b border-border-subtle pb-6 px-10` | Active subject, round, and turn display |
+| `StageHeader` | `components/live-match/StageHeader.tsx` | `rounded-2xl bg-surface-carbon/80 border border-border-medium/80 backdrop-blur-md p-2.5 sm:px-4 shadow-modal-dialog` | Sculpted championship broadcast command console with centered active team podium spotlight and round telemetry micro-tracker |
+| `ContestLedger` | `components/dashboard/ContestLedger.tsx` | `bg-surface-carbon border border-border-subtle rounded-2xl p-6` | Contest ledger table with dynamic status pills (POSTPONED, ONGOING, COMPLETED, CANCELLED) and active live session sync |
 | `MysteryBoxGrid` | `components/live-match/MysteryBoxGrid.tsx` | `border-2 bg-surface-carbon hover:border-border-bright rounded-xl h-36` | Sudden-death mystery boxes |
 | `WinnerCelebration` | `components/live-match/WinnerCelebration.tsx` | `bg-surface-carbon border border-border-medium rounded-2xl shadow-2xl p-8 md:p-12` | Grand victory podium with multi-team ranked leaderboard |
 | `BooksBankPage` | `app/books-bank/page.tsx` | `bg-surface-obsidian text-optic-white border-border-subtle rounded-2xl p-5 hover:border-team-b-cyan/50` | Digital textbook repository page |
