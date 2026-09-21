@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/Input';
 import { Question, Subject, Chapter } from '@/lib/types/tournament';
 import { createQuestion, updateQuestion } from '@/lib/actions/questions';
 import { CheckCircle2 } from 'lucide-react';
+import { MathRenderer } from '@/components/ui/MathRenderer';
 
 interface QuestionModalProps {
   isOpen: boolean;
@@ -174,17 +175,30 @@ export function QuestionModal({
 
         {/* Question Text Prompt */}
         <div>
-          <label className="block text-xs font-mono uppercase tracking-wider text-text-high-contrast mb-1.5">
-            Question Prompt (Projector Display Text)
-          </label>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="block text-xs font-mono uppercase tracking-wider text-text-high-contrast">
+              Question Prompt (Projector Display Text)
+            </label>
+            <span className="text-[10px] font-mono text-text-muted-slate">
+              LaTeX supported ($x$ or $$x$$)
+            </span>
+          </div>
           <textarea
             rows={3}
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="e.g. Which thermodynamic process occurs at constant pressure?"
+            placeholder="e.g. Which thermodynamic process occurs at constant pressure? Or: What is $$S$$?"
             className="w-full bg-surface-obsidian border border-border-medium rounded-md p-3 text-optic-white text-sm focus:outline-none focus:border-team-a-core transition-colors"
             required
           />
+          {text.includes('$') && (
+            <div className="mt-2 p-2.5 rounded-lg bg-surface-carbon border border-border-subtle">
+              <span className="text-[10px] font-mono text-team-a-bright uppercase font-bold block mb-1">
+                Formula Live Preview:
+              </span>
+              <MathRenderer content={text} className="text-sm text-optic-white" />
+            </div>
+          )}
         </div>
 
         {/* Options A, B, C, D */}
@@ -203,14 +217,14 @@ export function QuestionModal({
               <div
                 key={letter}
                 onClick={() => setCorrectIndex(idx)}
-                className={`flex items-center gap-3 p-2.5 rounded-lg border transition-all cursor-pointer ${
+                className={`flex items-start gap-3 p-2.5 rounded-lg border transition-all cursor-pointer ${
                   isCorrect
                     ? 'bg-state-success/10 border-state-success/60 text-optic-white'
                     : 'bg-surface-obsidian border-border-subtle hover:border-border-medium'
                 }`}
               >
                 <div
-                  className={`w-6 h-6 rounded-full flex items-center justify-center font-mono text-xs font-bold shrink-0 transition-colors ${
+                  className={`w-6 h-6 rounded-full flex items-center justify-center font-mono text-xs font-bold shrink-0 mt-0.5 transition-colors ${
                     isCorrect
                       ? 'bg-state-success text-surface-obsidian shadow-sm'
                       : 'bg-surface-carbon border border-border-medium text-text-muted-slate'
@@ -219,18 +233,25 @@ export function QuestionModal({
                   {letter}
                 </div>
 
-                <input
-                  type="text"
-                  value={options[idx]}
-                  onChange={(e) => handleOptionChange(idx, e.target.value)}
-                  placeholder={`Option ${letter}`}
-                  onClick={(e) => e.stopPropagation()}
-                  className="w-full bg-transparent text-sm text-optic-white focus:outline-none placeholder-text-muted-slate"
-                  required
-                />
+                <div className="flex-1 min-w-0">
+                  <input
+                    type="text"
+                    value={options[idx]}
+                    onChange={(e) => handleOptionChange(idx, e.target.value)}
+                    placeholder={`Option ${letter}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-full bg-transparent text-sm text-optic-white focus:outline-none placeholder-text-muted-slate"
+                    required
+                  />
+                  {options[idx].includes('$') && (
+                    <div className="mt-1 pt-1 border-t border-border-subtle/40 text-xs text-optic-white">
+                      <MathRenderer content={options[idx]} inline />
+                    </div>
+                  )}
+                </div>
 
                 {isCorrect && (
-                  <CheckCircle2 className="w-4 h-4 text-state-success shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-state-success shrink-0 mt-1" />
                 )}
               </div>
             );

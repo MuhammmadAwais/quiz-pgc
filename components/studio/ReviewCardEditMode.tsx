@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Check, X } from 'lucide-react';
 import { StagedQuestion, Difficulty, CognitiveType } from '@/lib/types/studio';
 import { useAiStudioStore } from '@/lib/store/useAiStudioStore';
+import { MathRenderer } from '@/components/ui/MathRenderer';
 
 interface ReviewCardEditModeProps {
   question: StagedQuestion;
@@ -78,6 +79,14 @@ export function ReviewCardEditMode({ question, index }: ReviewCardEditModeProps)
           required
           className="w-full bg-surface-obsidian border border-border-medium rounded-lg p-2.5 text-sm text-optic-white focus:outline-none focus:border-brand-primary font-sans"
         />
+        {prompt.includes('$') && (
+          <div className="p-2.5 rounded-lg bg-surface-onyx border border-border-subtle">
+            <span className="text-[10px] font-mono text-team-a-bright uppercase font-bold block mb-1">
+              Formula Live Preview:
+            </span>
+            <MathRenderer content={prompt} className="text-sm text-optic-white" />
+          </div>
+        )}
       </div>
 
       {/* 4 Options & Correct Radio Selection */}
@@ -93,7 +102,7 @@ export function ReviewCardEditMode({ question, index }: ReviewCardEditModeProps)
             return (
               <div
                 key={optIdx}
-                className={`p-2.5 rounded-xl border flex items-center gap-2.5 ${
+                className={`p-2.5 rounded-xl border flex items-start gap-2.5 ${
                   isCorrect
                     ? 'bg-state-success/15 border-state-success/50 ring-1 ring-state-success/30'
                     : 'bg-surface-onyx border-border-subtle'
@@ -102,7 +111,7 @@ export function ReviewCardEditMode({ question, index }: ReviewCardEditModeProps)
                 <button
                   type="button"
                   onClick={() => setCorrectIndex(optIdx)}
-                  className={`h-7 w-7 rounded flex items-center justify-center text-xs font-mono font-bold shrink-0 transition-colors cursor-pointer ${
+                  className={`h-7 w-7 rounded flex items-center justify-center text-xs font-mono font-bold shrink-0 mt-0.5 transition-colors cursor-pointer ${
                     isCorrect
                       ? 'bg-state-success text-white font-extrabold shadow-sm'
                       : 'bg-surface-interactive text-text-muted-slate hover:text-optic-white'
@@ -111,18 +120,25 @@ export function ReviewCardEditMode({ question, index }: ReviewCardEditModeProps)
                 >
                   {letter}
                 </button>
-                <input
-                  type="text"
-                  value={opt}
-                  onChange={(e) => {
-                    const next: [string, string, string, string] = [options[0], options[1], options[2], options[3]];
-                    next[optIdx] = e.target.value;
-                    setOptions(next);
-                  }}
-                  required
-                  placeholder={`Option ${letter}`}
-                  className="w-full bg-surface-obsidian border border-border-subtle rounded-lg px-2.5 py-1.5 text-xs text-optic-white focus:outline-none focus:border-brand-primary"
-                />
+                <div className="flex-1 min-w-0">
+                  <input
+                    type="text"
+                    value={opt}
+                    onChange={(e) => {
+                      const next: [string, string, string, string] = [options[0], options[1], options[2], options[3]];
+                      next[optIdx] = e.target.value;
+                      setOptions(next);
+                    }}
+                    required
+                    placeholder={`Option ${letter}`}
+                    className="w-full bg-surface-obsidian border border-border-subtle rounded-lg px-2.5 py-1.5 text-xs text-optic-white focus:outline-none focus:border-brand-primary"
+                  />
+                  {opt.includes('$') && (
+                    <div className="mt-1 pt-1 border-t border-border-subtle/40 text-xs text-optic-white">
+                      <MathRenderer content={opt} inline />
+                    </div>
+                  )}
+                </div>
               </div>
             );
           })}

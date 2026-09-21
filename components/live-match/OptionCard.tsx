@@ -3,6 +3,7 @@
 import React from 'react';
 import { CheckCircle2, XCircle, Award } from 'lucide-react';
 import { getTextContrastColor } from '@/lib/utils/color';
+import { MathRenderer } from '@/components/ui/MathRenderer';
 
 interface OptionCardProps {
   letter: string;
@@ -101,7 +102,7 @@ export function OptionCard({
         {/* Option Text */}
         <div className="flex-1 min-w-0">
           <p className="text-body-xl font-medium tracking-normal leading-relaxed truncate-3-lines">
-            {text}
+            <MathRenderer content={text} inline />
           </p>
         </div>
       </div>

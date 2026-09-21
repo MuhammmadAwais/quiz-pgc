@@ -22,6 +22,7 @@ import { Modal } from '@/components/ui/Modal';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { Question } from '@/lib/types/tournament';
 import { soundFX } from '@/lib/utils/audio';
+import { MathRenderer } from '@/components/ui/MathRenderer';
 
 export default function LiveMatchPage() {
   const router = useRouter();
@@ -249,10 +250,10 @@ export default function LiveMatchPage() {
               {/* Question Text Prompt Card */}
               <div className="p-6 md:p-8 rounded-2xl bg-surface-carbon border border-border-medium shadow-modal-dialog">
                 <span className="label-caps text-text-muted-slate block mb-2 font-sans">
-                  QUESTION PROMPT
+                  QUESTION 
                 </span>
                 <h2 className="text-headline-md md:text-headline-lg font-bold text-optic-white leading-relaxed tracking-tight font-sans">
-                  {currentQuestion.text}
+                  <MathRenderer content={currentQuestion.text} />
                 </h2>
               </div>
 

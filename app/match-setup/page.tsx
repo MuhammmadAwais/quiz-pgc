@@ -290,12 +290,18 @@ export default function MatchSetupPage() {
                     />
 
                     {/* Color Wheel & Swatch Selector */}
-                    <div className="space-y-1.5 pt-1">
-                      <label className="text-[10px] font-mono uppercase font-bold text-text-muted-slate block">
-                        Team Accent Color
-                      </label>
-                      <div className="flex items-center gap-2">
-                        <label className="relative w-9 h-9 rounded-lg cursor-pointer shrink-0 border border-border-medium overflow-hidden shadow-sm hover:scale-105 transition-transform">
+                    <div className="space-y-2 pt-1">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[10px] font-mono uppercase font-bold text-text-muted-slate block">
+                          Team Accent Color
+                        </label>
+                        <span className="text-[10px] font-mono text-text-muted-slate">
+                          Click swatch to open wheel
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2.5">
+                        <label className="relative w-9 h-9 rounded-lg cursor-pointer shrink-0 border border-border-medium overflow-hidden shadow-sm hover:scale-105 transition-transform" title="Click to open color wheel">
                           <input
                             type="color"
                             value={teamAColor}
@@ -314,18 +320,23 @@ export default function MatchSetupPage() {
                           maxLength={7}
                           className="w-24 h-9 bg-surface-carbon border border-border-medium rounded-lg px-2.5 text-xs font-mono text-optic-white text-center focus:outline-none focus:border-brand-primary"
                         />
+                      </div>
 
-                        {/* Presets Strip */}
-                        <div className="flex items-center gap-1 overflow-x-auto pl-1">
-                          {CURATED_TEAM_PRESETS.slice(0, 5).map((preset) => (
+                      {/* Presets Row without scrollbar */}
+                      <div className="space-y-1 pt-1 border-t border-border-subtle/50">
+                        <span className="text-[10px] font-mono text-text-muted-slate block">
+                          Quick Presets:
+                        </span>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {CURATED_TEAM_PRESETS.map((preset) => (
                             <button
                               key={preset.name}
                               type="button"
                               onClick={() => setTeamAColor(preset.hex)}
                               className={`w-6 h-6 rounded-full border transition-all shrink-0 cursor-pointer ${
                                 teamAColor.toLowerCase() === preset.hex.toLowerCase()
-                                  ? 'ring-2 ring-optic-white scale-110 border-white'
-                                  : 'border-border-subtle opacity-80 hover:opacity-100'
+                                  ? 'ring-2 ring-brand-primary scale-110 border-white shadow-sm'
+                                  : 'border-border-subtle opacity-80 hover:opacity-100 hover:scale-110'
                               }`}
                               style={{ backgroundColor: preset.hex }}
                               title={preset.name}
@@ -370,12 +381,18 @@ export default function MatchSetupPage() {
                     />
 
                     {/* Color Wheel & Swatch Selector */}
-                    <div className="space-y-1.5 pt-1">
-                      <label className="text-[10px] font-mono uppercase font-bold text-text-muted-slate block">
-                        Team Accent Color
-                      </label>
-                      <div className="flex items-center gap-2">
-                        <label className="relative w-9 h-9 rounded-lg cursor-pointer shrink-0 border border-border-medium overflow-hidden shadow-sm hover:scale-105 transition-transform">
+                    <div className="space-y-2 pt-1">
+                      <div className="flex items-center justify-between">
+                        <label className="text-[10px] font-mono uppercase font-bold text-text-muted-slate block">
+                          Team Accent Color
+                        </label>
+                        <span className="text-[10px] font-mono text-text-muted-slate">
+                          Click swatch to open wheel
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2.5">
+                        <label className="relative w-9 h-9 rounded-lg cursor-pointer shrink-0 border border-border-medium overflow-hidden shadow-sm hover:scale-105 transition-transform" title="Click to open color wheel">
                           <input
                             type="color"
                             value={teamBColor}
@@ -394,18 +411,23 @@ export default function MatchSetupPage() {
                           maxLength={7}
                           className="w-24 h-9 bg-surface-carbon border border-border-medium rounded-lg px-2.5 text-xs font-mono text-optic-white text-center focus:outline-none focus:border-brand-primary"
                         />
+                      </div>
 
-                        {/* Presets Strip */}
-                        <div className="flex items-center gap-1 overflow-x-auto pl-1">
-                          {CURATED_TEAM_PRESETS.slice(3).map((preset) => (
+                      {/* Presets Row without scrollbar */}
+                      <div className="space-y-1 pt-1 border-t border-border-subtle/50">
+                        <span className="text-[10px] font-mono text-text-muted-slate block">
+                          Quick Presets:
+                        </span>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {CURATED_TEAM_PRESETS.map((preset) => (
                             <button
                               key={preset.name}
                               type="button"
                               onClick={() => setTeamBColor(preset.hex)}
                               className={`w-6 h-6 rounded-full border transition-all shrink-0 cursor-pointer ${
                                 teamBColor.toLowerCase() === preset.hex.toLowerCase()
-                                  ? 'ring-2 ring-optic-white scale-110 border-white'
-                                  : 'border-border-subtle opacity-80 hover:opacity-100'
+                                  ? 'ring-2 ring-brand-primary scale-110 border-white shadow-sm'
+                                  : 'border-border-subtle opacity-80 hover:opacity-100 hover:scale-110'
                               }`}
                               style={{ backgroundColor: preset.hex }}
                               title={preset.name}
@@ -579,14 +601,16 @@ export default function MatchSetupPage() {
               </div>
               <button
                 type="button"
+                role="switch"
+                aria-checked={includeUsedQuestions}
                 onClick={() => setIncludeUsedQuestions(!includeUsedQuestions)}
-                className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
+                className={`w-12 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 p-0.5 flex items-center ${
                   includeUsedQuestions ? 'bg-team-a-core' : 'bg-surface-interactive border border-border-medium'
                 }`}
               >
                 <div
-                  className={`w-4 h-4 rounded-full bg-optic-white absolute top-1 transition-transform ${
-                    includeUsedQuestions ? 'translate-x-6' : 'translate-x-1'
+                  className={`w-5 h-5 rounded-full bg-white shadow-md transition-transform duration-200 ease-in-out ${
+                    includeUsedQuestions ? 'translate-x-6' : 'translate-x-0'
                   }`}
                 />
               </button>
