@@ -51,9 +51,9 @@ export function ContestLedger({ contests }: ContestLedgerProps) {
     <Card variant="carbon" className="space-y-6">
       {/* Header & Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border-subtle">
-        <div className="flex items-center gap-2.5">
-          <Swords className="w-5 h-5 text-team-a-bright" />
-          <div>
+        <div className="flex items-center gap-2.5 min-w-0">
+          <Swords className="w-5 h-5 text-team-a-bright shrink-0" />
+          <div className="min-w-0">
             <h2 className="text-base font-bold font-sans tracking-wide text-optic-white uppercase">
               Tournament Contest Ledger
             </h2>
@@ -65,7 +65,7 @@ export function ContestLedger({ contests }: ContestLedgerProps) {
 
         {/* Search & Filter Bar */}
         {contests.length > 0 && (
-          <div className="relative w-full sm:w-64">
+          <div className="relative w-full sm:w-64 shrink-0">
             <Search className="w-3.5 h-3.5 text-text-muted-slate absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
@@ -114,12 +114,13 @@ export function ContestLedger({ contests }: ContestLedgerProps) {
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="overflow-x-auto">
+          {/* Desktop Table — hidden on mobile */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left text-xs font-sans">
               <thead>
                 <tr className="border-b border-border-subtle text-text-muted-slate uppercase font-semibold">
-                  <th className="py-3 px-4">Date & Time</th>
-                  <th className="py-3 px-4">Contestants & Scores</th>
+                  <th className="py-3 px-4">Date &amp; Time</th>
+                  <th className="py-3 px-4">Contestants &amp; Scores</th>
                   <th className="py-3 px-4">Winner</th>
                   <th className="py-3 px-4 text-center">Questions Used</th>
                   <th className="py-3 px-4 text-right">Status</th>
@@ -140,13 +141,15 @@ export function ContestLedger({ contests }: ContestLedgerProps) {
                       key={c.id}
                       className="hover:bg-surface-interactive/60 transition-colors"
                     >
-                      <td className="py-4 px-4 text-text-muted-slate flex items-center gap-2">
-                        <Clock className="w-3.5 h-3.5" />
-                        <span>{dateStr}</span>
+                      <td className="py-4 px-4 text-text-muted-slate">
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-3.5 h-3.5 shrink-0" />
+                          <span>{dateStr}</span>
+                        </div>
                       </td>
 
                       <td className="py-4 px-4">
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-wrap items-center gap-2">
                           <span className="font-bold text-team-a-bright">
                             {c.team_a_name} ({c.team_a_score})
                           </span>
@@ -177,6 +180,65 @@ export function ContestLedger({ contests }: ContestLedgerProps) {
                 })}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile Card View — shown only on mobile */}
+          <div className="md:hidden space-y-3">
+            {paginatedContests.map((c) => {
+              const dateStr = new Date(c.created_at).toLocaleDateString(undefined, {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              });
+              const timeStr = new Date(c.created_at).toLocaleTimeString(undefined, {
+                hour: '2-digit',
+                minute: '2-digit',
+              });
+
+              return (
+                <div
+                  key={c.id}
+                  className="p-4 rounded-xl bg-surface-onyx border border-border-subtle space-y-3"
+                >
+                  {/* Date & Status row */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 text-[11px] font-mono text-text-muted-slate">
+                      <Clock className="w-3 h-3 shrink-0" />
+                      <span>{dateStr} • {timeStr}</span>
+                    </div>
+                    <span className="text-state-success font-bold text-[10px] uppercase font-mono">
+                      ✓ COMPLETED
+                    </span>
+                  </div>
+
+                  {/* Teams */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-center flex-1">
+                      <div className="text-xs font-bold text-team-a-bright truncate">{c.team_a_name}</div>
+                      <div className="text-2xl font-bold font-mono text-optic-white tabular-nums">{c.team_a_score}</div>
+                    </div>
+                    <div className="text-text-muted-slate text-xs font-mono font-bold shrink-0">VS</div>
+                    <div className="text-center flex-1">
+                      <div className="text-xs font-bold text-team-b-cyan truncate">{c.team_b_name}</div>
+                      <div className="text-2xl font-bold font-mono text-optic-white tabular-nums">{c.team_b_score}</div>
+                    </div>
+                  </div>
+
+                  {/* Winner & Questions */}
+                  <div className="flex items-center justify-between pt-2 border-t border-border-subtle/50">
+                    <div className="flex items-center gap-1.5">
+                      <Trophy className="w-3.5 h-3.5 text-team-b-cyan shrink-0" />
+                      <Badge variant="success" className="text-[11px]">
+                        {c.winner_name || 'Tie'}
+                      </Badge>
+                    </div>
+                    <span className="text-[11px] font-mono text-text-muted-slate">
+                      {c.revealed_count || 0} questions used
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           {/* Pagination Controls */}

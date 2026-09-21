@@ -104,19 +104,17 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-surface-obsidian p-6 md:p-10 max-w-5xl mx-auto space-y-8 transition-colors duration-200 font-sans">
       {/* Page Header */}
-      <div className="flex items-center justify-between pb-6 border-b border-border-subtle">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-surface-carbon border border-border-medium flex items-center justify-center">
-            <SettingsIcon className="w-5 h-5 text-team-b-cyan" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold font-sans tracking-tight text-optic-white">
-              ACCOUNT & CONSOLE SETTINGS
-            </h1>
-            <p className="text-xs text-text-muted-slate mt-0.5 font-sans">
-              Manage master credentials, tournament defaults, and database maintenance
-            </p>
-          </div>
+      <div className="flex items-start gap-3 pb-6 border-b border-border-subtle">
+        <div className="w-10 h-10 rounded-lg bg-surface-carbon border border-border-medium flex items-center justify-center shrink-0">
+          <SettingsIcon className="w-5 h-5 text-team-b-cyan" />
+        </div>
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold font-sans tracking-tight text-optic-white leading-tight">
+            ACCOUNT &amp; CONSOLE SETTINGS
+          </h1>
+          <p className="text-xs text-text-muted-slate mt-0.5 font-sans">
+            Manage master credentials, tournament defaults, and database maintenance
+          </p>
         </div>
       </div>
 

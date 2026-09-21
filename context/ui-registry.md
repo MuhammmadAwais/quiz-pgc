@@ -210,6 +210,45 @@ Last updated: 2026-09-21
 **Pattern notes:**
 Provides seamless client-side theme switching between Dark Mode (*Deep Slate & Petroleum Matrix*) and Light Mode (*Indigo Periwinkle High-Contrast*). Synchronizes instantly with `localStorage` (`pgc-arena-theme`) and updates the `.dark` / `.light` class on the `<html>` root element. Supported by an inline `<head>` script in `app/layout.tsx` to eliminate any Flash of Unstyled Content (FOUC). Present in the global Navbar, Login screen, and Live Match stage controls.
 
+---
 
+### Navbar (Responsive)
+File: `components/layout/Navbar.tsx`
+Last updated: 2026-09-21
 
+| Property | Class |
+|---|---|
+| Background | `bg-surface-obsidian/90 backdrop-blur-md` |
+| Border | `border-b border-border-subtle` |
+| Padding | `px-4 sm:px-6 py-3.5` |
+| Desktop nav items | `hidden lg:flex items-center gap-1` — full horizontal list ≥1024px |
+| Mobile hamburger | `lg:hidden` button with `Menu`/`X` icon toggle |
+| Mobile drawer | `fixed top-[57px] left-0 right-0 z-30 bg-surface-obsidian/97` slide-down panel |
+| Active item | `bg-surface-carbon text-team-a-bright border border-border-medium shadow-sm` |
+| Inactive item | `text-text-bright-slate hover:text-optic-white hover:bg-surface-onyx` |
+| Hover state | `hover:bg-surface-onyx transition-all` |
+| Shadow | None (blur handled by backdrop) |
+
+**Pattern notes:**
+Hamburger menu replaces full nav at `<lg` breakpoints. Mobile drawer items are `rounded-xl px-4 py-3` (larger touch targets). Closes automatically on navigation. Admin badge hidden on mobile; Logout text hidden below `sm`.
+
+---
+
+### ContestLedger (Responsive)
+File: `components/dashboard/ContestLedger.tsx`
+Last updated: 2026-09-21
+
+| Property | Class |
+|---|---|
+| Desktop table | `hidden md:block overflow-x-auto` — only shown ≥768px |
+| Mobile cards | `md:hidden space-y-3` — stacked cards on small screens |
+| Mobile card container | `p-4 rounded-xl bg-surface-onyx border border-border-subtle space-y-3` |
+| Score display | `text-2xl font-bold font-mono text-optic-white tabular-nums` |
+| Team A name | `text-xs font-bold text-team-a-bright truncate` |
+| Team B name | `text-xs font-bold text-team-b-cyan truncate` |
+| Meta row | `text-[11px] font-mono text-text-muted-slate` with `Clock` icon |
+| Status | `text-state-success font-bold text-[10px] uppercase font-mono` |
+
+**Pattern notes:**
+Two rendering modes based on breakpoint. Below `md`, each contest renders as a score card with team names, scores, winner badge, and question count. Above `md`, the full table with 5 columns is shown. Pagination controls are the same across both views.
 

@@ -23,11 +23,11 @@ export default async function DashboardPage() {
     <div className="min-h-screen bg-surface-obsidian p-6 md:p-10 max-w-7xl mx-auto space-y-8 transition-colors duration-200">
       {/* Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border-subtle">
-        <div>
+        <div className="min-w-0">
           <span className="font-mono text-xs uppercase tracking-widest text-team-b-cyan">
             BROADCAST STAGE DASHBOARD
           </span>
-          <h1 className="text-3xl font-extrabold font-sans tracking-tight text-optic-white mt-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-sans tracking-tight text-optic-white mt-1">
             PGC ARENA CONTROL
           </h1>
           <p className="text-xs text-text-muted-slate mt-1 font-sans">
@@ -35,7 +35,7 @@ export default async function DashboardPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 flex-wrap shrink-0">
           <Link href="/question-bank">
             <Button variant="console" size="md">
               <BookOpen className="w-4 h-4" />

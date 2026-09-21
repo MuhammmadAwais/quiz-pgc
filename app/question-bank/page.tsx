@@ -281,9 +281,9 @@ export default function QuestionBankPage() {
       </div>
 
       {/* 3-Pane Main Interface */}
-      <div className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 md:grid-cols-12 gap-6 font-sans">
+      <div className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 font-sans">
         {/* Pane 1: Subjects (3 cols) */}
-        <div className="md:col-span-3 flex flex-col h-full">
+        <div className="md:col-span-3 flex flex-col">
           <Card variant="carbon" className="flex-1 flex flex-col p-4">
             <div className="flex items-center justify-between pb-3 border-b border-border-subtle mb-3">
               <div className="flex items-center gap-2">
@@ -302,7 +302,7 @@ export default function QuestionBankPage() {
             </div>
 
             {/* Subjects List */}
-            <div className="space-y-1.5 overflow-y-auto max-h-[70vh] pr-1">
+            <div className="space-y-1.5 overflow-y-auto max-h-[40vh] md:max-h-[65vh] pr-1">
               {isLoading && !isLoaded ? (
                 <div className="space-y-2">
                   {[0, 1, 2, 3].map((i) => (
@@ -355,7 +355,7 @@ export default function QuestionBankPage() {
         </div>
 
         {/* Pane 2: Chapters / Topics (3 cols) */}
-        <div className="md:col-span-3 flex flex-col h-full">
+        <div className="md:col-span-3 flex flex-col">
           <Card variant="carbon" className="flex-1 flex flex-col p-4">
             <div className="flex items-center justify-between pb-3 border-b border-border-subtle mb-3">
               <div className="flex items-center gap-2">
@@ -376,7 +376,7 @@ export default function QuestionBankPage() {
             </div>
 
             {/* Chapters List */}
-            <div className="space-y-1.5 overflow-y-auto max-h-[70vh] pr-1">
+            <div className="space-y-1.5 overflow-y-auto max-h-[40vh] md:max-h-[65vh] pr-1">
               {isLoading && !isLoaded ? (
                 <div className="space-y-2">
                   {[0, 1, 2, 3].map((i) => (
@@ -455,7 +455,7 @@ export default function QuestionBankPage() {
         </div>
 
         {/* Pane 3: Questions List (6 cols) */}
-        <div className="md:col-span-6 flex flex-col h-full">
+        <div className="md:col-span-6 flex flex-col">
           <Card variant="carbon" className="flex-1 flex flex-col p-4">
             {/* Header & Search */}
             <div className="pb-3 border-b border-border-subtle mb-3 space-y-3">
@@ -488,7 +488,7 @@ export default function QuestionBankPage() {
             </div>
 
             {/* Questions Scroll Area */}
-            <div className="space-y-3 overflow-y-auto max-h-[66vh] pr-1">
+            <div className="space-y-3 overflow-y-auto max-h-[50vh] md:max-h-[62vh] pr-1">
               {isLoading && !isLoaded ? (
                 <div className="space-y-3">
                   {[0, 1, 2].map((i) => (

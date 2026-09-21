@@ -287,21 +287,21 @@ export default function BooksBankPage() {
           </div>
 
           {/* Search & Upload Action */}
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap w-full md:w-auto">
             {/* Reload / Sync Button */}
             <Button
               variant="console"
               size="sm"
               onClick={() => refreshRepo()}
               disabled={isSyncing || isLoading}
-              className="h-10 px-3 rounded-xl flex items-center gap-1.5 border-border-medium hover:border-team-b-cyan/50 text-xs text-text-bright-slate hover:text-optic-white cursor-pointer"
+              className="h-10 px-3 rounded-xl flex items-center gap-1.5 border-border-medium hover:border-team-b-cyan/50 text-xs text-text-bright-slate hover:text-optic-white cursor-pointer shrink-0"
               title="Synchronize textbooks from database"
             >
               <RotateCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-team-b-cyan' : 'text-text-muted-slate'}`} />
               <span>{isSyncing ? 'Syncing...' : 'Reload'}</span>
             </Button>
 
-            <div className="relative min-w-[240px]">
+            <div className="relative flex-1 min-w-[180px]">
               <Search className="w-4 h-4 absolute left-3 top-3 text-text-muted-slate" />
               <input
                 type="text"
@@ -316,7 +316,7 @@ export default function BooksBankPage() {
               variant="team-b"
               size="sm"
               onClick={() => setIsUploadModalOpen(true)}
-              className="h-10 px-4 rounded-xl flex items-center gap-2 shadow-sm cursor-pointer"
+              className="h-10 px-4 rounded-xl flex items-center gap-2 shadow-sm cursor-pointer shrink-0"
             >
               <UploadCloud className="w-4 h-4" />
               <span>Upload Textbook</span>

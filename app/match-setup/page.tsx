@@ -202,7 +202,7 @@ export default function MatchSetupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-obsidian p-6 md:p-10 max-w-5xl mx-auto space-y-6">
+    <div className="min-h-screen bg-surface-obsidian p-4 sm:p-6 md:p-10 max-w-5xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-border-subtle">
         <div>
@@ -240,9 +240,9 @@ export default function MatchSetupPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* Left Column: Form (7 cols) */}
-        <div className="lg:col-span-7 space-y-5">
+        <div className="lg:col-span-7 space-y-5 order-2 lg:order-1">
           {/* 1. Teams & Custom Colors */}
           <Card variant="carbon" className="p-5 space-y-4">
             <div className="flex items-center justify-between">
@@ -619,8 +619,8 @@ export default function MatchSetupPage() {
         </div>
 
         {/* Right Column: Match Summary & Launch (5 cols) */}
-        <div className="lg:col-span-5">
-          <Card variant="carbon" className="p-5 space-y-4 sticky top-24">
+        <div className="lg:col-span-5 order-1 lg:order-2">
+          <Card variant="carbon" className="p-5 space-y-4 lg:sticky lg:top-24">
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted-slate block pb-2 border-b border-border-subtle">
               Match Summary
             </span>
