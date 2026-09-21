@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Zap, Flame, Volume2, VolumeX } from 'lucide-react';
+import { Volume2, VolumeX } from 'lucide-react';
 import { soundFX } from '@/lib/utils/audio';
 
 interface StageHeaderProps {
@@ -29,10 +29,7 @@ export function StageHeader({
   subjectIndex = 0,
   totalSubjects = 1,
   teamTurn = 'TEAM_A',
-  activeTeamName: explicitActiveTeamName,
   activeTeamColor: explicitActiveTeamColor,
-  teamAName = 'Team A',
-  teamBName = 'Team B',
   teamAColor,
   teamBColor,
   isTieBreaker,
@@ -78,9 +75,10 @@ export function StageHeader({
         }}
       />
 
-      <div className="flex flex-wrap items-center justify-between gap-4 w-full">
+      {/* 3-Column True Center Grid */}
+      <div className="flex flex-col md:grid md:grid-cols-3 items-center justify-between gap-3 sm:gap-4 w-full">
         {/* 1. Left: Round Status & Question Status */}
-        <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+        <div className="flex items-center justify-center md:justify-start gap-2.5 sm:gap-3 shrink-0 w-full md:w-auto">
           {/* Round Status */}
           <div
             className="flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-xl bg-surface-onyx border transition-colors shadow-sm"
@@ -116,34 +114,26 @@ export function StageHeader({
           </div>
         </div>
 
-        {/* 2. Center: Prominent Subject Status */}
-        <div
-          className="flex items-center gap-3 px-5 sm:px-7 py-1.5 sm:py-2 rounded-xl border transition-all shadow-sm mx-auto md:mx-0"
-          style={{
-            borderColor: `${effectiveActiveTeamColor}45`,
-            backgroundColor: `${effectiveActiveTeamColor}12`,
-          }}
-        >
-          {isTieBreaker ? (
-            <Flame className="w-5 h-5 text-state-warning-rose animate-pulse shrink-0" />
-          ) : (
-            <Zap
-              className="w-5 h-5 shrink-0"
-              style={{ color: effectiveActiveTeamColor }}
-            />
-          )}
-          <div className="flex flex-col items-center sm:items-start leading-tight">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-text-muted-slate">
+        {/* 2. Center: Prominent Subject Status (True Centered, No Icon) */}
+        <div className="flex items-center justify-center w-full">
+          <div
+            className="flex flex-col items-center justify-center text-center px-6 sm:px-8 py-1.5 sm:py-2 rounded-xl border transition-all shadow-sm"
+            style={{
+              borderColor: `${effectiveActiveTeamColor}45`,
+              backgroundColor: `${effectiveActiveTeamColor}12`,
+            }}
+          >
+            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-text-muted-slate text-center">
               CURRENT SUBJECT
             </span>
-            <span className="font-mono text-base sm:text-lg md:text-xl font-black uppercase text-optic-white tracking-wider truncate max-w-[240px] sm:max-w-md drop-shadow-sm">
+            <span className="font-mono text-base sm:text-lg md:text-xl font-black uppercase text-optic-white tracking-wider text-center truncate max-w-[260px] sm:max-w-md drop-shadow-sm">
               {isTieBreaker ? 'SUDDEN-DEATH SUPER OVER' : subjectName}
             </span>
           </div>
         </div>
 
         {/* 3. Right: Audio Synthesizer Mute Control */}
-        <div className="flex items-center gap-3 shrink-0 ml-auto sm:ml-0">
+        <div className="flex items-center justify-center md:justify-end gap-3 shrink-0 w-full md:w-auto">
           <button
             type="button"
             onClick={handleToggleSound}
