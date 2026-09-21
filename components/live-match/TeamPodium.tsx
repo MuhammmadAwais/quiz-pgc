@@ -1,12 +1,14 @@
 'use client';
 
 import React from 'react';
+import { getTextContrastColor } from '@/lib/utils/color';
 
 interface TeamPodiumProps {
   faction: 'TEAM_A' | 'TEAM_B';
   name: string;
   score: number;
   isActiveTurn: boolean;
+  teamColor?: string;
 }
 
 export function TeamPodium({
@@ -14,35 +16,38 @@ export function TeamPodium({
   name,
   score,
   isActiveTurn,
+  teamColor,
 }: TeamPodiumProps) {
   const isTeamA = faction === 'TEAM_A';
+  const defaultColor = isTeamA ? '#8B5CF6' : '#06B6D4';
+  const effectiveColor = teamColor || defaultColor;
+  const badgeTextColor = getTextContrastColor(effectiveColor);
 
   return (
     <div
-      className={`relative rounded-xl transition-all duration-200 p-6 flex flex-col justify-between overflow-hidden ${
-        isTeamA
-          ? isActiveTurn
-            ? 'bg-surface-carbon border-2 border-team-a-core shadow-md'
-            : 'bg-surface-onyx border border-border-subtle opacity-75'
-          : isActiveTurn
-          ? 'bg-surface-carbon border-2 border-team-b-cyan shadow-md'
-          : 'bg-surface-onyx border border-border-subtle opacity-75'
+      style={
+        isActiveTurn
+          ? { borderColor: effectiveColor }
+          : undefined
+      }
+      className={`relative rounded-xl transition-all duration-200 p-6 flex flex-col justify-between overflow-hidden shadow-sm ${
+        isActiveTurn
+          ? 'bg-surface-carbon border-2'
+          : 'bg-surface-onyx border border-border-subtle opacity-80'
       }`}
     >
       {/* Team Identifier Header */}
       <div className="flex items-center justify-between z-10">
         <div className="flex items-center gap-2">
           <span
-            className={`w-2.5 h-2.5 rounded-full ${
-              isTeamA
-                ? isActiveTurn ? 'bg-team-a-core' : 'bg-team-a-deep/50'
-                : isActiveTurn ? 'bg-team-b-cyan' : 'bg-team-b-deep/50'
-            }`}
+            className="w-2.5 h-2.5 rounded-full"
+            style={{
+              backgroundColor: isActiveTurn ? effectiveColor : `${effectiveColor}80`,
+            }}
           />
           <span
-            className={`font-mono text-xs font-bold uppercase tracking-widest ${
-              isTeamA ? 'text-team-a-bright' : 'text-team-b-cyan'
-            }`}
+            className="font-mono text-xs font-bold uppercase tracking-widest"
+            style={{ color: effectiveColor }}
           >
             {isTeamA ? 'TEAM ALPHA' : 'TEAM BETA'}
           </span>
@@ -50,11 +55,11 @@ export function TeamPodium({
 
         {isActiveTurn && (
           <span
-            className={`font-mono text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
-              isTeamA
-                ? 'bg-team-a-core text-white'
-                : 'bg-team-b-cyan text-white'
-            }`}
+            className="font-mono text-[10px] font-bold uppercase px-2.5 py-0.5 rounded shadow-sm animate-badge-spring"
+            style={{
+              backgroundColor: effectiveColor,
+              color: badgeTextColor,
+            }}
           >
             ACTIVE TURN
           </span>
@@ -74,9 +79,8 @@ export function TeamPodium({
           POINTS
         </span>
         <span
-          className={`score-display ${
-            isTeamA ? 'text-team-a-bright' : 'text-team-b-cyan'
-          }`}
+          className="score-display font-extrabold"
+          style={{ color: effectiveColor }}
         >
           {score}
         </span>
@@ -84,3 +88,4 @@ export function TeamPodium({
     </div>
   );
 }
+

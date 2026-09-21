@@ -42,6 +42,8 @@ export interface Contest {
 export interface TournamentConfig {
   teamAName: string;
   teamBName: string;
+  teamAColor?: string;
+  teamBColor?: string;
   selectedSubjectIds: string[];
   subjectQuestionCounts: Record<string, number>; // subject_id -> questions per team
   mcqsPerSubject?: number; // fallback total

@@ -20,6 +20,13 @@ import { getSubjects } from '@/lib/actions/subjects';
 import { getPoolStats, fetchEligibleQuestions, seedSampleQuestions } from '@/lib/actions/questions';
 import { useTournamentStore } from '@/lib/store/tournament-store';
 import { useRepositoryStore } from '@/lib/store/useRepositoryStore';
+import { useTheme } from '@/components/theme/ThemeProvider';
+import {
+  CURATED_TEAM_PRESETS,
+  getAccessibleTeamColor,
+  getTextContrastColor,
+} from '@/lib/utils/color';
+import { Palette, ShieldAlert } from 'lucide-react';
 
 export default function MatchSetupPage() {
   const router = useRouter();
@@ -38,9 +45,14 @@ export default function MatchSetupPage() {
   const teamBScore = useTournamentStore((s) => s.teamBScore);
   const resetMatch = useTournamentStore((s) => s.resetMatch);
 
+  const { theme } = useTheme();
+  const isDarkMode = theme === 'dark';
+
   // Form State
   const [teamAName, setTeamAName] = useState('Alpha Titans');
   const [teamBName, setTeamBName] = useState('Cyber Phoenix');
+  const [teamAColor, setTeamAColor] = useState('#8B5CF6');
+  const [teamBColor, setTeamBColor] = useState('#06B6D4');
   const [selectedSubjectIds, setSelectedSubjectIds] = useState<string[]>([]);
   const [subjectQuestionCounts, setSubjectQuestionCounts] = useState<Record<string, number>>({});
   const [pointsPerMcq, setPointsPerMcq] = useState(10);
@@ -139,9 +151,14 @@ export default function MatchSetupPage() {
 
     setLaunching(true);
     try {
+      const safetyA = getAccessibleTeamColor(teamAColor, isDarkMode);
+      const safetyB = getAccessibleTeamColor(teamBColor, isDarkMode);
+
       const config: TournamentConfig = {
         teamAName: teamAName.trim() || 'Team A',
         teamBName: teamBName.trim() || 'Team B',
+        teamAColor: safetyA.safeColor,
+        teamBColor: safetyB.safeColor,
         selectedSubjectIds,
         subjectQuestionCounts,
         mcqsPerSubject: 2,
@@ -226,38 +243,186 @@ export default function MatchSetupPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: Form (7 cols) */}
         <div className="lg:col-span-7 space-y-5">
-          {/* 1. Teams */}
-          <Card variant="carbon" className="p-5 space-y-3">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted-slate block">
-              Teams
-            </span>
+          {/* 1. Teams & Custom Colors */}
+          <Card variant="carbon" className="p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted-slate block">
+                Teams &amp; Stage Identity
+              </span>
+              <span className="text-[11px] font-mono text-text-muted-slate flex items-center gap-1">
+                <Palette className="w-3.5 h-3.5" />
+                <span>Custom Color Wheel</span>
+              </span>
+            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <span className="text-[11px] font-mono text-team-a-bright font-semibold flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-team-a-core" />
-                  Team A (Violet)
-                </span>
-                <Input
-                  value={teamAName}
-                  onChange={(e) => setTeamAName(e.target.value)}
-                  placeholder="Team A Name"
-                  className="text-sm font-semibold"
-                />
+            {/* Same-color Warning */}
+            {teamAColor.toLowerCase() === teamBColor.toLowerCase() && (
+              <div className="p-2.5 rounded-xl bg-state-warning-rose/15 border border-state-warning-rose/30 text-state-warning-rose text-xs flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4 shrink-0" />
+                <span>Both teams currently share the same color. Please choose distinct colors for stage visual clarity.</span>
               </div>
+            )}
 
-              <div className="space-y-1.5">
-                <span className="text-[11px] font-mono text-team-b-ice font-semibold flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-team-b-cyan" />
-                  Team B (Cyan)
-                </span>
-                <Input
-                  value={teamBName}
-                  onChange={(e) => setTeamBName(e.target.value)}
-                  placeholder="Team B Name"
-                  className="text-sm font-semibold"
-                />
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Team A Configuration */}
+              {(() => {
+                const safetyA = getAccessibleTeamColor(teamAColor, isDarkMode);
+                return (
+                  <div className="p-4 rounded-xl bg-surface-onyx border border-border-subtle space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-mono font-semibold flex items-center gap-1.5" style={{ color: safetyA.safeColor }}>
+                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: safetyA.safeColor }} />
+                        Team Alpha (First Turn)
+                      </span>
+                      {safetyA.isAdjusted && (
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-surface-interactive border border-border-medium text-text-muted-slate">
+                          Contrast Adjusted
+                        </span>
+                      )}
+                    </div>
+
+                    <Input
+                      label="Team Name"
+                      value={teamAName}
+                      onChange={(e) => setTeamAName(e.target.value)}
+                      placeholder="Team A Name"
+                      className="text-sm font-semibold"
+                    />
+
+                    {/* Color Wheel & Swatch Selector */}
+                    <div className="space-y-1.5 pt-1">
+                      <label className="text-[10px] font-mono uppercase font-bold text-text-muted-slate block">
+                        Team Accent Color
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <label className="relative w-9 h-9 rounded-lg cursor-pointer shrink-0 border border-border-medium overflow-hidden shadow-sm hover:scale-105 transition-transform">
+                          <input
+                            type="color"
+                            value={teamAColor}
+                            onChange={(e) => setTeamAColor(e.target.value)}
+                            className="absolute -top-4 -left-4 w-16 h-16 cursor-pointer opacity-0"
+                            title="Open Color Wheel"
+                          />
+                          <div className="w-full h-full" style={{ backgroundColor: teamAColor }} />
+                        </label>
+
+                        <input
+                          type="text"
+                          value={teamAColor.toUpperCase()}
+                          onChange={(e) => setTeamAColor(e.target.value)}
+                          placeholder="#8B5CF6"
+                          maxLength={7}
+                          className="w-24 h-9 bg-surface-carbon border border-border-medium rounded-lg px-2.5 text-xs font-mono text-optic-white text-center focus:outline-none focus:border-brand-primary"
+                        />
+
+                        {/* Presets Strip */}
+                        <div className="flex items-center gap-1 overflow-x-auto pl-1">
+                          {CURATED_TEAM_PRESETS.slice(0, 5).map((preset) => (
+                            <button
+                              key={preset.name}
+                              type="button"
+                              onClick={() => setTeamAColor(preset.hex)}
+                              className={`w-6 h-6 rounded-full border transition-all shrink-0 cursor-pointer ${
+                                teamAColor.toLowerCase() === preset.hex.toLowerCase()
+                                  ? 'ring-2 ring-optic-white scale-110 border-white'
+                                  : 'border-border-subtle opacity-80 hover:opacity-100'
+                              }`}
+                              style={{ backgroundColor: preset.hex }}
+                              title={preset.name}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      {safetyA.isAdjusted && (
+                        <p className="text-[10px] font-mono text-text-muted-slate pt-1">
+                          Note: Displayed as <span className="font-bold" style={{ color: safetyA.safeColor }}>{safetyA.safeColor}</span> on stage to ensure readability against the background.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Team B Configuration */}
+              {(() => {
+                const safetyB = getAccessibleTeamColor(teamBColor, isDarkMode);
+                return (
+                  <div className="p-4 rounded-xl bg-surface-onyx border border-border-subtle space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-mono font-semibold flex items-center gap-1.5" style={{ color: safetyB.safeColor }}>
+                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: safetyB.safeColor }} />
+                        Team Beta (Second Turn)
+                      </span>
+                      {safetyB.isAdjusted && (
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-surface-interactive border border-border-medium text-text-muted-slate">
+                          Contrast Adjusted
+                        </span>
+                      )}
+                    </div>
+
+                    <Input
+                      label="Team Name"
+                      value={teamBName}
+                      onChange={(e) => setTeamBName(e.target.value)}
+                      placeholder="Team B Name"
+                      className="text-sm font-semibold"
+                    />
+
+                    {/* Color Wheel & Swatch Selector */}
+                    <div className="space-y-1.5 pt-1">
+                      <label className="text-[10px] font-mono uppercase font-bold text-text-muted-slate block">
+                        Team Accent Color
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <label className="relative w-9 h-9 rounded-lg cursor-pointer shrink-0 border border-border-medium overflow-hidden shadow-sm hover:scale-105 transition-transform">
+                          <input
+                            type="color"
+                            value={teamBColor}
+                            onChange={(e) => setTeamBColor(e.target.value)}
+                            className="absolute -top-4 -left-4 w-16 h-16 cursor-pointer opacity-0"
+                            title="Open Color Wheel"
+                          />
+                          <div className="w-full h-full" style={{ backgroundColor: teamBColor }} />
+                        </label>
+
+                        <input
+                          type="text"
+                          value={teamBColor.toUpperCase()}
+                          onChange={(e) => setTeamBColor(e.target.value)}
+                          placeholder="#06B6D4"
+                          maxLength={7}
+                          className="w-24 h-9 bg-surface-carbon border border-border-medium rounded-lg px-2.5 text-xs font-mono text-optic-white text-center focus:outline-none focus:border-brand-primary"
+                        />
+
+                        {/* Presets Strip */}
+                        <div className="flex items-center gap-1 overflow-x-auto pl-1">
+                          {CURATED_TEAM_PRESETS.slice(3).map((preset) => (
+                            <button
+                              key={preset.name}
+                              type="button"
+                              onClick={() => setTeamBColor(preset.hex)}
+                              className={`w-6 h-6 rounded-full border transition-all shrink-0 cursor-pointer ${
+                                teamBColor.toLowerCase() === preset.hex.toLowerCase()
+                                  ? 'ring-2 ring-optic-white scale-110 border-white'
+                                  : 'border-border-subtle opacity-80 hover:opacity-100'
+                              }`}
+                              style={{ backgroundColor: preset.hex }}
+                              title={preset.name}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      {safetyB.isAdjusted && (
+                        <p className="text-[10px] font-mono text-text-muted-slate pt-1">
+                          Note: Displayed as <span className="font-bold" style={{ color: safetyB.safeColor }}>{safetyB.safeColor}</span> on stage to ensure readability against the background.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </Card>
 

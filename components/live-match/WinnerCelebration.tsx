@@ -6,6 +6,7 @@ import { Trophy, ArrowRight, RotateCcw, CheckCircle2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Button } from '@/components/ui/Button';
 import { commitContestResult } from '@/lib/actions/contests';
+import { soundFX } from '@/lib/utils/audio';
 
 interface WinnerCelebrationProps {
   winnerName: string;
@@ -31,6 +32,9 @@ export function WinnerCelebration({
   const [committed, setCommitted] = useState(false);
 
   useEffect(() => {
+    // Play zero-network victory fanfare
+    soundFX.playVictory();
+
     // Stage fireworks celebration
     const end = Date.now() + 3.5 * 1000;
     const colors = ['#3D52A0', '#7091E6', '#0E7490', '#124E66', '#9ACDEA'];

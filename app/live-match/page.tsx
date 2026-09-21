@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { Question } from '@/lib/types/tournament';
+import { soundFX } from '@/lib/utils/audio';
 
 export default function LiveMatchPage() {
   const router = useRouter();
@@ -153,6 +154,8 @@ export default function LiveMatchPage() {
           teamTurn={teamTurn}
           teamAName={config.teamAName}
           teamBName={config.teamBName}
+          teamAColor={config.teamAColor}
+          teamBColor={config.teamBColor}
           isTieBreaker={isTieBreaker}
         />
 
@@ -187,6 +190,7 @@ export default function LiveMatchPage() {
             name={config.teamAName}
             score={teamAScore}
             isActiveTurn={isTeamA}
+            teamColor={config.teamAColor}
           />
         </div>
 
@@ -196,6 +200,7 @@ export default function LiveMatchPage() {
             /* Super Over Mystery Box Grid */
             <MysteryBoxGrid
               onSelectBox={(boxIdx) => {
+                soundFX.playMysteryBox();
                 selectMysteryBox(boxIdx);
                 revealQuestion();
               }}
@@ -228,7 +233,10 @@ export default function LiveMatchPage() {
               <Button
                 variant={isTeamA ? 'team-a' : 'team-b'}
                 size="lg"
-                onClick={revealQuestion}
+                onClick={() => {
+                  soundFX.playReveal();
+                  revealQuestion();
+                }}
                 className="font-bold text-sm tracking-wider px-8"
               >
                 <Eye className="w-4 h-4 mr-1.5" />
@@ -264,6 +272,8 @@ export default function LiveMatchPage() {
                       isSubmitted={isAnswerSubmitted}
                       isCorrect={isCorrect}
                       teamTurn={teamTurn}
+                      teamColor={isTeamA ? config.teamAColor : config.teamBColor}
+                      points={config.pointsPerMcq || 10}
                       onSelect={() => selectOption(idx)}
                       disabled={isAnswerSubmitted}
                     />
@@ -277,7 +287,17 @@ export default function LiveMatchPage() {
                   <Button
                     variant={isTeamA ? 'team-a' : 'team-b'}
                     size="lg"
-                    onClick={confirmAnswer}
+                    onClick={() => {
+                      if (selectedOptionIndex !== null && currentQuestion) {
+                        const isCorrect = selectedOptionIndex === currentQuestion.correct_index;
+                        if (isCorrect) {
+                          soundFX.playCorrect();
+                        } else {
+                          soundFX.playIncorrect();
+                        }
+                      }
+                      confirmAnswer();
+                    }}
                     className="font-bold text-base px-10 shadow-sm"
                   >
                     <CheckCircle2 className="w-5 h-5 mr-2" />
@@ -315,6 +335,7 @@ export default function LiveMatchPage() {
             name={config.teamBName}
             score={teamBScore}
             isActiveTurn={!isTeamA}
+            teamColor={config.teamBColor}
           />
         </div>
       </div>
