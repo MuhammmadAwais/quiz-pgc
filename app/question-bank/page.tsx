@@ -14,6 +14,9 @@ import {
   Search,
   Sparkles,
   CheckCircle2,
+  RotateCw,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -25,32 +28,43 @@ import { AiStudioModal } from '@/components/studio/AiStudioModal';
 import { MathRenderer } from '@/components/ui/MathRenderer';
 import { Subject, Chapter, Question } from '@/lib/types/tournament';
 import { Book } from '@/lib/types/books';
-import { getBooks } from '@/lib/actions/books';
+import { useRepositoryStore } from '@/lib/store/useRepositoryStore';
 import {
-  getSubjects,
   createSubject,
   deleteSubject,
 } from '@/lib/actions/subjects';
 import {
-  getChapters,
   createChapter,
   deleteChapter,
 } from '@/lib/actions/chapters';
 import {
-  getQuestions,
   deleteQuestion,
   seedSampleQuestions,
 } from '@/lib/actions/questions';
 
+const QUESTIONS_PER_PAGE = 10;
+
 export default function QuestionBankPage() {
   const router = useRouter();
-  const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [chapters, setChapters] = useState<Chapter[]>([]);
-  const [questions, setQuestions] = useState<Question[]>([]);
+
+  // Central in-memory repository store
+  const subjects = useRepositoryStore((s) => s.subjects);
+  const chapters = useRepositoryStore((s) => s.chapters);
+  const questions = useRepositoryStore((s) => s.questions);
+  const books = useRepositoryStore((s) => s.books);
+  const isLoaded = useRepositoryStore((s) => s.isLoaded);
+  const isLoading = useRepositoryStore((s) => s.isLoading);
+  const isSyncing = useRepositoryStore((s) => s.isSyncing);
+  const loadRepo = useRepositoryStore((s) => s.loadRepo);
+  const refreshRepo = useRepositoryStore((s) => s.refreshRepo);
+  const removeSubject = useRepositoryStore((s) => s.removeSubject);
+  const removeChapter = useRepositoryStore((s) => s.removeChapter);
+  const removeQuestion = useRepositoryStore((s) => s.removeQuestion);
+
   const [selectedSubjectId, setSelectedSubjectId] = useState<string | null>(null);
   const [selectedChapterId, setSelectedChapterId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
   const [isPending, startTransition] = useTransition();
 
   // Modals state
@@ -63,40 +77,25 @@ export default function QuestionBankPage() {
   const [seedLoading, setSeedLoading] = useState(false);
 
   // Books Bank & AI Studio state
-  const [books, setBooks] = useState<Book[]>([]);
   const [isAiStudioOpen, setIsAiStudioOpen] = useState(false);
   const [selectedBookForAi, setSelectedBookForAi] = useState<Book | null>(null);
 
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      const [subs, chaps, qs, bks] = await Promise.all([
-        getSubjects(),
-        getChapters(),
-        getQuestions(),
-        getBooks(),
-      ]);
-      setSubjects(subs);
-      setChapters(chaps);
-      setQuestions(qs);
-      setBooks(bks);
-
-      if (!selectedSubjectId && subs.length > 0) {
-        setSelectedSubjectId(subs[0].id);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const refreshBooks = async () => {
-    const bks = await getBooks();
-    setBooks(bks);
-  };
-
+  // Initialize store if not already loaded (0ms on return visits!)
   useEffect(() => {
-    loadData();
-  }, []);
+    loadRepo();
+  }, [loadRepo]);
+
+  // Default to first subject if none selected
+  useEffect(() => {
+    if (!selectedSubjectId && subjects.length > 0) {
+      setSelectedSubjectId(subjects[0].id);
+    }
+  }, [subjects, selectedSubjectId]);
+
+  // Reset pagination to page 1 whenever filter or search query changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedSubjectId, selectedChapterId, searchQuery]);
 
   // Filtered lists
   const activeSubject = subjects.find((s) => s.id === selectedSubjectId);
@@ -114,6 +113,13 @@ export default function QuestionBankPage() {
     return matchesSubject && matchesChapter && matchesSearch;
   });
 
+  // Client-side pagination slices
+  const totalPages = Math.max(1, Math.ceil(filteredQuestions.length / QUESTIONS_PER_PAGE));
+  const paginatedQuestions = filteredQuestions.slice(
+    (currentPage - 1) * QUESTIONS_PER_PAGE,
+    currentPage * QUESTIONS_PER_PAGE
+  );
+
   const handleAddSubject = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newSubjectName.trim()) return;
@@ -123,7 +129,7 @@ export default function QuestionBankPage() {
       if (res.success) {
         setNewSubjectName('');
         setIsAddSubjectOpen(false);
-        await loadData();
+        await refreshRepo();
       }
     });
   };
@@ -132,13 +138,14 @@ export default function QuestionBankPage() {
     e.stopPropagation();
     if (!confirm('Are you sure you want to delete this subject and all its chapters & questions?')) return;
 
+    removeSubject(id);
     startTransition(async () => {
       await deleteSubject(id);
       if (selectedSubjectId === id) {
         setSelectedSubjectId(null);
         setSelectedChapterId(null);
       }
-      await loadData();
+      await refreshRepo();
     });
   };
 
@@ -151,7 +158,7 @@ export default function QuestionBankPage() {
       if (res.success) {
         setNewChapterName('');
         setIsAddChapterOpen(false);
-        await loadData();
+        await refreshRepo();
       }
     });
   };
@@ -160,18 +167,20 @@ export default function QuestionBankPage() {
     e.stopPropagation();
     if (!confirm('Are you sure you want to delete this chapter and its questions?')) return;
 
+    removeChapter(id);
     startTransition(async () => {
       await deleteChapter(id);
       if (selectedChapterId === id) setSelectedChapterId(null);
-      await loadData();
+      await refreshRepo();
     });
   };
 
   const handleDeleteQuestion = async (id: string) => {
     if (!confirm('Delete this question?')) return;
+    removeQuestion(id);
     startTransition(async () => {
       await deleteQuestion(id);
-      await loadData();
+      await refreshRepo();
     });
   };
 
@@ -179,7 +188,7 @@ export default function QuestionBankPage() {
     setSeedLoading(true);
     try {
       await seedSampleQuestions();
-      await loadData();
+      await refreshRepo();
     } finally {
       setSeedLoading(false);
     }
@@ -201,6 +210,19 @@ export default function QuestionBankPage() {
           </div>
 
           <div className="flex items-center gap-2.5 flex-wrap">
+            {/* Reload / Sync Button */}
+            <Button
+              variant="console"
+              size="sm"
+              onClick={() => refreshRepo()}
+              disabled={isSyncing || isLoading}
+              className="flex items-center gap-1.5 border-white/20 hover:border-team-b-cyan/50 text-xs text-text-bright-slate hover:text-optic-white"
+              title="Synchronize question bank from database"
+            >
+              <RotateCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-team-b-cyan' : 'text-text-muted-slate'}`} />
+              <span>{isSyncing ? 'Syncing...' : 'Reload'}</span>
+            </Button>
+
             {/* Books Bank Dedicated Page Link */}
             <Link href="/books-bank">
               <Button
@@ -471,74 +493,144 @@ export default function QuestionBankPage() {
                   </Button>
                 </div>
               ) : (
-                filteredQuestions.map((q, idx) => (
-                  <div
-                    key={q.id}
-                    className="p-4 rounded-lg bg-surface-onyx border border-white/10 hover:border-white/20 transition-all group space-y-3"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-start gap-2.5">
-                        <span className="font-mono text-xs text-team-a-bright font-bold mt-0.5">
-                          {String(idx + 1).padStart(2, '0')}.
-                        </span>
-                        <div className="text-sm font-medium text-optic-white leading-relaxed">
-                          <MathRenderer content={q.text} />
+                paginatedQuestions.map((q, idx) => {
+                  const globalIdx = (currentPage - 1) * QUESTIONS_PER_PAGE + idx + 1;
+                  return (
+                    <div
+                      key={q.id}
+                      className="p-4 rounded-lg bg-surface-onyx border border-white/10 hover:border-white/20 transition-all group space-y-3"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-2.5">
+                          <span className="font-mono text-xs text-team-a-bright font-bold mt-0.5">
+                            {String(globalIdx).padStart(2, '0')}.
+                          </span>
+                          <div className="text-sm font-medium text-optic-white leading-relaxed">
+                            <MathRenderer content={q.text} />
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            onClick={() => {
+                              setEditingQuestion(q);
+                              setIsQuestionModalOpen(true);
+                            }}
+                            className="p-1 text-text-muted-slate hover:text-team-a-bright rounded transition-colors"
+                            title="Edit Question"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteQuestion(q.id)}
+                            className="p-1 text-text-muted-slate hover:text-state-warning-rose rounded transition-colors"
+                            title="Delete Question"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-1 shrink-0">
-                        <button
-                          onClick={() => {
-                            setEditingQuestion(q);
-                            setIsQuestionModalOpen(true);
-                          }}
-                          className="p-1 text-text-muted-slate hover:text-team-a-bright rounded transition-colors"
-                          title="Edit Question"
-                        >
-                          <Edit2 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteQuestion(q.id)}
-                          className="p-1 text-text-muted-slate hover:text-state-warning-rose rounded transition-colors"
-                          title="Delete Question"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+                      {/* Options 2x2 Preview */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-white/5">
+                        {q.options.map((opt, oIdx) => {
+                          const isCorrect = q.correct_index === oIdx;
+                          const letter = ['A', 'B', 'C', 'D'][oIdx];
+
+                          return (
+                            <div
+                              key={oIdx}
+                              className={`flex items-center gap-2 p-2 rounded text-xs transition-colors ${
+                                isCorrect
+                                  ? 'bg-state-success/15 border border-state-success/40 text-state-success font-medium'
+                                  : 'bg-surface-carbon/80 border border-white/5 text-text-bright-slate'
+                              }`}
+                            >
+                              <span className="font-mono font-bold text-[11px] opacity-70">
+                                [{letter}]
+                              </span>
+                              <span className="truncate">
+                                <MathRenderer content={opt} inline />
+                              </span>
+                              {isCorrect && (
+                                <CheckCircle2 className="w-3.5 h-3.5 ml-auto shrink-0" />
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
-
-                    {/* Options 2x2 Preview */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-white/5">
-                      {q.options.map((opt, oIdx) => {
-                        const isCorrect = q.correct_index === oIdx;
-                        const letter = ['A', 'B', 'C', 'D'][oIdx];
-
-                        return (
-                          <div
-                            key={oIdx}
-                            className={`flex items-center gap-2 p-2 rounded text-xs transition-colors ${
-                              isCorrect
-                                ? 'bg-state-success/15 border border-state-success/40 text-state-success font-medium'
-                                : 'bg-surface-carbon/80 border border-white/5 text-text-bright-slate'
-                            }`}
-                          >
-                            <span className="font-mono font-bold text-[11px] opacity-70">
-                              [{letter}]
-                            </span>
-                            <span className="truncate">
-                              <MathRenderer content={opt} inline />
-                            </span>
-                            {isCorrect && (
-                              <CheckCircle2 className="w-3.5 h-3.5 ml-auto shrink-0" />
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
+
+            {/* Pagination Controls */}
+            {filteredQuestions.length > QUESTIONS_PER_PAGE && (
+              <div className="pt-3 border-t border-white/10 mt-3 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+                <span className="text-text-muted-slate text-[11px]">
+                  Showing {(currentPage - 1) * QUESTIONS_PER_PAGE + 1}–
+                  {Math.min(currentPage * QUESTIONS_PER_PAGE, filteredQuestions.length)} of{' '}
+                  {filteredQuestions.length}
+                </span>
+
+                <div className="flex items-center gap-1.5">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={currentPage <= 1}
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    className="h-7 px-2 text-xs"
+                  >
+                    <ChevronLeft className="w-3.5 h-3.5 mr-0.5" /> Prev
+                  </Button>
+
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => {
+                      if (
+                        totalPages > 6 &&
+                        Math.abs(pageNum - currentPage) > 2 &&
+                        pageNum !== 1 &&
+                        pageNum !== totalPages
+                      ) {
+                        if (pageNum === 2 || pageNum === totalPages - 1) {
+                          return (
+                            <span key={pageNum} className="text-text-muted-slate px-0.5 text-[10px]">
+                              ...
+                            </span>
+                          );
+                        }
+                        return null;
+                      }
+
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => setCurrentPage(pageNum)}
+                          className={`w-6 h-6 rounded text-xs flex items-center justify-center transition-colors cursor-pointer ${
+                            currentPage === pageNum
+                              ? 'bg-team-a-core text-surface-obsidian font-bold shadow-sm'
+                              : 'bg-surface-onyx text-text-muted-slate hover:text-optic-white hover:bg-surface-interactive'
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={currentPage >= totalPages}
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    className="h-7 px-2 text-xs"
+                  >
+                    Next <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </Card>
         </div>
       </div>
@@ -627,7 +719,7 @@ export default function QuestionBankPage() {
         selectedSubjectId={selectedSubjectId || undefined}
         selectedChapterId={selectedChapterId || undefined}
         editingQuestion={editingQuestion}
-        onSuccess={loadData}
+        onSuccess={() => refreshRepo()}
       />
 
       {/* AI Studio Modal */}
@@ -642,7 +734,7 @@ export default function QuestionBankPage() {
           setIsAiStudioOpen(false);
           router.push('/books-bank');
         }}
-        onSuccess={loadData}
+        onSuccess={() => refreshRepo()}
       />
     </div>
   );

@@ -18,9 +18,13 @@ import { Subject, TournamentConfig } from '@/lib/types/tournament';
 import { getSubjects } from '@/lib/actions/subjects';
 import { getPoolStats, fetchEligibleQuestions, seedSampleQuestions } from '@/lib/actions/questions';
 import { useTournamentStore } from '@/lib/store/tournament-store';
+import { useRepositoryStore } from '@/lib/store/useRepositoryStore';
 
 export default function MatchSetupPage() {
   const router = useRouter();
+  const repoSubjects = useRepositoryStore((s) => s.subjects);
+  const loadRepo = useRepositoryStore((s) => s.loadRepo);
+
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
   const [launching, setLaunching] = useState(false);
@@ -42,13 +46,19 @@ export default function MatchSetupPage() {
   const [includeUsedQuestions, setIncludeUsedQuestions] = useState(true);
 
   // Pool Validation State
-  const [poolTotal, setPoolTotal] = useState(0);
   const [poolBreakdown, setPoolBreakdown] = useState<Record<string, number>>({});
   const [validatingPool, setValidatingPool] = useState(false);
 
   useEffect(() => {
+    loadRepo();
+  }, [loadRepo]);
+
+  useEffect(() => {
     async function init() {
-      const subs = await getSubjects();
+      let subs = repoSubjects;
+      if (subs.length === 0) {
+        subs = await getSubjects();
+      }
       setSubjects(subs);
 
       const defaultCounts: Record<string, number> = {};
@@ -58,33 +68,39 @@ export default function MatchSetupPage() {
       setSubjectQuestionCounts(defaultCounts);
 
       if (subs.length > 0) {
-        setSelectedSubjectIds(subs.slice(0, 3).map((s) => s.id));
+        setSelectedSubjectIds((prev) => (prev.length === 0 ? subs.slice(0, 3).map((s) => s.id) : prev));
       }
       setLoading(false);
     }
     init();
-  }, []);
+  }, [repoSubjects]);
 
-  // Recalculate pool whenever selection or toggle changes
+  // Fetch pool stats for all available subjects so selections have immediate accurate stats
   useEffect(() => {
-    async function validate() {
-      if (selectedSubjectIds.length === 0) {
-        setPoolTotal(0);
+    async function validateAll() {
+      if (subjects.length === 0) {
         setPoolBreakdown({});
         return;
       }
 
       setValidatingPool(true);
       try {
-        const stats = await getPoolStats(selectedSubjectIds, includeUsedQuestions);
-        setPoolTotal(stats.totalAvailable);
+        const allSubjectIds = subjects.map((s) => s.id);
+        const stats = await getPoolStats(allSubjectIds, includeUsedQuestions);
         setPoolBreakdown(stats.breakdown);
+      } catch (err) {
+        console.error('Failed to validate question pool:', err);
       } finally {
         setValidatingPool(false);
       }
     }
-    validate();
-  }, [selectedSubjectIds, includeUsedQuestions]);
+    validateAll();
+  }, [subjects, includeUsedQuestions]);
+
+  const poolTotal = selectedSubjectIds.reduce(
+    (sum, id) => sum + (poolBreakdown[id] || 0),
+    0
+  );
 
   const toggleSubject = (id: string) => {
     if (selectedSubjectIds.includes(id)) {
@@ -295,13 +311,25 @@ export default function MatchSetupPage() {
                           <span className="text-sm font-semibold text-optic-white block truncate">
                             {sub.name}
                           </span>
-                          <span
-                            className={`text-[11px] font-mono block ${
-                              isShort ? 'text-state-warning-rose' : 'text-text-muted-slate'
-                            }`}
-                          >
-                            {available} in bank {isShort && `(need ${needed})`}
-                          </span>
+                          {isSelected && (
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              {isShort ? (
+                                <span className="text-[11px] font-mono text-state-warning-rose flex items-center gap-1">
+                                  <AlertCircle className="w-3 h-3 shrink-0" />
+                                  <span>
+                                    Short by {needed - available} (have {available}, need {needed})
+                                  </span>
+                                </span>
+                              ) : (
+                                <span className="text-[11px] font-mono text-team-b-ice flex items-center gap-1">
+                                  <CheckCircle2 className="w-3 h-3 shrink-0" />
+                                  <span>
+                                    {available} available in bank (need {needed})
+                                  </span>
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
 

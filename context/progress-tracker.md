@@ -6,13 +6,22 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ## Current Status
 
-**Phase:** Phase 7 — Books Bank & AI MCQ Generation Studio (Complete)  
-**Last completed:** Backblaze B2 PDF upload & proxy routes, server-side PDF slicing with pdf-lib, Google Gemini 3.6 Flash pipeline with fallback matrix, Books Bank shelf modal, PDF.js page range preview with inspect zoom modal, persistent Rapid Review Deck with KaTeX math rendering, and 1-click batch commit to database  
-**Next:** User stage testing and textbook upload  
+**Phase:** Phase 8 — Architecture Optimization, Hybrid In-Memory Caching, Pagination & Match Setup Telemetry (Complete)  
+**Last completed:** Centralized Zustand repository store (`useRepositoryStore.ts`) for zero-roundtrip routing, client-side pagination for Question Bank (10/page) & Books Bank (6/page), login page demo autofill removal with password preview toggle, and match setup question pool telemetry fix  
+**Next:** User stage testing and match rehearsal
 
 ---
 
 ## Progress
+
+### Phase 8 — Architecture Optimization & UX Polish
+
+- [x] 26 Centralized In-Memory Repository Cache (`lib/store/useRepositoryStore.ts` holding subjects, chapters, questions, books for 0ms client-side route transitions)
+- [x] 27 On-Demand Reload & Sync Actions (sleek header sync button with spinning feedback across `/question-bank` and `/books-bank`)
+- [x] 28 Question Bank Pagination (10 MCQs per page, active page pills, previous/next controls, KaTeX rendering optimization)
+- [x] 29 Books Bank Pagination (6 textbooks per page, tag filter auto-reset, previous/next controls)
+- [x] 30 Login Console Overhaul (removed demo credentials autofill link, added inline `Eye`/`EyeOff` password preview toggle)
+- [x] 31 Match Setup Question Pool Telemetry Fix (removed confusing "0 in bank" label on unselected subjects, pre-validated all pools, precise requirement indicators)
 
 ### Phase 1 — Foundation, Schema & Tokens
 

@@ -115,7 +115,54 @@ Last updated: 2026-09-21
 | Shadow | `shadow-2xl`, `shadow-team-b-cyan/20` |
 | Accent usage | `bg-team-b-cyan` (Save Accepted to Question Bank CTA) |
 
+### InputWithToggle
+File: `components/ui/Input.tsx`, `app/page.tsx`
+Last updated: 2026-09-21
+
+| Property | Class |
+|---|---|
+| Background | `bg-surface-obsidian` (input field), `bg-surface-carbon` (card wrapper) |
+| Border | `border-white/20`, `focus:border-team-a-core`, `focus:ring-1 focus:ring-team-a-core/40` |
+| Border radius | `rounded-md` |
+| Text | `text-optic-white`, placeholder `text-text-muted-slate`, font `font-mono text-xs` |
+| Right element | `absolute right-3 top-1/2 -translate-y-1/2 flex items-center z-10 pr-11` (input padding) |
+| Action toggle | `text-text-muted-slate hover:text-optic-white transition-colors p-1` (`Eye` / `EyeOff`) |
+
 **Pattern notes:**
-Sticky footer pinned to the bottom of the review modal. All controls standardized to `h-10` with matching `rounded-xl` borders: Subject/Topic dropdowns, `Clear All`, and primary Save CTA. Submits directly to `/api/ai/save` REST endpoint.
+Standardizes inline action buttons inside text fields without layout disruption. Used for master password preview in the login console.
+
+---
+
+### PaginationBar
+File: `app/question-bank/page.tsx`, `app/books-bank/page.tsx`
+Last updated: 2026-09-21
+
+| Property | Class |
+|---|---|
+| Background | `bg-surface-onyx` (inactive pills), `bg-team-a-core` / `bg-team-b-cyan` (active pills) |
+| Border | `pt-3 border-t border-white/10` (divider) |
+| Border radius | `rounded text-xs` (Question Bank), `rounded-lg text-xs` (Books Bank) |
+| Text | `font-mono text-xs text-text-muted-slate`, active `text-surface-obsidian font-bold` |
+| Spacing | `flex items-center gap-1.5`, `h-7 px-2` / `h-8 px-2.5` (stepper buttons) |
+| Hover state | `hover:text-optic-white hover:bg-surface-interactive` |
+
+**Pattern notes:**
+Deterministic client-side pagination that caps rendering to 10 MCQs or 6 textbooks per page. Prevents DOM bloat and eliminates KaTeX re-rendering slowdowns on low-end projector hardware.
+
+---
+
+### SubjectPoolTelemetry
+File: `app/match-setup/page.tsx`
+Last updated: 2026-09-21
+
+| Property | Class |
+|---|---|
+| Unselected state | Completely hides bank count (zero text clutter) |
+| Sufficient state | `text-[11px] font-mono text-team-b-ice flex items-center gap-1` (`CheckCircle2`) |
+| Shortage state | `text-[11px] font-mono text-state-warning-rose flex items-center gap-1` (`AlertCircle`) |
+
+**Pattern notes:**
+Removes confusing "0 in bank" telemetry for unselected cards. Pre-validates all subjects from the repository store to provide immediate, precise pool requirement status upon selection.
+
 
 

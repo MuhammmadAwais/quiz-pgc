@@ -19,6 +19,9 @@ import {
   X,
   ExternalLink,
   Plus,
+  RotateCw,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -27,18 +30,29 @@ import { Modal } from '@/components/ui/Modal';
 import { Badge } from '@/components/ui/Badge';
 import { Book } from '@/lib/types/books';
 import { Subject, Chapter } from '@/lib/types/tournament';
-import { getBooks, createBookRecord, updateBookRecord, deleteBook } from '@/lib/actions/books';
-import { getSubjects } from '@/lib/actions/subjects';
-import { getChapters } from '@/lib/actions/chapters';
+import { useRepositoryStore } from '@/lib/store/useRepositoryStore';
+import { createBookRecord, updateBookRecord, deleteBook } from '@/lib/actions/books';
 import { AiStudioModal } from '@/components/studio/AiStudioModal';
 
+const BOOKS_PER_PAGE = 6;
+
 export default function BooksBankPage() {
-  const [books, setBooks] = useState<Book[]>([]);
-  const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [chapters, setChapters] = useState<Chapter[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Central in-memory repository store
+  const books = useRepositoryStore((s) => s.books);
+  const subjects = useRepositoryStore((s) => s.subjects);
+  const chapters = useRepositoryStore((s) => s.chapters);
+  const isLoaded = useRepositoryStore((s) => s.isLoaded);
+  const isLoading = useRepositoryStore((s) => s.isLoading);
+  const isSyncing = useRepositoryStore((s) => s.isSyncing);
+  const loadRepo = useRepositoryStore((s) => s.loadRepo);
+  const refreshRepo = useRepositoryStore((s) => s.refreshRepo);
+  const addBook = useRepositoryStore((s) => s.addBook);
+  const updateBookInStore = useRepositoryStore((s) => s.updateBook);
+  const removeBook = useRepositoryStore((s) => s.removeBook);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Modal States
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -63,25 +77,15 @@ export default function BooksBankPage() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
 
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      const [bks, subs, chaps] = await Promise.all([
-        getBooks(),
-        getSubjects(),
-        getChapters(),
-      ]);
-      setBooks(bks);
-      setSubjects(subs);
-      setChapters(chaps);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Load from in-memory cache or initial fetch
   useEffect(() => {
-    loadData();
-  }, []);
+    loadRepo();
+  }, [loadRepo]);
+
+  // Reset pagination to page 1 on filter or search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedTag, searchQuery]);
 
   // Compute all unique tags across textbooks
   const allTags = Array.from(
@@ -99,6 +103,13 @@ export default function BooksBankPage() {
 
     return matchesSearch && matchesTag;
   });
+
+  // Client-side pagination slices
+  const totalPages = Math.max(1, Math.ceil(filteredBooks.length / BOOKS_PER_PAGE));
+  const paginatedBooks = filteredBooks.slice(
+    (currentPage - 1) * BOOKS_PER_PAGE,
+    currentPage * BOOKS_PER_PAGE
+  );
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -165,7 +176,7 @@ export default function BooksBankPage() {
       setSelectedFile(null);
       setTitle('');
       setTagsInput('');
-      await loadData();
+      await refreshRepo();
 
       setTimeout(() => {
         setIsUploadModalOpen(false);
@@ -181,9 +192,10 @@ export default function BooksBankPage() {
 
   const handleDelete = async (book: Book) => {
     if (!confirm(`Are you sure you want to remove "${book.title}" from Books Bank?`)) return;
+    removeBook(book.id);
     try {
       await deleteBook(book.id, book.file_key);
-      await loadData();
+      await refreshRepo();
     } catch (err) {
       console.error('Delete failed:', err);
     }
@@ -235,10 +247,9 @@ export default function BooksBankPage() {
         throw new Error(res.error || 'Failed to update textbook details.');
       }
 
-      // Update in local state immediately
-      setBooks((prev) =>
-        prev.map((b) => (b.id === res.book!.id ? res.book! : b))
-      );
+      // Update in store immediately
+      updateBookInStore(res.book);
+      await refreshRepo();
 
       setIsEditModalOpen(false);
       setEditingBook(null);
@@ -276,7 +287,20 @@ export default function BooksBankPage() {
 
           {/* Search & Upload Action */}
           <div className="flex items-center gap-3 flex-wrap">
-            <div className="relative min-w-[260px]">
+            {/* Reload / Sync Button */}
+            <Button
+              variant="console"
+              size="sm"
+              onClick={() => refreshRepo()}
+              disabled={isSyncing || isLoading}
+              className="h-10 px-3 rounded-xl flex items-center gap-1.5 border-white/20 hover:border-team-b-cyan/50 text-xs text-text-bright-slate hover:text-optic-white cursor-pointer"
+              title="Synchronize textbooks from database"
+            >
+              <RotateCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-team-b-cyan' : 'text-text-muted-slate'}`} />
+              <span>{isSyncing ? 'Syncing...' : 'Reload'}</span>
+            </Button>
+
+            <div className="relative min-w-[240px]">
               <Search className="w-4 h-4 absolute left-3 top-3 text-text-muted-slate" />
               <input
                 type="text"
@@ -341,7 +365,7 @@ export default function BooksBankPage() {
         )}
 
         {/* Books Shelf Grid */}
-        {loading ? (
+        {isLoading && !isLoaded ? (
           <div className="flex flex-col items-center justify-center py-24 space-y-3">
             <Loader2 className="w-8 h-8 animate-spin text-team-b-cyan" />
             <p className="text-xs text-text-muted-slate font-mono">Loading Books Bank repository...</p>
@@ -371,7 +395,7 @@ export default function BooksBankPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {filteredBooks.map((book) => (
+            {paginatedBooks.map((book) => (
               <div
                 key={book.id}
                 className="p-5 rounded-2xl bg-surface-carbon border border-border-subtle hover:border-team-b-cyan/50 transition-all flex flex-col justify-between group shadow-lg space-y-4"
@@ -471,6 +495,55 @@ export default function BooksBankPage() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {filteredBooks.length > BOOKS_PER_PAGE && (
+          <div className="pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+            <span className="text-text-muted-slate text-[11px]">
+              Showing {(currentPage - 1) * BOOKS_PER_PAGE + 1}–
+              {Math.min(currentPage * BOOKS_PER_PAGE, filteredBooks.length)} of{' '}
+              {filteredBooks.length} textbooks
+            </span>
+
+            <div className="flex items-center gap-1.5">
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={currentPage <= 1}
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                className="h-8 px-2.5 text-xs cursor-pointer"
+              >
+                <ChevronLeft className="w-4 h-4 mr-1" /> Prev
+              </Button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`w-7 h-7 rounded-lg text-xs flex items-center justify-center transition-colors cursor-pointer ${
+                      currentPage === pageNum
+                        ? 'bg-team-b-cyan text-surface-obsidian font-bold shadow-sm'
+                        : 'bg-surface-carbon text-text-muted-slate hover:text-optic-white hover:bg-surface-interactive'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
+              </div>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={currentPage >= totalPages}
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                className="h-8 px-2.5 text-xs cursor-pointer"
+              >
+                Next <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
+            </div>
           </div>
         )}
       </div>
@@ -736,7 +809,7 @@ export default function BooksBankPage() {
         books={books}
         initialBookId={selectedBookForAi?.id}
         onOpenBooksBank={() => setIsUploadModalOpen(true)}
-        onSuccess={loadData}
+        onSuccess={() => refreshRepo()}
       />
     </div>
   );

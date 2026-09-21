@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Swords, Lock, Mail, Sparkles, AlertCircle, ArrowRight } from 'lucide-react';
+import { Swords, Lock, Mail, AlertCircle, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -11,6 +11,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,11 +48,6 @@ export default function LoginPage() {
       setError(message);
       setLoading(false);
     }
-  };
-
-  const handleDemoFill = () => {
-    setEmail('admin@pgc.edu');
-    setPassword('Admin@PGC2026!');
   };
 
   return (
@@ -99,12 +95,27 @@ export default function LoginPage() {
             <div>
               <Input
                 label="Master Password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
                 className="font-mono text-xs"
+                rightElement={
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-text-muted-slate hover:text-optic-white transition-colors p-1 cursor-pointer focus:outline-none"
+                    title={showPassword ? 'Hide password' : 'Show password'}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                }
               />
             </div>
 
@@ -128,18 +139,6 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
-
-          {/* Quick Demo Credentials Autofill */}
-          <div className="mt-6 pt-5 border-t border-white/10 text-center">
-            <button
-              type="button"
-              onClick={handleDemoFill}
-              className="inline-flex items-center gap-2 text-xs font-mono text-team-b-ice hover:text-optic-white transition-colors cursor-pointer"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Click to Autofill Demo Master Credentials</span>
-            </button>
-          </div>
         </div>
 
         {/* Projector System Notice */}
