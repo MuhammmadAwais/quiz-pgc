@@ -134,7 +134,7 @@ export function ReviewCard({ question, index, total }: ReviewCardProps) {
                 {isCorrect && (
                   <div className="flex items-center gap-1 text-[10px] font-bold text-state-success shrink-0 font-mono uppercase tracking-wider">
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Correct Answer</span>
+                    <span className="hidden sm:inline">Correct Answer</span>
                   </div>
                 )}
               </div>

@@ -98,27 +98,27 @@ export function RapidReviewDeck({
   return (
     <section className="space-y-4 font-sans animate-fade-in">
       {/* Top Banner & Quick Actions */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 bg-surface-onyx border border-border-subtle p-4 rounded-2xl">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-team-b-cyan/15 border border-team-b-cyan/30 flex items-center justify-center text-team-b-cyan shrink-0">
-            <Sparkles className="w-4 h-4" />
+      <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 bg-surface-onyx border border-border-subtle p-4 sm:p-5 rounded-2xl">
+        <div className="flex items-start sm:items-center gap-3 min-w-0 flex-1">
+          <div className="w-10 h-10 rounded-xl bg-team-b-cyan/15 border border-team-b-cyan/30 flex items-center justify-center text-team-b-cyan shrink-0">
+            <Sparkles className="w-5 h-5" />
           </div>
-          <div>
-            <h2 className="text-sm font-bold font-mono tracking-wider text-optic-white flex items-center gap-2">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-sm font-bold font-mono tracking-wider text-optic-white flex items-center gap-2 flex-wrap">
               <span>Review Generated Questions</span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-surface-interactive border border-border-subtle text-team-b-cyan font-bold">
-                {stagedQuestions.length}
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-surface-interactive border border-border-subtle text-team-b-cyan font-bold whitespace-nowrap">
+                {stagedQuestions.length} Questions
               </span>
             </h2>
-            <p className="text-xs text-text-muted-slate mt-0.5">
+            <p className="text-xs text-text-muted-slate mt-0.5 leading-relaxed">
               Accept good questions, reject or edit any that look off, then save them to Question Bank.
             </p>
           </div>
         </div>
 
         {/* Shortcuts & Bulk Actions */}
-        <div className="flex items-center gap-2.5 w-full md:w-auto justify-end flex-wrap sm:flex-nowrap">
-          <div className="hidden lg:flex items-center gap-1.5 text-[11px] text-text-muted-slate font-mono mr-1">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full xl:w-auto justify-between sm:justify-end shrink-0 pt-2 xl:pt-0 border-t xl:border-t-0 border-border-subtle/50">
+          <div className="hidden 2xl:flex items-center gap-1.5 text-[11px] text-text-muted-slate font-mono mr-1 shrink-0">
             <span className="opacity-70">Shortcuts:</span>
             <span className="px-1.5 py-0.5 rounded bg-surface-interactive text-text-bright-slate font-bold">↵ Accept</span>
             <span className="px-1.5 py-0.5 rounded bg-surface-interactive text-text-bright-slate font-bold">⌫ Reject</span>
@@ -129,7 +129,7 @@ export function RapidReviewDeck({
             <button
               type="button"
               onClick={rejectAll}
-              className="h-9 px-3.5 rounded-xl bg-surface-interactive hover:bg-state-warning-rose/20 border border-border-subtle hover:border-state-warning-rose/40 text-text-muted-slate hover:text-state-warning-rose text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+              className="h-9 px-3.5 rounded-xl bg-surface-interactive hover:bg-state-warning-rose/20 border border-border-subtle hover:border-state-warning-rose/40 text-text-muted-slate hover:text-state-warning-rose text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap shrink-0"
               title="Reject all questions in this batch"
             >
               <XCircle className="w-4 h-4" />
@@ -139,7 +139,7 @@ export function RapidReviewDeck({
             <button
               type="button"
               onClick={acceptAll}
-              className="h-9 px-4 rounded-xl bg-state-success/20 hover:bg-state-success/30 border border-state-success/40 text-state-success text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02]"
+              className="h-9 px-4 rounded-xl bg-state-success/20 hover:bg-state-success/30 border border-state-success/40 text-state-success text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02] whitespace-nowrap shrink-0"
               title="Accept all questions at once"
             >
               <CheckCheck className="w-4 h-4 stroke-[2.5]" />

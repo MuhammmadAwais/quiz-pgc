@@ -52,7 +52,7 @@ export function StageHeader({
   return (
     <div className="w-full flex flex-col items-center justify-between gap-3 pb-6 border-b border-border-subtle">
       {/* Top Telemetry & Subject Pill */}
-      <div className="flex items-center justify-between w-full">
+      <div className="flex flex-wrap items-center justify-between gap-3 w-full">
         {/* Left: Round / Telemetry */}
         <div className="flex items-center gap-2">
           {isTieBreaker ? (
