@@ -10,7 +10,6 @@ import {
   Minimize2,
   CheckCircle2,
   ArrowRight,
-  Sparkles,
 } from 'lucide-react';
 import { useTournamentStore } from '@/lib/store/tournament-store';
 import { StageHeader } from '@/components/live-match/StageHeader';
@@ -20,6 +19,7 @@ import { MysteryBoxGrid } from '@/components/live-match/MysteryBoxGrid';
 import { WinnerCelebration } from '@/components/live-match/WinnerCelebration';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { Question } from '@/lib/types/tournament';
 
 export default function LiveMatchPage() {
@@ -50,7 +50,6 @@ export default function LiveMatchPage() {
     revealedQuestionIds,
     isMatchFinished,
     winnerName,
-    questionPool,
     teamAQuestionPool,
     teamBQuestionPool,
     historyStack,
@@ -87,10 +86,10 @@ export default function LiveMatchPage() {
     return (
       <div className="min-h-screen bg-surface-obsidian flex items-center justify-center p-6 text-center">
         <div className="max-w-md space-y-4">
-          <h2 className="text-2xl font-bold font-mono text-optic-white">
+          <h2 className="text-2xl font-bold font-sans text-optic-white">
             NO ACTIVE STAGE MATCH LOADED
           </h2>
-          <p className="text-sm text-text-muted-slate">
+          <p className="text-sm text-text-muted-slate font-sans">
             Configure match rules, teams, and question pool in the Match Setup console before entering
             the live arena.
           </p>
@@ -142,19 +141,7 @@ export default function LiveMatchPage() {
   const currentSubjectQuota = config.subjectQuestionCounts?.[activeSubject?.id] || config.mcqsPerSubject || 2;
 
   return (
-    <div className="min-h-screen w-full bg-surface-obsidian text-optic-white flex flex-col justify-between projector-safe-margin select-none overflow-y-auto relative py-6 px-4 md:px-8">
-      {/* Background ambient lighting */}
-      <div
-        className={`absolute top-0 left-0 w-96 h-96 rounded-full blur-[140px] pointer-events-none opacity-20 transition-all duration-700 ${
-          isTeamA ? 'bg-team-a-core' : 'bg-transparent'
-        }`}
-      />
-      <div
-        className={`absolute top-0 right-0 w-96 h-96 rounded-full blur-[140px] pointer-events-none opacity-20 transition-all duration-700 ${
-          !isTeamA ? 'bg-team-b-cyan' : 'bg-transparent'
-        }`}
-      />
-
+    <div className="min-h-screen w-full bg-surface-obsidian text-optic-white flex flex-col justify-between projector-safe-margin select-none overflow-y-auto relative py-6 px-4 md:px-8 transition-colors duration-200">
       {/* Top Stage Header (Subject, Question telemetry, Active Turn) */}
       <div className="w-full z-10">
         <StageHeader
@@ -171,7 +158,7 @@ export default function LiveMatchPage() {
 
         {/* Top Active Turn Advance Status Banner */}
         {isAnswerSubmitted && (
-          <div className="w-full max-w-4xl mx-auto mt-3 px-6 py-2.5 rounded-xl bg-surface-carbon/90 border border-state-success/40 shadow-[0_0_24px_rgba(34,211,238,0.2)] flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="w-full max-w-4xl mx-auto mt-3 px-6 py-2.5 rounded-xl bg-surface-carbon border border-state-success/40 shadow-sm flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="flex items-center gap-3">
               <span className="w-2.5 h-2.5 rounded-full bg-state-success animate-ping" />
               <span className="font-mono text-xs md:text-sm font-bold text-optic-white uppercase tracking-wider">
@@ -218,19 +205,19 @@ export default function LiveMatchPage() {
             />
           ) : !isQuestionRevealed ? (
             /* Unrevealed Question Placeholder Card */
-            <div className="w-full h-80 rounded-2xl bg-surface-carbon border border-white/15 flex flex-col items-center justify-center p-8 text-center space-y-5 shadow-[0_16px_36px_rgba(0,0,0,0.85)]">
+            <div className="w-full h-80 rounded-2xl bg-surface-carbon border border-border-medium flex flex-col items-center justify-center p-8 text-center space-y-5 shadow-modal-dialog">
               <div
                 className={`w-16 h-16 rounded-2xl flex items-center justify-center ${
                   isTeamA
-                    ? 'bg-team-a-core/20 border border-team-a-bright text-team-a-bright glow-team-a'
-                    : 'bg-team-b-cyan/20 border border-team-b-ice text-team-b-ice glow-team-b'
+                    ? 'bg-team-a-core/15 border border-team-a-bright text-team-a-bright'
+                    : 'bg-team-b-cyan/15 border border-team-b-ice text-team-b-cyan'
                 }`}
               >
                 <Eye className="w-8 h-8" />
               </div>
 
               <div className="space-y-1">
-                <h3 className="text-xl md:text-2xl font-bold text-optic-white">
+                <h3 className="text-xl md:text-2xl font-bold text-optic-white font-sans">
                   {activeTeamName}&apos;s Question Ready
                 </h3>
                 <p className="text-xs text-text-muted-slate font-mono uppercase">
@@ -250,13 +237,13 @@ export default function LiveMatchPage() {
             </div>
           ) : currentQuestion ? (
             /* Active Question Bay & 2x2 Option Grid */
-            <div className="w-full space-y-6 animate-in fade-in zoom-in-95 duration-300">
+            <div className="w-full space-y-6 animate-in fade-in zoom-in-95 duration-200">
               {/* Question Text Prompt Card */}
-              <div className="p-6 md:p-8 rounded-2xl bg-surface-carbon border border-white/20 shadow-[0_16px_32px_rgba(0,0,0,0.85)]">
-                <span className="label-caps text-text-muted-slate block mb-2">
+              <div className="p-6 md:p-8 rounded-2xl bg-surface-carbon border border-border-medium shadow-modal-dialog">
+                <span className="label-caps text-text-muted-slate block mb-2 font-sans">
                   QUESTION PROMPT
                 </span>
-                <h2 className="text-headline-md md:text-headline-lg font-bold text-optic-white leading-relaxed tracking-tight">
+                <h2 className="text-headline-md md:text-headline-lg font-bold text-optic-white leading-relaxed tracking-tight font-sans">
                   {currentQuestion.text}
                 </h2>
               </div>
@@ -291,7 +278,7 @@ export default function LiveMatchPage() {
                     variant={isTeamA ? 'team-a' : 'team-b'}
                     size="lg"
                     onClick={confirmAnswer}
-                    className="font-bold text-base px-10 shadow-[0_0_24px_rgba(255,255,255,0.2)] animate-pulse"
+                    className="font-bold text-base px-10 shadow-sm"
                   >
                     <CheckCircle2 className="w-5 h-5 mr-2" />
                     CONFIRM VERBAL RESPONSE
@@ -306,7 +293,7 @@ export default function LiveMatchPage() {
                     variant={isTeamA ? 'team-a' : 'team-b'}
                     size="lg"
                     onClick={nextTurn}
-                    className="font-bold text-base px-10 shadow-[0_0_24px_rgba(255,255,255,0.25)]"
+                    className="font-bold text-base px-10 shadow-sm"
                   >
                     <span>PROCEED TO NEXT TURN</span>
                     <ArrowRight className="w-5 h-5 ml-2" />
@@ -333,7 +320,7 @@ export default function LiveMatchPage() {
       </div>
 
       {/* Floating Unobtrusive Operator Control Bar */}
-      <div className="w-full max-w-7xl mx-auto flex items-center justify-between pt-4 border-t border-white/10 z-20">
+      <div className="w-full max-w-7xl mx-auto flex items-center justify-between pt-4 border-t border-border-subtle z-20">
         <div className="flex items-center gap-3">
           {/* Undo Action Button */}
           <Button
@@ -376,10 +363,13 @@ export default function LiveMatchPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Dual Theme Switcher */}
+          <ThemeToggle />
+
           {/* Toggle Fullscreen */}
           <button
             onClick={toggleFullscreen}
-            className="p-2 rounded-md bg-surface-carbon border border-white/15 text-text-bright-slate hover:text-optic-white hover:bg-surface-interactive transition-colors"
+            className="p-2 rounded-lg bg-surface-carbon border border-border-medium text-text-bright-slate hover:text-optic-white hover:bg-surface-interactive transition-colors cursor-pointer"
             title="Toggle Projector Fullscreen"
           >
             {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
@@ -388,7 +378,7 @@ export default function LiveMatchPage() {
           {/* Exit Match */}
           <button
             onClick={() => setExitModalOpen(true)}
-            className="p-2 rounded-md bg-surface-carbon border border-white/15 text-text-muted-slate hover:text-state-warning-rose hover:bg-state-warning-rose/10 transition-colors"
+            className="p-2 rounded-lg bg-surface-carbon border border-border-medium text-text-muted-slate hover:text-state-warning-rose hover:bg-state-warning-rose/10 transition-colors cursor-pointer"
             title="Exit Live Match"
           >
             <LogOut className="w-4 h-4" />
@@ -419,11 +409,11 @@ export default function LiveMatchPage() {
         title="Exit Active Match?"
       >
         <div className="space-y-4">
-          <p className="text-sm text-text-muted-slate">
+          <p className="text-sm text-text-muted-slate font-sans">
             Exiting now will discard uncommitted live match scores. Are you sure you want to return to
             the tournament dashboard?
           </p>
-          <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
+          <div className="flex justify-end gap-3 pt-3 border-t border-border-subtle">
             <Button variant="console" size="sm" onClick={() => setExitModalOpen(false)}>
               Continue Match
             </Button>

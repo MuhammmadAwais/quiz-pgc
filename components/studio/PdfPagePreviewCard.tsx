@@ -169,7 +169,7 @@ export function PdfPagePreviewCard({
           </span>
         </div>
         <div className="flex items-center gap-2 text-[11px]">
-          <span className="px-2.5 py-0.5 rounded-md bg-surface-interactive border border-white/10 text-team-b-cyan font-mono font-bold">
+          <span className="px-2.5 py-0.5 rounded-md bg-surface-interactive border border-border-subtle text-team-b-cyan font-mono font-bold">
             {startPage === endPage
               ? `Page ${startPage}`
               : `Pages ${startPage} → ${endPage} (${endPage - startPage + 1} pages)`}
@@ -223,7 +223,7 @@ export function PdfPagePreviewCard({
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="sticky top-0 z-20 shrink-0 flex items-center justify-between px-5 py-3.5 bg-surface-onyx border-b border-white/10">
+              <div className="sticky top-0 z-20 shrink-0 flex items-center justify-between px-5 py-3.5 bg-surface-onyx border-b border-border-subtle">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-team-b-cyan/15 border border-team-b-cyan/30 flex items-center justify-center text-team-b-cyan shrink-0">
                     <FileText className="w-4 h-4" />
@@ -268,7 +268,7 @@ export function PdfPagePreviewCard({
 
                 {/* Zoom Controls */}
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center bg-surface-interactive border border-white/10 rounded-xl p-1 gap-1">
+                  <div className="flex items-center bg-surface-interactive border border-border-subtle rounded-xl p-1 gap-1">
                     <button
                       type="button"
                       onClick={() => setZoomScale((s) => Math.max(0.7, Number((s - 0.2).toFixed(1))))}
@@ -295,7 +295,7 @@ export function PdfPagePreviewCard({
                   <button
                     type="button"
                     onClick={() => setZoomPage(null)}
-                    className="p-2 rounded-xl bg-surface-interactive hover:bg-white/15 text-text-bright-slate hover:text-optic-white transition-colors ml-1 border border-white/10"
+                    className="p-2 rounded-xl bg-surface-interactive hover:bg-surface-interactive/80 text-text-bright-slate hover:text-optic-white transition-colors ml-1 border border-border-subtle"
                     title="Close (Esc)"
                   >
                     <X className="w-4 h-4" />
@@ -307,7 +307,7 @@ export function PdfPagePreviewCard({
               <div className="flex-1 overflow-auto p-4 sm:p-6 flex items-start justify-center bg-surface-obsidian/80">
                 <canvas
                   ref={zoomCanvasRef}
-                  className="rounded-xl shadow-2xl border border-white/10 max-w-full h-auto"
+                  className="rounded-xl shadow-2xl border border-border-subtle max-w-full h-auto"
                 />
               </div>
             </div>
@@ -403,7 +403,7 @@ function SinglePageThumbnail({
   }, [fileUrl, pageNumber, isPdfJsReady, maxPages, getCachedPdfDoc]);
 
   return (
-    <div className="p-3 rounded-xl bg-surface-onyx border border-white/10 space-y-2.5 flex flex-col justify-between">
+    <div className="p-3 rounded-xl bg-surface-onyx border border-border-subtle space-y-2.5 flex flex-col justify-between">
       {/* Header Bar */}
       <div className="flex items-center justify-between">
         <span className="text-[10px] font-bold font-mono uppercase tracking-wider text-text-muted-slate">
@@ -422,7 +422,7 @@ function SinglePageThumbnail({
             <ChevronLeft className="w-3 h-3" />
           </button>
 
-          <span className="px-2 py-0.5 rounded bg-surface-carbon text-xs font-mono font-bold text-optic-white min-w-[36px] text-center border border-white/10">
+          <span className="px-2 py-0.5 rounded bg-surface-carbon text-xs font-mono font-bold text-optic-white min-w-[36px] text-center border border-border-subtle">
             {pageNumber}
           </span>
 
@@ -441,7 +441,7 @@ function SinglePageThumbnail({
       {/* Surface Preview */}
       <div
         onClick={onZoomClick}
-        className="relative group h-44 rounded-lg bg-surface-obsidian border border-white/5 flex items-center justify-center overflow-hidden cursor-pointer hover:border-white/20 transition-all"
+        className="relative group h-44 rounded-lg bg-surface-obsidian border border-border-subtle/50 flex items-center justify-center overflow-hidden cursor-pointer hover:border-border-medium transition-all"
         title="Click to inspect page in full resolution"
       >
         {isLoading ? (

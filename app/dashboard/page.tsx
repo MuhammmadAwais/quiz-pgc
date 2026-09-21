@@ -7,8 +7,6 @@ import {
   Layers,
   Play,
   Clock,
-  Sparkles,
-  ArrowUpRight,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -24,17 +22,17 @@ export default async function DashboardPage() {
   ]);
 
   return (
-    <div className="min-h-screen bg-surface-obsidian p-6 md:p-10 max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-surface-obsidian p-6 md:p-10 max-w-7xl mx-auto space-y-8 transition-colors duration-200">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border-subtle">
         <div>
           <span className="font-mono text-xs uppercase tracking-widest text-team-b-cyan">
             BROADCAST STAGE DASHBOARD
           </span>
-          <h1 className="text-3xl font-extrabold font-mono tracking-wide text-optic-white mt-1">
+          <h1 className="text-3xl font-extrabold font-sans tracking-tight text-optic-white mt-1">
             PGC ARENA CONTROL
           </h1>
-          <p className="text-xs text-text-muted-slate mt-1">
+          <p className="text-xs text-text-muted-slate mt-1 font-sans">
             Overview of live tournament competitions, questions database, and contest archives
           </p>
         </div>
@@ -49,7 +47,7 @@ export default async function DashboardPage() {
 
           <Link href="/match-setup">
             <Button variant="team-a" size="md" className="font-bold">
-              <Play className="w-4 h-4 fill-surface-obsidian" />
+              <Play className="w-4 h-4 fill-white" />
               <span>Launch New Match</span>
             </Button>
           </Link>
@@ -60,14 +58,14 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         {/* Total Contests */}
         <Card variant="carbon" className="flex items-center gap-5 p-6">
-          <div className="w-12 h-12 rounded-xl bg-team-a-core/15 border border-team-a-core/40 flex items-center justify-center shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-team-a-core/15 border border-team-a-core/30 flex items-center justify-center shrink-0">
             <Trophy className="w-6 h-6 text-team-a-bright" />
           </div>
           <div>
-            <span className="font-mono text-xs text-text-muted-slate uppercase tracking-wider block">
+            <span className="font-sans text-xs text-text-muted-slate uppercase tracking-wider block font-semibold">
               Total Contests Held
             </span>
-            <span className="font-mono text-3xl font-bold text-optic-white tabular-nums">
+            <span className="text-3xl font-bold text-optic-white tabular-nums font-sans">
               {stats.totalContests}
             </span>
           </div>
@@ -75,14 +73,14 @@ export default async function DashboardPage() {
 
         {/* Questions in Bank */}
         <Card variant="carbon" className="flex items-center gap-5 p-6">
-          <div className="w-12 h-12 rounded-xl bg-team-b-cyan/15 border border-team-b-cyan/40 flex items-center justify-center shrink-0">
-            <BookOpen className="w-6 h-6 text-team-b-ice" />
+          <div className="w-12 h-12 rounded-xl bg-team-b-cyan/15 border border-team-b-cyan/30 flex items-center justify-center shrink-0">
+            <BookOpen className="w-6 h-6 text-team-b-cyan" />
           </div>
           <div>
-            <span className="font-mono text-xs text-text-muted-slate uppercase tracking-wider block">
+            <span className="font-sans text-xs text-text-muted-slate uppercase tracking-wider block font-semibold">
               Questions in Bank
             </span>
-            <span className="font-mono text-3xl font-bold text-optic-white tabular-nums">
+            <span className="text-3xl font-bold text-optic-white tabular-nums font-sans">
               {stats.totalQuestions}
             </span>
           </div>
@@ -90,14 +88,14 @@ export default async function DashboardPage() {
 
         {/* Active Subjects */}
         <Card variant="carbon" className="flex items-center gap-5 p-6">
-          <div className="w-12 h-12 rounded-xl bg-surface-onyx border border-white/15 flex items-center justify-center shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-surface-onyx border border-border-medium flex items-center justify-center shrink-0">
             <Layers className="w-6 h-6 text-state-success" />
           </div>
           <div>
-            <span className="font-mono text-xs text-text-muted-slate uppercase tracking-wider block">
+            <span className="font-sans text-xs text-text-muted-slate uppercase tracking-wider block font-semibold">
               Active Subjects
             </span>
-            <span className="font-mono text-3xl font-bold text-optic-white tabular-nums">
+            <span className="text-3xl font-bold text-optic-white tabular-nums font-sans">
               {stats.totalSubjects}
             </span>
           </div>
@@ -106,10 +104,10 @@ export default async function DashboardPage() {
 
       {/* Contest History Ledger */}
       <Card variant="carbon" className="space-y-6">
-        <div className="flex items-center justify-between pb-4 border-b border-white/10">
+        <div className="flex items-center justify-between pb-4 border-b border-border-subtle">
           <div className="flex items-center gap-2.5">
             <Swords className="w-5 h-5 text-team-a-bright" />
-            <h2 className="text-base font-bold font-mono tracking-wider text-optic-white uppercase">
+            <h2 className="text-base font-bold font-sans tracking-wide text-optic-white uppercase">
               Tournament Contest Ledger
             </h2>
           </div>
@@ -119,10 +117,10 @@ export default async function DashboardPage() {
         </div>
 
         {contests.length === 0 ? (
-          <div className="text-center py-12 border border-dashed border-white/10 rounded-xl space-y-3">
+          <div className="text-center py-12 border border-dashed border-border-medium rounded-2xl space-y-3">
             <Swords className="w-10 h-10 text-text-muted-slate mx-auto opacity-40" />
-            <h3 className="text-base font-bold text-optic-white">No Matches Recorded Yet</h3>
-            <p className="text-xs text-text-muted-slate max-w-sm mx-auto">
+            <h3 className="text-base font-bold text-optic-white font-sans">No Matches Recorded Yet</h3>
+            <p className="text-xs text-text-muted-slate max-w-sm mx-auto font-sans">
               Configure teams and launch your first live stage competition. Contest records and used
               questions are committed automatically upon match conclusion.
             </p>
@@ -136,9 +134,9 @@ export default async function DashboardPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs font-mono">
+            <table className="w-full text-left text-xs font-sans">
               <thead>
-                <tr className="border-b border-white/10 text-text-muted-slate uppercase">
+                <tr className="border-b border-border-subtle text-text-muted-slate uppercase font-semibold">
                   <th className="py-3 px-4">Date & Time</th>
                   <th className="py-3 px-4">Contestants & Scores</th>
                   <th className="py-3 px-4">Winner</th>
@@ -146,7 +144,7 @@ export default async function DashboardPage() {
                   <th className="py-3 px-4 text-right">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-border-subtle">
                 {contests.map((c) => {
                   const dateStr = new Date(c.created_at).toLocaleDateString(undefined, {
                     month: 'short',
@@ -172,7 +170,7 @@ export default async function DashboardPage() {
                             {c.team_a_name} ({c.team_a_score})
                           </span>
                           <span className="text-text-muted-slate">vs</span>
-                          <span className="font-bold text-team-b-ice">
+                          <span className="font-bold text-team-b-cyan">
                             {c.team_b_name} ({c.team_b_score})
                           </span>
                         </div>

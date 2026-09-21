@@ -2,10 +2,11 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Swords, Lock, Mail, AlertCircle, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { Swords, AlertCircle, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -51,18 +52,19 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-surface-obsidian relative overflow-hidden">
-      {/* Background ambient glowing orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-team-a-core/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-team-b-cyan/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen flex items-center justify-center p-6 bg-surface-obsidian relative overflow-hidden transition-colors duration-200">
+      {/* Top right theme toggle */}
+      <div className="absolute top-6 right-6 z-20">
+        <ThemeToggle />
+      </div>
 
       <div className="relative w-full max-w-md z-10">
         {/* Header Branding */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-surface-carbon border border-team-a-bright/40 shadow-[0_0_32px_rgba(139,92,246,0.35)] mb-4">
-            <Swords className="w-7 h-7 text-team-a-bright" />
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-surface-carbon border border-border-medium shadow-sm mb-4">
+            <Swords className="w-7 h-7 text-brand-primary" />
           </div>
-          <h1 className="text-3xl font-extrabold font-mono tracking-wider text-optic-white">
+          <h1 className="text-3xl font-extrabold font-sans tracking-tight text-optic-white">
             PGC <span className="text-team-b-cyan">ARENA</span>
           </h1>
           <p className="mt-2 text-sm text-text-muted-slate font-sans">
@@ -71,10 +73,10 @@ export default function LoginPage() {
         </div>
 
         {/* Login Card */}
-        <div className="bg-surface-carbon border border-white/15 rounded-xl p-8 shadow-[0_24px_48px_-12px_rgba(0,0,0,0.95)]">
+        <div className="bg-surface-carbon border border-border-medium rounded-2xl p-8 shadow-modal-dialog">
           <form onSubmit={handleLogin} className="space-y-5">
             {error && (
-              <div className="flex items-start gap-3 p-3.5 rounded-md bg-state-warning-rose/15 border border-state-warning-rose/40 text-state-warning-rose text-xs font-mono">
+              <div className="flex items-start gap-3 p-3.5 rounded-lg bg-state-warning-rose/15 border border-state-warning-rose/40 text-state-warning-rose text-xs font-sans">
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                 <span>{error}</span>
               </div>
@@ -88,7 +90,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@pgc.edu"
-                className="font-mono text-xs"
+                className="text-xs"
               />
             </div>
 
@@ -100,7 +102,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="font-mono text-xs"
+                className="text-xs"
                 rightElement={
                   <button
                     type="button"
@@ -128,7 +130,7 @@ export default function LoginPage() {
             >
               {loading ? (
                 <span className="flex items-center gap-2">
-                  <span className="w-4 h-4 border-2 border-surface-obsidian border-t-transparent rounded-full animate-spin" />
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   Authenticating...
                 </span>
               ) : (

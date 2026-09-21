@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Swords, BookOpen, Library, LayoutDashboard, Settings, LogOut } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 export function Navbar() {
   const pathname = usePathname();
@@ -31,15 +32,15 @@ export function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-40 w-full bg-surface-obsidian/90 backdrop-blur-md border-b border-white/10 px-6 py-3.5">
+    <nav className="sticky top-0 z-40 w-full bg-surface-obsidian/90 backdrop-blur-md border-b border-border-subtle px-6 py-3.5 transition-colors duration-200">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Brand Logo */}
         <Link href="/dashboard" className="flex items-center gap-3 group">
-          <div className="w-8 h-8 rounded-md bg-team-a-core flex items-center justify-center shadow-[0_0_16px_rgba(139,92,246,0.6)] group-hover:shadow-[0_0_24px_rgba(139,92,246,0.8)] transition-all">
-            <Swords className="w-4 h-4 text-surface-obsidian" />
+          <div className="w-8 h-8 rounded-lg bg-team-a-core flex items-center justify-center border border-border-bright/30 transition-all">
+            <Swords className="w-4 h-4 text-white" />
           </div>
           <div className="flex flex-col">
-            <span className="font-mono font-extrabold text-sm tracking-widest text-optic-white flex items-center gap-1.5">
+            <span className="font-extrabold text-sm tracking-wider text-optic-white flex items-center gap-1.5 font-sans">
               PGC <span className="text-team-b-cyan">ARENA</span>
             </span>
             <span className="font-mono text-[9px] text-text-muted-slate uppercase tracking-wider">
@@ -58,9 +59,9 @@ export function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-md text-sm font-medium transition-all ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all ${
                   isActive
-                    ? 'bg-surface-carbon text-team-a-bright border border-white/15 shadow-sm'
+                    ? 'bg-surface-carbon text-team-a-bright border border-border-medium shadow-sm'
                     : 'text-text-bright-slate hover:text-optic-white hover:bg-surface-onyx'
                 }`}
               >
@@ -71,16 +72,18 @@ export function Navbar() {
           })}
         </div>
 
-        {/* Right Admin Profile / Logout */}
+        {/* Right Section: Theme Toggle & Admin Profile */}
         <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded border border-white/10 bg-surface-onyx text-xs font-mono text-text-high-contrast">
-            <span className="w-2 h-2 rounded-full bg-team-b-cyan animate-pulse" />
+          <ThemeToggle />
+
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-md border border-border-medium bg-surface-onyx text-xs font-mono text-text-high-contrast">
+            <span className="w-2 h-2 rounded-full bg-team-b-cyan" />
             <span>ADMIN</span>
           </div>
 
           <button
             onClick={handleSignOut}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium text-text-muted-slate hover:text-state-warning-rose hover:bg-state-warning-rose/10 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-text-muted-slate hover:text-state-warning-rose hover:bg-state-warning-rose/10 transition-colors cursor-pointer border border-transparent hover:border-state-warning-rose/20"
             title="Sign Out"
           >
             <LogOut className="w-3.5 h-3.5" />

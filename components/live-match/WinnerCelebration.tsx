@@ -32,8 +32,8 @@ export function WinnerCelebration({
 
   useEffect(() => {
     // Stage fireworks celebration
-    const end = Date.now() + 4 * 1000;
-    const colors = ['#8B5CF6', '#06B6D4', '#22D3EE', '#FFFFFF'];
+    const end = Date.now() + 3.5 * 1000;
+    const colors = ['#3D52A0', '#7091E6', '#0E7490', '#124E66', '#9ACDEA'];
 
     const frame = () => {
       confetti({
@@ -84,17 +84,10 @@ export function WinnerCelebration({
   const isTeamBWinner = winnerName === teamBName;
 
   return (
-    <div className="fixed inset-0 z-50 bg-surface-obsidian/95 backdrop-blur-md flex items-center justify-center p-6 animate-in fade-in duration-500">
-      <div className="w-full max-w-2xl bg-surface-carbon border border-white/20 rounded-2xl p-8 md:p-12 text-center shadow-[0_32px_64px_-16px_rgba(0,0,0,0.95)] relative overflow-hidden space-y-8">
-        {/* Glow ambient */}
-        <div
-          className={`absolute top-0 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full blur-3xl pointer-events-none opacity-30 ${
-            isTeamAWinner ? 'bg-team-a-core' : isTeamBWinner ? 'bg-team-b-cyan' : 'bg-state-success'
-          }`}
-        />
-
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-6 animate-in fade-in duration-300">
+      <div className="w-full max-w-2xl bg-surface-carbon border border-border-medium rounded-2xl p-8 md:p-12 text-center shadow-modal-dialog relative overflow-hidden space-y-8">
         {/* Trophy Icon */}
-        <div className="relative inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-surface-onyx border border-white/20 shadow-[0_0_40px_rgba(34,211,238,0.35)]">
+        <div className="relative inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-surface-onyx border border-border-medium shadow-sm">
           <Trophy className="w-10 h-10 text-state-success" />
         </div>
 
@@ -103,10 +96,10 @@ export function WinnerCelebration({
           <span className="font-mono text-xs font-bold uppercase tracking-widest text-state-success">
             MATCH TOURNAMENT CONCLUDED
           </span>
-          <h1 className="text-3xl md:text-5xl font-extrabold text-optic-white tracking-tight">
+          <h1 className="text-3xl md:text-5xl font-extrabold text-optic-white tracking-tight font-sans">
             {winnerName === 'Tie' ? 'MATCH TIED!' : `${winnerName} VICTORIOUS!`}
           </h1>
-          <p className="text-sm text-text-muted-slate">
+          <p className="text-sm text-text-muted-slate font-sans">
             {revealedQuestionIds.length} questions contested in this round
           </p>
         </div>
@@ -116,8 +109,8 @@ export function WinnerCelebration({
           <div
             className={`p-5 rounded-xl border ${
               isTeamAWinner
-                ? 'bg-team-a-core/15 border-team-a-core text-optic-white glow-team-a'
-                : 'bg-surface-onyx border-white/10 text-text-bright-slate'
+                ? 'bg-team-a-core/15 border-team-a-core text-optic-white'
+                : 'bg-surface-onyx border-border-subtle text-text-bright-slate'
             }`}
           >
             <span className="font-mono text-xs uppercase block text-team-a-bright mb-1">
@@ -131,8 +124,8 @@ export function WinnerCelebration({
           <div
             className={`p-5 rounded-xl border ${
               isTeamBWinner
-                ? 'bg-team-b-cyan/15 border-team-b-cyan text-optic-white glow-team-b'
-                : 'bg-surface-onyx border-white/10 text-text-bright-slate'
+                ? 'bg-team-b-cyan/15 border-team-b-cyan text-optic-white'
+                : 'bg-surface-onyx border-border-subtle text-text-bright-slate'
             }`}
           >
             <span className="font-mono text-xs uppercase block text-team-b-ice mb-1">
@@ -157,7 +150,7 @@ export function WinnerCelebration({
         </div>
 
         {/* Post-Match Actions */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 border-t border-white/10 relative z-10">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 border-t border-border-subtle relative z-10">
           <Button
             variant="console"
             size="md"

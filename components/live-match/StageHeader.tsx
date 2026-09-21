@@ -31,7 +31,7 @@ export function StageHeader({
   const activeTeamName = isTeamA ? teamAName : teamBName;
 
   return (
-    <div className="w-full flex flex-col items-center justify-between gap-3 pb-6 border-b border-white/10">
+    <div className="w-full flex flex-col items-center justify-between gap-3 pb-6 border-b border-border-subtle">
       {/* Top Telemetry & Subject Pill */}
       <div className="flex items-center justify-between w-full">
         {/* Left: Round / Telemetry */}
@@ -55,7 +55,7 @@ export function StageHeader({
         </div>
 
         {/* Center: Current Subject */}
-        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-carbon border border-white/15 shadow-sm">
+        <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-carbon border border-border-medium shadow-sm">
           <Zap className="w-3.5 h-3.5 text-team-b-cyan" />
           <span className="font-mono text-xs uppercase font-bold text-optic-white tracking-widest">
             {isTieBreaker ? 'RANDOM MYSTERY SUBJECT' : subjectName}
@@ -71,10 +71,10 @@ export function StageHeader({
 
       {/* Central High-Intensity Turn Banner */}
       <div
-        className={`w-full text-center py-2.5 px-6 rounded-lg transition-all duration-300 ${
+        className={`w-full text-center py-2.5 px-6 rounded-lg transition-all duration-300 shadow-sm ${
           isTeamA
-            ? 'bg-team-a-core/20 border border-team-a-core/60 shadow-[0_0_24px_rgba(139,92,246,0.35)]'
-            : 'bg-team-b-cyan/20 border border-team-b-cyan/60 shadow-[0_0_24px_rgba(6,182,212,0.35)]'
+            ? 'bg-team-a-core/15 border border-team-a-core/50'
+            : 'bg-team-b-cyan/15 border border-team-b-cyan/50'
         }`}
       >
         <span className="font-mono text-xs uppercase tracking-widest text-text-bright-slate mr-2">

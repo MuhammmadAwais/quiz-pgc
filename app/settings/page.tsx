@@ -102,18 +102,18 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-obsidian p-6 md:p-10 max-w-5xl mx-auto space-y-8">
+    <div className="min-h-screen bg-surface-obsidian p-6 md:p-10 max-w-5xl mx-auto space-y-8 transition-colors duration-200 font-sans">
       {/* Page Header */}
-      <div className="flex items-center justify-between pb-6 border-b border-white/10">
+      <div className="flex items-center justify-between pb-6 border-b border-border-subtle">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-surface-carbon border border-white/15 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg bg-surface-carbon border border-border-medium flex items-center justify-center">
             <SettingsIcon className="w-5 h-5 text-team-b-cyan" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold font-mono tracking-wide text-optic-white">
+            <h1 className="text-2xl font-bold font-sans tracking-tight text-optic-white">
               ACCOUNT & CONSOLE SETTINGS
             </h1>
-            <p className="text-xs text-text-muted-slate mt-0.5">
+            <p className="text-xs text-text-muted-slate mt-0.5 font-sans">
               Manage master credentials, tournament defaults, and database maintenance
             </p>
           </div>
@@ -123,9 +123,9 @@ export default function SettingsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Security & Password */}
         <Card variant="carbon" className="space-y-6">
-          <div className="flex items-center gap-2.5 pb-4 border-b border-white/10">
+          <div className="flex items-center gap-2.5 pb-4 border-b border-border-subtle">
             <KeyRound className="w-4 h-4 text-team-a-bright" />
-            <h2 className="text-sm font-bold font-mono tracking-wider text-optic-white uppercase">
+            <h2 className="text-sm font-bold font-sans tracking-wider text-optic-white uppercase">
               Update Master Credentials
             </h2>
           </div>
@@ -180,9 +180,9 @@ export default function SettingsPage() {
 
         {/* Database & Seeder Console */}
         <Card variant="carbon" className="space-y-6">
-          <div className="flex items-center gap-2.5 pb-4 border-b border-white/10">
-            <Database className="w-4 h-4 text-team-b-ice" />
-            <h2 className="text-sm font-bold font-mono tracking-wider text-optic-white uppercase">
+          <div className="flex items-center gap-2.5 pb-4 border-b border-border-subtle">
+            <Database className="w-4 h-4 text-team-b-cyan" />
+            <h2 className="text-sm font-bold font-sans tracking-wider text-optic-white uppercase">
               Database Maintenance & Seeding
             </h2>
           </div>
@@ -195,14 +195,14 @@ export default function SettingsPage() {
               </div>
             )}
 
-            <div className="p-4 rounded-lg bg-surface-onyx border border-white/10 space-y-2">
+            <div className="p-4 rounded-xl bg-surface-onyx border border-border-subtle space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-optic-white">
+                <span className="text-xs font-sans font-bold text-optic-white">
                   Sample Question Seeder
                 </span>
-                <Sparkles className="w-4 h-4 text-team-b-ice" />
+                <Sparkles className="w-4 h-4 text-team-b-cyan" />
               </div>
-              <p className="text-xs text-text-muted-slate">
+              <p className="text-xs text-text-muted-slate font-sans">
                 Quickly load vetted competition questions across Computer Science, Physics, and
                 Mathematics into your Question Bank.
               </p>
@@ -218,8 +218,8 @@ export default function SettingsPage() {
             </div>
 
             {/* Danger Zone */}
-            <div className="p-4 rounded-lg bg-state-warning-rose/10 border border-state-warning-rose/30 space-y-3">
-              <span className="text-xs font-mono font-bold text-state-warning-rose uppercase flex items-center gap-1.5">
+            <div className="p-4 rounded-xl bg-state-warning-rose/10 border border-state-warning-rose/30 space-y-3">
+              <span className="text-xs font-sans font-bold text-state-warning-rose uppercase flex items-center gap-1.5">
                 <AlertTriangle className="w-3.5 h-3.5" />
                 <span>Danger Zone</span>
               </span>
@@ -257,11 +257,11 @@ export default function SettingsPage() {
         title="Clear Match History?"
       >
         <div className="space-y-4">
-          <p className="text-sm text-text-muted-slate">
+          <p className="text-sm text-text-muted-slate font-sans">
             This will permanently remove all past tournament contest records and question usage
             history. Active question bank MCQs will NOT be deleted.
           </p>
-          <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
+          <div className="flex justify-end gap-3 pt-3 border-t border-border-subtle">
             <Button
               variant="console"
               size="sm"
@@ -288,11 +288,11 @@ export default function SettingsPage() {
         title="Factory Reset All Tournament Data?"
       >
         <div className="space-y-4">
-          <p className="text-sm text-state-warning-rose">
+          <p className="text-sm text-state-warning-rose font-sans">
             Warning: This action is irreversible. All subjects, chapters, questions, and contest
             records will be completely purged from Supabase.
           </p>
-          <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
+          <div className="flex justify-end gap-3 pt-3 border-t border-border-subtle">
             <Button
               variant="console"
               size="sm"

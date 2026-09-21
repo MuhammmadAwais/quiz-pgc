@@ -3,9 +3,9 @@ import { Skeleton, BookCardSkeleton } from '@/components/ui/Skeleton';
 
 export default function BooksBankLoading() {
   return (
-    <div className="min-h-screen bg-surface-obsidian flex flex-col font-sans animate-fade-in">
+    <div className="min-h-screen bg-surface-obsidian flex flex-col font-sans animate-fade-in transition-colors duration-200">
       {/* Top Action Header Skeleton */}
-      <div className="bg-surface-onyx border-b border-white/10 px-6 py-4">
+      <div className="bg-surface-onyx border-b border-border-subtle px-6 py-4">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-2">
             <Skeleton className="w-36 h-3 rounded bg-surface-interactive/40" />
@@ -15,7 +15,7 @@ export default function BooksBankLoading() {
 
           <div className="flex items-center gap-3">
             <Skeleton className="w-24 h-10 rounded-xl bg-surface-interactive/40" />
-            <Skeleton className="w-64 h-10 rounded-xl bg-surface-carbon border border-white/10" />
+            <Skeleton className="w-64 h-10 rounded-xl bg-surface-carbon border border-border-medium" />
             <Skeleton className="w-36 h-10 rounded-xl bg-team-b-cyan/20 border border-team-b-cyan/30" />
           </div>
         </div>

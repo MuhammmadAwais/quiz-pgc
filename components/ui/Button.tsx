@@ -16,7 +16,7 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseClasses =
-    'inline-flex items-center justify-center font-sans font-semibold rounded-md transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]';
+    'inline-flex items-center justify-center font-sans font-semibold rounded-lg transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]';
 
   const sizeClasses = {
     sm: 'text-xs px-3 py-1.5 gap-1.5',
@@ -26,15 +26,15 @@ export function Button({
 
   const variantClasses = {
     'team-a':
-      'bg-team-a-core hover:bg-team-a-bright text-surface-obsidian shadow-sm hover:shadow-[0_0_24px_rgba(139,92,246,0.5)] border-0',
+      'bg-team-a-core hover:brightness-110 text-white shadow-sm border border-team-a-bright/30',
     'team-b':
-      'bg-team-b-cyan hover:bg-team-b-ice text-surface-obsidian shadow-sm hover:shadow-[0_0_24px_rgba(6,182,212,0.5)] border-0',
+      'bg-team-b-cyan hover:brightness-110 text-white shadow-sm border border-team-b-ice/30',
     'console':
-      'bg-surface-carbon hover:bg-surface-interactive text-text-optic-white border border-white/15 hover:border-white/35',
+      'bg-surface-carbon hover:bg-surface-interactive text-text-primary border border-border-medium hover:border-border-bright shadow-sm',
     'danger':
-      'bg-state-warning-rose/20 hover:bg-state-warning-rose/30 text-state-warning-rose border border-state-warning-rose/40 hover:border-state-warning-rose',
+      'bg-state-warning-rose/15 hover:bg-state-warning-rose/25 text-state-warning-rose border border-state-warning-rose/40 hover:border-state-warning-rose',
     'ghost':
-      'bg-transparent hover:bg-surface-carbon text-text-bright-slate hover:text-text-optic-white',
+      'bg-transparent hover:bg-surface-onyx text-text-bright-slate hover:text-optic-white',
   };
 
   return (

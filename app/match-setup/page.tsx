@@ -187,7 +187,7 @@ export default function MatchSetupPage() {
   return (
     <div className="min-h-screen bg-surface-obsidian p-6 md:p-10 max-w-5xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-white/10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-border-subtle">
         <div>
           <h1 className="text-xl font-bold font-mono tracking-wide text-optic-white">
             Match Setup
@@ -263,7 +263,7 @@ export default function MatchSetupPage() {
 
           {/* 2. Subjects & Question Quotas (Clean Unified List) */}
           <Card variant="carbon" className="p-5 space-y-3">
-            <div className="flex items-center justify-between pb-2 border-b border-white/10">
+            <div className="flex items-center justify-between pb-2 border-b border-border-subtle">
               <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted-slate">
                 Subjects & Questions per Team
               </span>
@@ -297,7 +297,7 @@ export default function MatchSetupPage() {
                       className={`p-3 rounded-xl border transition-all flex items-center justify-between gap-3 ${
                         isSelected
                           ? 'bg-surface-onyx border-team-a-core/40 shadow-sm'
-                          : 'bg-surface-onyx/40 border-white/5 opacity-60 hover:opacity-100 hover:border-white/15'
+                          : 'bg-surface-onyx/40 border-border-subtle/40 opacity-60 hover:opacity-100 hover:border-border-medium'
                       }`}
                     >
                       {/* Checkbox & Subject info */}
@@ -309,7 +309,7 @@ export default function MatchSetupPage() {
                           className={`w-5 h-5 rounded border flex items-center justify-center text-xs shrink-0 transition-colors ${
                             isSelected
                               ? 'bg-team-a-core border-team-a-core text-surface-obsidian font-bold'
-                              : 'border-white/20 bg-surface-carbon'
+                              : 'border-border-medium bg-surface-carbon'
                           }`}
                         >
                           {isSelected && '✓'}
@@ -346,7 +346,7 @@ export default function MatchSetupPage() {
                           <span className="text-xs font-mono text-text-muted-slate hidden sm:inline">
                             Per team:
                           </span>
-                          <div className="flex items-center border border-white/15 rounded-lg bg-surface-carbon overflow-hidden">
+                          <div className="flex items-center border border-border-medium rounded-lg bg-surface-carbon overflow-hidden">
                             <button
                               type="button"
                               onClick={() => updateSubjectCount(sub.id, -1)}
@@ -397,13 +397,13 @@ export default function MatchSetupPage() {
                   step={5}
                   value={pointsPerMcq}
                   onChange={(e) => setPointsPerMcq(Math.max(1, parseInt(e.target.value) || 10))}
-                  className="w-16 bg-surface-obsidian border border-white/20 rounded-lg px-2.5 py-1.5 text-optic-white text-sm font-mono text-center focus:border-team-a-core focus:outline-none"
+                  className="w-16 bg-surface-obsidian border border-border-medium rounded-lg px-2.5 py-1.5 text-optic-white text-sm font-mono text-center focus:border-team-a-core focus:outline-none"
                 />
                 <span className="text-xs font-mono text-text-muted-slate">pts</span>
               </div>
             </div>
 
-            <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-4">
+            <div className="pt-3 border-t border-border-subtle flex items-center justify-between gap-4">
               <div>
                 <span className="text-xs font-mono font-semibold text-optic-white block">
                   Allow questions from past matches
@@ -416,7 +416,7 @@ export default function MatchSetupPage() {
                 type="button"
                 onClick={() => setIncludeUsedQuestions(!includeUsedQuestions)}
                 className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
-                  includeUsedQuestions ? 'bg-team-a-core' : 'bg-surface-interactive border border-white/20'
+                  includeUsedQuestions ? 'bg-team-a-core' : 'bg-surface-interactive border border-border-medium'
                 }`}
               >
                 <div
@@ -432,7 +432,7 @@ export default function MatchSetupPage() {
         {/* Right Column: Match Summary & Launch (5 cols) */}
         <div className="lg:col-span-5">
           <Card variant="carbon" className="p-5 space-y-4 sticky top-24">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted-slate block pb-2 border-b border-white/10">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted-slate block pb-2 border-b border-border-subtle">
               Match Summary
             </span>
 
@@ -494,13 +494,13 @@ export default function MatchSetupPage() {
             )}
 
             {/* Start Match Button */}
-            <div className="pt-2 border-t border-white/10 space-y-2">
+            <div className="pt-2 border-t border-border-subtle space-y-2">
               <Button
                 variant="team-a"
                 size="lg"
                 onClick={handleStartMatch}
                 disabled={!isPoolSufficient || launching}
-                className="w-full font-bold text-sm tracking-wider py-3 shadow-[0_0_24px_rgba(139,92,246,0.35)]"
+                className="w-full font-bold text-sm tracking-wider py-3 shadow-md"
               >
                 {launching ? (
                   'Starting Match...'

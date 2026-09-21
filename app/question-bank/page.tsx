@@ -198,14 +198,14 @@ export default function QuestionBankPage() {
   return (
     <div className="min-h-screen bg-surface-obsidian flex flex-col">
       {/* Top Action Header */}
-      <div className="bg-surface-onyx border-b border-white/10 px-6 py-4">
+      <div className="bg-surface-onyx border-b border-border-subtle px-6 py-4">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-xl font-bold font-mono tracking-wider text-optic-white flex items-center gap-2">
+            <h1 className="text-xl font-bold font-sans tracking-tight text-optic-white flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-team-a-bright" />
               <span>QUESTION BANK MANAGEMENT</span>
             </h1>
-            <p className="text-xs text-text-muted-slate mt-0.5">
+            <p className="text-xs text-text-muted-slate mt-0.5 font-sans">
               Hierarchical bank: Subjects → Chapters / Topics → Multiple Choice Questions
             </p>
           </div>
@@ -217,7 +217,7 @@ export default function QuestionBankPage() {
               size="sm"
               onClick={() => refreshRepo()}
               disabled={isSyncing || isLoading}
-              className="flex items-center gap-1.5 border-white/20 hover:border-team-b-cyan/50 text-xs text-text-bright-slate hover:text-optic-white"
+              className="flex items-center gap-1.5 border-border-medium hover:border-border-bright text-xs text-text-bright-slate hover:text-optic-white"
               title="Synchronize question bank from database"
             >
               <RotateCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-team-b-cyan' : 'text-text-muted-slate'}`} />
@@ -262,6 +262,7 @@ export default function QuestionBankPage() {
               </Button>
             )}
 
+            {/* Manual New Question Trigger */}
             <Button
               variant="team-a"
               size="sm"
@@ -270,6 +271,7 @@ export default function QuestionBankPage() {
                 setIsQuestionModalOpen(true);
               }}
               disabled={subjects.length === 0}
+              className="flex items-center gap-1.5 shadow-sm font-bold"
             >
               <Plus className="w-4 h-4" />
               <span>New Question</span>
@@ -279,20 +281,20 @@ export default function QuestionBankPage() {
       </div>
 
       {/* 3-Pane Main Interface */}
-      <div className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 md:grid-cols-12 gap-6">
+      <div className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 md:grid-cols-12 gap-6 font-sans">
         {/* Pane 1: Subjects (3 cols) */}
         <div className="md:col-span-3 flex flex-col h-full">
           <Card variant="carbon" className="flex-1 flex flex-col p-4">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
+            <div className="flex items-center justify-between pb-3 border-b border-border-subtle mb-3">
               <div className="flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-team-a-bright" />
-                <span className="font-mono text-xs font-bold uppercase tracking-wider text-optic-white">
+                <span className="font-sans text-xs font-bold uppercase tracking-wider text-optic-white">
                   Subjects ({subjects.length})
                 </span>
               </div>
               <button
                 onClick={() => setIsAddSubjectOpen(true)}
-                className="p-1 rounded hover:bg-surface-interactive text-text-bright-slate hover:text-team-a-bright transition-colors"
+                className="p-1 rounded hover:bg-surface-interactive text-text-bright-slate hover:text-team-a-bright transition-colors cursor-pointer"
                 title="Add Subject"
               >
                 <Plus className="w-4 h-4" />
@@ -322,10 +324,10 @@ export default function QuestionBankPage() {
                         setSelectedSubjectId(sub.id);
                         setSelectedChapterId(null);
                       }}
-                      className={`group flex items-center justify-between p-2.5 rounded-md cursor-pointer transition-all ${
+                      className={`group flex items-center justify-between p-2.5 rounded-lg cursor-pointer transition-all ${
                         isSelected
-                          ? 'bg-team-a-core/15 border border-team-a-core text-optic-white shadow-[0_0_12px_rgba(139,92,246,0.25)]'
-                          : 'bg-surface-onyx border border-white/8 hover:bg-surface-interactive text-text-bright-slate'
+                          ? 'bg-team-a-core/15 border border-team-a-core text-optic-white font-bold shadow-sm'
+                          : 'bg-surface-onyx border border-border-subtle hover:bg-surface-interactive text-text-bright-slate'
                       }`}
                     >
                       <div className="flex items-center gap-2 min-w-0">
@@ -338,7 +340,7 @@ export default function QuestionBankPage() {
                         </Badge>
                         <button
                           onClick={(e) => handleDeleteSubject(sub.id, e)}
-                          className="opacity-0 group-hover:opacity-100 p-1 text-text-muted-slate hover:text-state-warning-rose transition-all"
+                          className="opacity-0 group-hover:opacity-100 p-1 text-text-muted-slate hover:text-state-warning-rose transition-all cursor-pointer"
                           title="Delete Subject"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -355,17 +357,17 @@ export default function QuestionBankPage() {
         {/* Pane 2: Chapters / Topics (3 cols) */}
         <div className="md:col-span-3 flex flex-col h-full">
           <Card variant="carbon" className="flex-1 flex flex-col p-4">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
+            <div className="flex items-center justify-between pb-3 border-b border-border-subtle mb-3">
               <div className="flex items-center gap-2">
                 <Layers className="w-4 h-4 text-team-b-cyan" />
-                <span className="font-mono text-xs font-bold uppercase tracking-wider text-optic-white truncate">
+                <span className="font-sans text-xs font-bold uppercase tracking-wider text-optic-white truncate">
                   {activeSubject ? activeSubject.name : 'Chapters'}
                 </span>
               </div>
               {selectedSubjectId && (
                 <button
                   onClick={() => setIsAddChapterOpen(true)}
-                  className="p-1 rounded hover:bg-surface-interactive text-text-bright-slate hover:text-team-b-cyan transition-colors"
+                  className="p-1 rounded hover:bg-surface-interactive text-text-bright-slate hover:text-team-b-cyan transition-colors cursor-pointer"
                   title="Add Chapter"
                 >
                   <Plus className="w-4 h-4" />
@@ -402,13 +404,13 @@ export default function QuestionBankPage() {
                   {/* "All Chapters" Option */}
                   <div
                     onClick={() => setSelectedChapterId(null)}
-                    className={`flex items-center justify-between p-2.5 rounded-md cursor-pointer transition-all ${
+                    className={`flex items-center justify-between p-2.5 rounded-lg cursor-pointer transition-all ${
                       selectedChapterId === null
-                        ? 'bg-team-b-cyan/15 border border-team-b-cyan text-optic-white'
-                        : 'bg-surface-onyx border border-white/8 hover:bg-surface-interactive text-text-muted-slate'
+                        ? 'bg-team-b-cyan/15 border border-team-b-cyan text-optic-white font-bold shadow-sm'
+                        : 'bg-surface-onyx border border-border-subtle hover:bg-surface-interactive text-text-muted-slate'
                     }`}
                   >
-                    <span className="font-medium text-xs font-mono uppercase">
+                    <span className="font-medium text-xs font-sans uppercase">
                       All Topics
                     </span>
                     <Badge variant="neutral" className="text-[10px] px-1.5 py-0">
@@ -423,10 +425,10 @@ export default function QuestionBankPage() {
                       <div
                         key={chap.id}
                         onClick={() => setSelectedChapterId(chap.id)}
-                        className={`group flex items-center justify-between p-2.5 rounded-md cursor-pointer transition-all ${
+                        className={`group flex items-center justify-between p-2.5 rounded-lg cursor-pointer transition-all ${
                           isSelected
-                            ? 'bg-team-b-cyan/15 border border-team-b-cyan text-optic-white shadow-[0_0_12px_rgba(6,182,212,0.25)]'
-                            : 'bg-surface-onyx border border-white/8 hover:bg-surface-interactive text-text-bright-slate'
+                            ? 'bg-team-b-cyan/15 border border-team-b-cyan text-optic-white font-bold shadow-sm'
+                            : 'bg-surface-onyx border border-border-subtle hover:bg-surface-interactive text-text-bright-slate'
                         }`}
                       >
                         <span className="font-medium text-xs truncate">{chap.name}</span>
@@ -437,7 +439,7 @@ export default function QuestionBankPage() {
                           </Badge>
                           <button
                             onClick={(e) => handleDeleteChapter(chap.id, e)}
-                            className="opacity-0 group-hover:opacity-100 p-1 text-text-muted-slate hover:text-state-warning-rose transition-all"
+                            className="opacity-0 group-hover:opacity-100 p-1 text-text-muted-slate hover:text-state-warning-rose transition-all cursor-pointer"
                             title="Delete Chapter"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -456,7 +458,7 @@ export default function QuestionBankPage() {
         <div className="md:col-span-6 flex flex-col h-full">
           <Card variant="carbon" className="flex-1 flex flex-col p-4">
             {/* Header & Search */}
-            <div className="pb-3 border-b border-white/10 mb-3 space-y-3">
+            <div className="pb-3 border-b border-border-subtle mb-3 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <HelpCircle className="w-4 h-4 text-team-a-bright" />
@@ -480,7 +482,7 @@ export default function QuestionBankPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search questions or options..."
-                  className="w-full bg-surface-obsidian border border-white/15 rounded-md pl-9 pr-3 py-1.5 text-xs text-optic-white placeholder-text-muted-slate focus:outline-none focus:border-team-a-core"
+                  className="w-full bg-surface-obsidian border border-border-medium rounded-md pl-9 pr-3 py-1.5 text-xs text-optic-white placeholder-text-muted-slate focus:outline-none focus:border-team-a-core"
                 />
               </div>
             </div>
@@ -494,7 +496,7 @@ export default function QuestionBankPage() {
                   ))}
                 </div>
               ) : filteredQuestions.length === 0 ? (
-                <div className="text-center p-8 border border-dashed border-white/10 rounded-lg">
+                <div className="text-center p-8 border border-dashed border-border-subtle rounded-lg">
                   <HelpCircle className="w-8 h-8 text-text-muted-slate mx-auto mb-2 opacity-50" />
                   <p className="text-xs text-text-muted-slate mb-3">
                     No questions match the current filters.
@@ -517,7 +519,7 @@ export default function QuestionBankPage() {
                   return (
                     <div
                       key={q.id}
-                      className="p-4 rounded-lg bg-surface-onyx border border-white/10 hover:border-white/20 transition-all group space-y-3"
+                      className="p-4 rounded-lg bg-surface-onyx border border-border-subtle hover:border-border-medium transition-all group space-y-3"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-start gap-2.5">
@@ -551,7 +553,7 @@ export default function QuestionBankPage() {
                       </div>
 
                       {/* Options 2x2 Preview */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-white/5">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-border-subtle/50">
                         {q.options.map((opt, oIdx) => {
                           const isCorrect = q.correct_index === oIdx;
                           const letter = ['A', 'B', 'C', 'D'][oIdx];
@@ -562,7 +564,7 @@ export default function QuestionBankPage() {
                               className={`flex items-center gap-2 p-2 rounded text-xs transition-colors ${
                                 isCorrect
                                   ? 'bg-state-success/15 border border-state-success/40 text-state-success font-medium'
-                                  : 'bg-surface-carbon/80 border border-white/5 text-text-bright-slate'
+                                  : 'bg-surface-carbon/80 border border-border-subtle/50 text-text-bright-slate'
                               }`}
                             >
                               <span className="font-mono font-bold text-[11px] opacity-70">
@@ -586,7 +588,7 @@ export default function QuestionBankPage() {
 
             {/* Pagination Controls */}
             {filteredQuestions.length > QUESTIONS_PER_PAGE && (
-              <div className="pt-3 border-t border-white/10 mt-3 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+              <div className="pt-3 border-t border-border-subtle mt-3 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
                 <span className="text-text-muted-slate text-[11px]">
                   Showing {(currentPage - 1) * QUESTIONS_PER_PAGE + 1}–
                   {Math.min(currentPage * QUESTIONS_PER_PAGE, filteredQuestions.length)} of{' '}
@@ -669,7 +671,7 @@ export default function QuestionBankPage() {
             required
             autoFocus
           />
-          <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
+          <div className="flex justify-end gap-3 pt-3 border-t border-border-subtle">
             <Button
               type="button"
               variant="console"
@@ -705,7 +707,7 @@ export default function QuestionBankPage() {
             required
             autoFocus
           />
-          <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
+          <div className="flex justify-end gap-3 pt-3 border-t border-border-subtle">
             <Button
               type="button"
               variant="console"

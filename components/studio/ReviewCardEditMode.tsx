@@ -43,7 +43,7 @@ export function ReviewCardEditMode({ question, index }: ReviewCardEditModeProps)
       onSubmit={handleSave}
       className="rounded-2xl bg-surface-carbon border border-team-a-core/50 p-5 sm:p-6 space-y-4 shadow-xl"
     >
-      <div className="flex items-center justify-between border-b border-white/10 pb-3">
+      <div className="flex items-center justify-between border-b border-border-subtle pb-3">
         <span className="text-xs font-mono font-bold text-optic-white">
           Editing Question #{index + 1}
         </span>
@@ -51,14 +51,14 @@ export function ReviewCardEditMode({ question, index }: ReviewCardEditModeProps)
           <button
             type="button"
             onClick={() => setEditingQuestionId(null)}
-            className="px-2.5 py-1 rounded bg-surface-interactive text-text-muted-slate hover:text-optic-white text-xs flex items-center gap-1"
+            className="px-2.5 py-1 rounded bg-surface-interactive text-text-muted-slate hover:text-optic-white text-xs flex items-center gap-1 cursor-pointer"
           >
             <X className="w-3.5 h-3.5" />
             <span>Cancel</span>
           </button>
           <button
             type="submit"
-            className="px-3 py-1 rounded bg-team-a-core hover:bg-team-a-core/90 text-optic-white text-xs font-bold flex items-center gap-1 cursor-pointer"
+            className="px-3 py-1 rounded bg-team-a-core hover:brightness-105 text-white text-xs font-bold flex items-center gap-1 cursor-pointer"
           >
             <Check className="w-3.5 h-3.5" />
             <span>Save Edits</span>
@@ -76,7 +76,7 @@ export function ReviewCardEditMode({ question, index }: ReviewCardEditModeProps)
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           required
-          className="w-full bg-surface-obsidian border border-white/15 rounded-lg p-2.5 text-sm text-optic-white focus:outline-none focus:border-team-a-core font-sans"
+          className="w-full bg-surface-obsidian border border-border-medium rounded-lg p-2.5 text-sm text-optic-white focus:outline-none focus:border-brand-primary font-sans"
         />
       </div>
 
@@ -96,28 +96,32 @@ export function ReviewCardEditMode({ question, index }: ReviewCardEditModeProps)
                 className={`p-2.5 rounded-xl border flex items-center gap-2.5 ${
                   isCorrect
                     ? 'bg-state-success/15 border-state-success/50 ring-1 ring-state-success/30'
-                    : 'bg-surface-onyx border-white/10'
+                    : 'bg-surface-onyx border-border-subtle'
                 }`}
               >
                 <button
                   type="button"
                   onClick={() => setCorrectIndex(optIdx)}
-                  className={`w-6 h-6 rounded flex items-center justify-center text-xs font-mono font-bold shrink-0 transition-colors ${
+                  className={`h-7 w-7 rounded flex items-center justify-center text-xs font-mono font-bold shrink-0 transition-colors cursor-pointer ${
                     isCorrect
-                      ? 'bg-state-success text-surface-obsidian font-extrabold'
+                      ? 'bg-state-success text-white font-extrabold shadow-sm'
                       : 'bg-surface-interactive text-text-muted-slate hover:text-optic-white'
                   }`}
-                  title="Click to mark as correct answer"
+                  title="Mark as correct answer"
                 >
                   {letter}
                 </button>
                 <input
                   type="text"
                   value={opt}
-                  onChange={(e) => handleOptionChange(optIdx, e.target.value)}
+                  onChange={(e) => {
+                    const next: [string, string, string, string] = [options[0], options[1], options[2], options[3]];
+                    next[optIdx] = e.target.value;
+                    setOptions(next);
+                  }}
                   required
                   placeholder={`Option ${letter}`}
-                  className="flex-1 bg-transparent text-xs text-optic-white focus:outline-none placeholder-text-muted-slate"
+                  className="w-full bg-surface-obsidian border border-border-subtle rounded-lg px-2.5 py-1.5 text-xs text-optic-white focus:outline-none focus:border-brand-primary"
                 />
               </div>
             );
@@ -125,7 +129,7 @@ export function ReviewCardEditMode({ question, index }: ReviewCardEditModeProps)
         </div>
       </div>
 
-      {/* Metadata Selectors: Difficulty & Question Type */}
+      {/* Difficulty & Type Controls */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
         <div className="space-y-1">
           <label className="text-[10px] font-mono uppercase font-bold text-text-muted-slate">
@@ -134,7 +138,7 @@ export function ReviewCardEditMode({ question, index }: ReviewCardEditModeProps)
           <select
             value={difficulty}
             onChange={(e) => setDifficulty(e.target.value as Difficulty)}
-            className="w-full bg-surface-obsidian border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-optic-white focus:outline-none focus:border-team-a-core"
+            className="w-full bg-surface-obsidian border border-border-medium rounded-lg px-2.5 py-1.5 text-xs text-optic-white focus:outline-none focus:border-brand-primary font-sans"
           >
             <option value="EASY">EASY</option>
             <option value="MEDIUM">MEDIUM</option>
@@ -149,7 +153,7 @@ export function ReviewCardEditMode({ question, index }: ReviewCardEditModeProps)
           <select
             value={cognitiveType}
             onChange={(e) => setCognitiveType(e.target.value as CognitiveType)}
-            className="w-full bg-surface-obsidian border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-optic-white focus:outline-none focus:border-team-a-core"
+            className="w-full bg-surface-obsidian border border-border-medium rounded-lg px-2.5 py-1.5 text-xs text-optic-white focus:outline-none focus:border-brand-primary font-sans"
           >
             <option value="KNOWLEDGE">Facts &amp; Definitions</option>
             <option value="CONCEPTUAL">Concepts &amp; Principles</option>
@@ -168,7 +172,7 @@ export function ReviewCardEditMode({ question, index }: ReviewCardEditModeProps)
           value={explanation}
           onChange={(e) => setExplanation(e.target.value)}
           placeholder="Explanation for why this option is correct..."
-          className="w-full bg-surface-obsidian border border-white/15 rounded-lg p-2.5 text-xs text-optic-white focus:outline-none focus:border-team-a-core font-sans"
+          className="w-full bg-surface-obsidian border border-border-medium rounded-lg p-2.5 text-xs text-optic-white focus:outline-none focus:border-brand-primary font-sans"
         />
       </div>
     </form>

@@ -149,23 +149,23 @@ export function AiStudioModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 overflow-hidden">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-surface-obsidian/90 backdrop-blur-md"
+        className="fixed inset-0 bg-black/60 backdrop-blur-md"
         onClick={onClose}
       />
 
       {/* Modal Container */}
-      <div className="relative w-full max-w-5xl bg-surface-carbon border border-border-medium rounded-2xl shadow-2xl flex flex-col max-h-[92vh] z-10 animate-fade-in overflow-hidden">
+      <div className="relative w-full max-w-5xl bg-surface-carbon border border-border-medium rounded-2xl shadow-modal-dialog flex flex-col max-h-[92vh] z-10 animate-fade-in overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-4 bg-surface-onyx border-b border-white/10 flex items-center justify-between shrink-0">
+        <div className="px-6 py-4 bg-surface-onyx border-b border-border-subtle flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-team-a-core/15 border border-team-a-core/30 flex items-center justify-center text-team-a-bright">
               <Sparkles className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-base font-bold font-mono uppercase tracking-wider text-optic-white flex items-center gap-2">
+              <h2 className="text-base font-bold font-sans uppercase tracking-wider text-optic-white flex items-center gap-2">
                 <span>Create Questions with AI</span>
               </h2>
-              <p className="text-xs text-text-muted-slate">
+              <p className="text-xs text-text-muted-slate font-sans">
                 Generate multiple-choice questions directly from your textbooks
               </p>
             </div>
@@ -173,13 +173,13 @@ export function AiStudioModal({
 
           <div className="flex items-center gap-3">
             {/* Nav Tabs */}
-            <div className="flex items-center bg-surface-interactive border border-white/10 rounded-lg p-1 text-xs font-mono">
+            <div className="flex items-center bg-surface-interactive border border-border-subtle rounded-lg p-1 text-xs font-sans">
               <button
                 type="button"
                 onClick={() => setActiveTab('SETUP')}
                 className={`px-3 py-1 rounded-md transition-colors cursor-pointer ${
                   activeTab === 'SETUP'
-                    ? 'bg-team-a-core text-optic-white font-bold'
+                    ? 'bg-team-a-core text-white font-bold'
                     : 'text-text-muted-slate hover:text-optic-white'
                 }`}
               >
@@ -191,7 +191,7 @@ export function AiStudioModal({
                 disabled={stagedQuestions.length === 0}
                 className={`px-3 py-1 rounded-md transition-colors cursor-pointer disabled:opacity-30 ${
                   activeTab === 'REVIEW'
-                    ? 'bg-team-a-core text-optic-white font-bold'
+                    ? 'bg-team-a-core text-white font-bold'
                     : 'text-text-muted-slate hover:text-optic-white'
                 }`}
               >
@@ -229,7 +229,7 @@ export function AiStudioModal({
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {isGenerating ? (
             <div className="py-12 px-4 space-y-6 animate-fade-in text-center max-w-2xl mx-auto">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-team-a-core/15 border border-team-a-core/40 shadow-[0_0_32px_rgba(139,92,246,0.35)] mb-1">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-team-a-core/15 border border-team-a-core/40 shadow-sm mb-1">
                 <Sparkles className="w-8 h-8 text-team-a-bright animate-spin" />
               </div>
               <div className="space-y-2">
@@ -277,18 +277,18 @@ export function AiStudioModal({
               )}
 
               {/* 1. Textbook Selection & Books Bank Integration */}
-              <div className="p-4 rounded-xl bg-surface-onyx border border-white/10 space-y-3">
+              <div className="p-4 rounded-xl bg-surface-onyx border border-border-subtle space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <BookOpen className="w-4 h-4 text-team-b-cyan" />
-                    <label className="text-xs font-mono font-bold uppercase tracking-wider text-optic-white">
+                    <label className="text-xs font-sans font-bold uppercase tracking-wider text-optic-white">
                       Select Textbook:
                     </label>
                   </div>
                   <button
                     type="button"
                     onClick={onOpenBooksBank}
-                    className="text-xs text-team-b-cyan hover:underline font-mono flex items-center gap-1 cursor-pointer"
+                    className="text-xs text-team-b-cyan hover:underline font-sans flex items-center gap-1 cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Upload New Book</span>
@@ -296,12 +296,12 @@ export function AiStudioModal({
                 </div>
 
                 {books.length === 0 ? (
-                  <div className="p-4 border border-dashed border-white/15 rounded-xl text-center space-y-2">
-                    <p className="text-xs text-text-muted-slate">No textbooks available in Books Bank.</p>
+                  <div className="p-4 border border-dashed border-border-medium rounded-xl text-center space-y-2">
+                    <p className="text-xs text-text-muted-slate font-sans">No textbooks available in Books Bank.</p>
                     <button
                       type="button"
                       onClick={onOpenBooksBank}
-                      className="px-3 py-1.5 rounded-lg bg-team-b-cyan text-surface-obsidian text-xs font-mono font-bold"
+                      className="px-3 py-1.5 rounded-lg bg-team-b-cyan text-white text-xs font-sans font-bold"
                     >
                       Upload First Textbook
                     </button>
@@ -319,7 +319,7 @@ export function AiStudioModal({
                           endPage: Math.min(5, b?.page_count || 10),
                         });
                       }}
-                      className="w-full bg-surface-carbon border border-white/15 rounded-lg px-3 py-2 text-xs text-optic-white focus:outline-none focus:border-team-b-cyan font-mono"
+                      className="w-full bg-surface-carbon border border-border-medium rounded-lg px-3 py-2 text-xs text-optic-white focus:outline-none focus:border-brand-primary font-sans"
                     >
                       {books.map((b) => (
                         <option key={b.id} value={b.id}>
@@ -330,11 +330,11 @@ export function AiStudioModal({
 
                     {selectedBook && selectedBook.subject_tags && selectedBook.subject_tags.length > 0 && (
                       <div className="flex items-center gap-1.5 flex-wrap pt-1 text-[11px] text-text-muted-slate">
-                        <span className="font-mono">Tags:</span>
+                        <span className="font-sans">Tags:</span>
                         {selectedBook.subject_tags.map((tag, i) => (
                           <span
                             key={i}
-                            className="px-2 py-0.5 rounded bg-surface-interactive border border-white/10 text-team-b-cyan font-mono"
+                            className="px-2 py-0.5 rounded bg-surface-interactive border border-border-subtle text-team-b-cyan font-sans"
                           >
                             {tag}
                           </span>
@@ -347,9 +347,9 @@ export function AiStudioModal({
 
               {/* 2. Page Range Selector */}
               {selectedBook && (
-                <div className="p-4 rounded-xl bg-surface-onyx border border-white/10 space-y-3">
+                <div className="p-4 rounded-xl bg-surface-onyx border border-border-subtle space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-optic-white">
+                    <span className="text-xs font-sans font-bold uppercase tracking-wider text-optic-white">
                       Pages to Read from Book:
                     </span>
                     <span className="text-xs text-team-b-cyan font-mono font-bold">
@@ -369,9 +369,9 @@ export function AiStudioModal({
               )}
 
               {/* 3. Target Subject & Chapter (Where to save after review) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl bg-surface-onyx border border-white/10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl bg-surface-onyx border border-border-subtle">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-mono font-bold uppercase tracking-wider text-optic-white flex items-center gap-1.5">
+                  <label className="text-xs font-sans font-bold uppercase tracking-wider text-optic-white flex items-center gap-1.5">
                     <Layers className="w-3.5 h-3.5 text-team-a-bright" />
                     <span>Target Subject:</span>
                   </label>
@@ -386,7 +386,7 @@ export function AiStudioModal({
                       });
                     }}
                     required
-                    className="w-full bg-surface-carbon border border-white/15 rounded-lg px-3 py-2 text-xs text-optic-white focus:outline-none focus:border-team-a-core"
+                    className="w-full bg-surface-carbon border border-border-medium rounded-lg px-3 py-2 text-xs text-optic-white focus:outline-none focus:border-brand-primary font-sans"
                   >
                     {subjects.map((sub) => (
                       <option key={sub.id} value={sub.id}>
@@ -397,7 +397,7 @@ export function AiStudioModal({
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-mono font-bold uppercase tracking-wider text-optic-white flex items-center gap-1.5">
+                  <label className="text-xs font-sans font-bold uppercase tracking-wider text-optic-white flex items-center gap-1.5">
                     <Layers className="w-3.5 h-3.5 text-team-b-cyan" />
                     <span>Target Chapter / Topic:</span>
                   </label>
@@ -406,7 +406,7 @@ export function AiStudioModal({
                     onChange={(e) => setConfig({ targetChapterId: e.target.value })}
                     required
                     disabled={!config.targetSubjectId || filteredChapters.length === 0}
-                    className="w-full bg-surface-carbon border border-white/15 rounded-lg px-3 py-2 text-xs text-optic-white focus:outline-none focus:border-team-a-core disabled:opacity-40"
+                    className="w-full bg-surface-carbon border border-border-medium rounded-lg px-3 py-2 text-xs text-optic-white focus:outline-none focus:border-brand-primary disabled:opacity-40 font-sans"
                   >
                     {filteredChapters.map((chap) => (
                       <option key={chap.id} value={chap.id}>
@@ -418,7 +418,7 @@ export function AiStudioModal({
               </div>
 
               {/* 4. Generation Constraints: Topic, Count, Difficulty, Cognitive */}
-              <div className="p-4 rounded-xl bg-surface-onyx border border-white/10 space-y-4">
+              <div className="p-4 rounded-xl bg-surface-onyx border border-border-subtle space-y-4">
                 <div className="flex items-center gap-2">
                   <Settings2 className="w-4 h-4 text-team-a-bright" />
                   <span className="text-xs font-mono font-bold uppercase tracking-wider text-optic-white">
@@ -436,20 +436,20 @@ export function AiStudioModal({
                     value={config.topicPrompt}
                     onChange={(e) => setConfig({ topicPrompt: e.target.value })}
                     placeholder="e.g. Projectile Motion, Laws of Motion, Work and Energy"
-                    className="w-full bg-surface-carbon border border-white/15 rounded-lg px-3 py-2 text-xs text-optic-white placeholder-text-muted-slate focus:outline-none focus:border-team-a-core"
+                    className="w-full bg-surface-carbon border border-border-medium rounded-lg px-3 py-2 text-xs text-optic-white placeholder-text-muted-slate focus:outline-none focus:border-brand-primary font-sans"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
                   {/* Count */}
                   <div className="space-y-1">
-                    <label className="text-xs font-mono text-text-muted-slate">
+                    <label className="text-xs font-sans text-text-muted-slate">
                       Number of Questions:
                     </label>
                     <select
                       value={config.count}
                       onChange={(e) => setConfig({ count: Number(e.target.value) })}
-                      className="w-full bg-surface-carbon border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-optic-white focus:outline-none focus:border-team-a-core"
+                      className="w-full bg-surface-carbon border border-border-medium rounded-lg px-2.5 py-1.5 text-xs text-optic-white focus:outline-none focus:border-brand-primary font-sans"
                     >
                       <option value={5}>5 Questions</option>
                       <option value={10}>10 Questions</option>
@@ -460,13 +460,13 @@ export function AiStudioModal({
 
                   {/* Difficulty */}
                   <div className="space-y-1">
-                    <label className="text-xs font-mono text-text-muted-slate">
+                    <label className="text-xs font-sans text-text-muted-slate">
                       Difficulty Level:
                     </label>
                     <select
                       value={config.difficultyBias}
                       onChange={(e) => setConfig({ difficultyBias: e.target.value as any })}
-                      className="w-full bg-surface-carbon border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-optic-white focus:outline-none focus:border-team-a-core"
+                      className="w-full bg-surface-carbon border border-border-medium rounded-lg px-2.5 py-1.5 text-xs text-optic-white focus:outline-none focus:border-brand-primary font-sans"
                     >
                       <option value="BALANCED">Mixed (Balanced)</option>
                       <option value="EASY">Easy (Foundational)</option>
@@ -477,13 +477,13 @@ export function AiStudioModal({
 
                   {/* Cognitive */}
                   <div className="space-y-1">
-                    <label className="text-xs font-mono text-text-muted-slate">
+                    <label className="text-xs font-sans text-text-muted-slate">
                       Question Type:
                     </label>
                     <select
                       value={config.cognitiveBias}
                       onChange={(e) => setConfig({ cognitiveBias: e.target.value as any })}
-                      className="w-full bg-surface-carbon border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-optic-white focus:outline-none focus:border-team-a-core"
+                      className="w-full bg-surface-carbon border border-border-medium rounded-lg px-2.5 py-1.5 text-xs text-optic-white focus:outline-none focus:border-brand-primary font-sans"
                     >
                       <option value="MIXED">Mixed Balance</option>
                       <option value="KNOWLEDGE">Facts &amp; Definitions</option>

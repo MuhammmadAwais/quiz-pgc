@@ -4,9 +4,9 @@ import { Skeleton, QuestionCardSkeleton, SubjectRowSkeleton } from '@/components
 
 export default function QuestionBankLoading() {
   return (
-    <div className="min-h-screen bg-surface-obsidian flex flex-col animate-fade-in">
+    <div className="min-h-screen bg-surface-obsidian flex flex-col animate-fade-in transition-colors duration-200">
       {/* Top Header Skeleton */}
-      <div className="bg-surface-onyx border-b border-white/10 px-6 py-4">
+      <div className="bg-surface-onyx border-b border-border-subtle px-6 py-4">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1.5">
             <Skeleton className="w-64 h-6 rounded bg-team-a-core/30" />
@@ -27,7 +27,7 @@ export default function QuestionBankLoading() {
         {/* Pane 1: Subjects (3 cols) */}
         <div className="md:col-span-3 flex flex-col">
           <Card variant="carbon" className="flex-1 flex flex-col p-4 space-y-3">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+            <div className="flex items-center justify-between pb-3 border-b border-border-subtle">
               <Skeleton className="w-28 h-4 rounded bg-surface-interactive/70" />
               <Skeleton className="w-5 h-5 rounded bg-team-a-core/30" />
             </div>
@@ -43,7 +43,7 @@ export default function QuestionBankLoading() {
         {/* Pane 2: Chapters / Topics (3 cols) */}
         <div className="md:col-span-3 flex flex-col">
           <Card variant="carbon" className="flex-1 flex flex-col p-4 space-y-3">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+            <div className="flex items-center justify-between pb-3 border-b border-border-subtle">
               <Skeleton className="w-24 h-4 rounded bg-surface-interactive/70" />
               <Skeleton className="w-5 h-5 rounded bg-team-b-cyan/30" />
             </div>
@@ -59,12 +59,12 @@ export default function QuestionBankLoading() {
         {/* Pane 3: Questions List (6 cols) */}
         <div className="md:col-span-6 flex flex-col">
           <Card variant="carbon" className="flex-1 flex flex-col p-4 space-y-3">
-            <div className="pb-3 border-b border-white/10 space-y-3">
+            <div className="pb-3 border-b border-border-subtle space-y-3">
               <div className="flex items-center justify-between">
                 <Skeleton className="w-36 h-4 rounded bg-surface-interactive/70" />
                 <Skeleton className="w-24 h-5 rounded bg-team-b-cyan/20" />
               </div>
-              <Skeleton className="w-full h-8 rounded-md bg-surface-obsidian border border-white/10" />
+              <Skeleton className="w-full h-8 rounded-md bg-surface-obsidian border border-border-medium" />
             </div>
 
             <div className="space-y-3">

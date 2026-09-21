@@ -137,7 +137,7 @@ export function QuestionModal({
                   const firstChap = chapters.find((c) => c.subject_id === e.target.value);
                   if (firstChap) setChapterId(firstChap.id);
                 }}
-                className="w-full bg-surface-obsidian border border-white/20 rounded-md px-3 py-2 text-optic-white text-xs font-mono focus:border-team-a-core focus:outline-none"
+                className="w-full bg-surface-obsidian border border-border-medium rounded-md px-3 py-2 text-optic-white text-xs font-mono focus:border-team-a-core focus:outline-none"
               >
                 {subjects.map((sub) => (
                   <option key={sub.id} value={sub.id} className="bg-surface-carbon text-optic-white">
@@ -154,7 +154,7 @@ export function QuestionModal({
               <select
                 value={chapterId}
                 onChange={(e) => setChapterId(e.target.value)}
-                className="w-full bg-surface-obsidian border border-white/20 rounded-md px-3 py-2 text-optic-white text-xs font-mono focus:border-team-a-core focus:outline-none"
+                className="w-full bg-surface-obsidian border border-border-medium rounded-md px-3 py-2 text-optic-white text-xs font-mono focus:border-team-a-core focus:outline-none"
               >
                 {availableChapters.length === 0 ? (
                   <option value="" disabled className="bg-surface-carbon text-text-muted-slate">
@@ -182,7 +182,7 @@ export function QuestionModal({
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="e.g. Which thermodynamic process occurs at constant pressure?"
-            className="w-full bg-surface-obsidian border border-white/20 rounded-md p-3 text-optic-white text-sm focus:outline-none focus:border-team-a-core transition-colors"
+            className="w-full bg-surface-obsidian border border-border-medium rounded-md p-3 text-optic-white text-sm focus:outline-none focus:border-team-a-core transition-colors"
             required
           />
         </div>
@@ -206,14 +206,14 @@ export function QuestionModal({
                 className={`flex items-center gap-3 p-2.5 rounded-lg border transition-all cursor-pointer ${
                   isCorrect
                     ? 'bg-state-success/10 border-state-success/60 text-optic-white'
-                    : 'bg-surface-obsidian border-white/10 hover:border-white/25'
+                    : 'bg-surface-obsidian border-border-subtle hover:border-border-medium'
                 }`}
               >
                 <div
                   className={`w-6 h-6 rounded-full flex items-center justify-center font-mono text-xs font-bold shrink-0 transition-colors ${
                     isCorrect
-                      ? 'bg-state-success text-surface-obsidian shadow-[0_0_12px_rgba(34,211,238,0.5)]'
-                      : 'bg-surface-carbon border border-white/20 text-text-muted-slate'
+                      ? 'bg-state-success text-surface-obsidian shadow-sm'
+                      : 'bg-surface-carbon border border-border-medium text-text-muted-slate'
                   }`}
                 >
                   {letter}
@@ -238,7 +238,7 @@ export function QuestionModal({
         </div>
 
         {/* Modal Actions */}
-        <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
+        <div className="flex justify-end gap-3 pt-3 border-t border-border-subtle">
           <Button type="button" variant="console" size="sm" onClick={onClose}>
             Cancel
           </Button>

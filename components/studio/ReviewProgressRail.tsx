@@ -31,8 +31,8 @@ export function ReviewProgressRail() {
               onClick={() => setActiveCardIndex(idx)}
               className={`flex items-center justify-between p-2 rounded-lg border text-xs font-mono transition-all text-left cursor-pointer shrink-0 lg:shrink ${
                 isActive
-                  ? 'bg-team-b-cyan/20 border-team-b-cyan text-optic-white shadow-[0_0_10px_rgba(6,182,212,0.25)]'
-                  : 'bg-surface-carbon border-white/10 hover:bg-surface-interactive text-text-muted-slate'
+                  ? 'bg-team-b-cyan/15 border-team-b-cyan text-optic-white shadow-sm font-bold'
+                  : 'bg-surface-carbon border-border-subtle hover:bg-surface-interactive text-text-muted-slate'
               }`}
             >
               <div className="flex items-center gap-1.5 truncate">

@@ -83,28 +83,28 @@ export function StudioStickyFooter({
   };
 
   return (
-    <div className="sticky bottom-0 z-30 w-full bg-surface-onyx/95 border-t border-white/10 backdrop-blur-xl p-4 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4 mt-6">
+    <div className="sticky bottom-0 z-30 w-full bg-surface-onyx/95 border-t border-border-subtle backdrop-blur-xl p-4 shadow-modal-dialog flex flex-col md:flex-row items-center justify-between gap-4 mt-6">
       {/* Left: Summary Counters */}
       <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
         <div className="flex items-center gap-1.5 text-xs font-semibold">
           <Inbox className="w-4 h-4 text-text-muted-slate" />
-          <span className="text-text-muted-slate">Needs Review:</span>
+          <span className="text-text-muted-slate font-sans">Needs Review:</span>
           <span className="font-mono font-bold text-optic-white">{pending.length}</span>
         </div>
 
-        <span className="text-white/20">•</span>
+        <span className="text-text-muted-slate/30">•</span>
 
         <div className="flex items-center gap-1.5 text-xs font-semibold">
           <CheckCircle2 className="w-4 h-4 text-state-success" />
-          <span className="text-text-muted-slate">Accepted:</span>
+          <span className="text-text-muted-slate font-sans">Accepted:</span>
           <span className="font-mono font-bold text-state-success">{accepted.length}</span>
         </div>
 
-        <span className="text-white/20">•</span>
+        <span className="text-text-muted-slate/30">•</span>
 
         <div className="flex items-center gap-1.5 text-xs font-semibold">
           <XCircle className="w-4 h-4 text-state-warning-rose" />
-          <span className="text-text-muted-slate">Rejected:</span>
+          <span className="text-text-muted-slate font-sans">Rejected:</span>
           <span className="font-mono font-bold text-state-warning-rose">{rejected.length}</span>
         </div>
       </div>
@@ -121,7 +121,7 @@ export function StudioStickyFooter({
               targetChapterId: subChaps.length > 0 ? subChaps[0].id : null,
             });
           }}
-          className="h-10 bg-surface-carbon border border-white/15 rounded-xl px-3 text-xs text-optic-white focus:outline-none focus:border-team-b-cyan"
+          className="h-10 bg-surface-carbon border border-border-medium rounded-xl px-3 text-xs text-optic-white focus:outline-none focus:border-brand-secondary font-sans"
         >
           <option value="">Choose Subject...</option>
           {subjects.map((sub) => (
@@ -135,7 +135,7 @@ export function StudioStickyFooter({
           value={config.targetChapterId || ''}
           onChange={(e) => setConfig({ targetChapterId: e.target.value || null })}
           disabled={!config.targetSubjectId || filteredChapters.length === 0}
-          className="h-10 bg-surface-carbon border border-white/15 rounded-xl px-3 text-xs text-optic-white focus:outline-none focus:border-team-b-cyan disabled:opacity-40"
+          className="h-10 bg-surface-carbon border border-border-medium rounded-xl px-3 text-xs text-optic-white focus:outline-none focus:border-brand-secondary disabled:opacity-40 font-sans"
         >
           <option value="">Choose Topic...</option>
           {filteredChapters.map((chap) => (
@@ -156,7 +156,7 @@ export function StudioStickyFooter({
             }
           }}
           disabled={isSaving}
-          className="h-10 px-3.5 rounded-xl bg-surface-interactive hover:bg-state-warning-rose/15 hover:border-state-warning-rose/30 hover:text-state-warning-rose border border-white/10 text-xs font-semibold text-text-muted-slate transition-all cursor-pointer flex items-center gap-1.5"
+          className="h-10 px-3.5 rounded-xl bg-surface-interactive hover:bg-state-warning-rose/15 hover:border-state-warning-rose/30 hover:text-state-warning-rose border border-border-subtle text-xs font-semibold text-text-muted-slate transition-all cursor-pointer flex items-center gap-1.5 font-sans"
         >
           <Trash2 className="w-3.5 h-3.5" />
           <span>Clear All</span>
@@ -166,7 +166,7 @@ export function StudioStickyFooter({
           type="button"
           onClick={handleSave}
           disabled={isSaving || accepted.length === 0}
-          className="h-10 px-5 rounded-xl bg-team-b-cyan hover:bg-team-b-cyan/90 disabled:opacity-40 text-surface-obsidian text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-lg shadow-team-b-cyan/20 hover:scale-[1.01]"
+          className="h-10 px-5 rounded-xl bg-team-b-cyan hover:brightness-105 disabled:opacity-40 text-white text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-sm hover:scale-[1.01] font-sans"
         >
           {isSaving ? (
             <>

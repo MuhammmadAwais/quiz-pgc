@@ -26,25 +26,22 @@ export function OptionCard({
 }: OptionCardProps) {
   const isTeamA = teamTurn === 'TEAM_A';
 
-  // State styling determination
-  let borderBgClass = 'bg-surface-carbon border border-white/10 text-optic-white hover:bg-surface-interactive hover:border-white/30';
-  let glowClass = '';
+  // State styling determination (Zero glows, clean architectural borders and fills)
+  let borderBgClass = 'bg-surface-carbon border border-border-subtle text-optic-white hover:bg-surface-interactive hover:border-border-bright';
 
   if (isSubmitted) {
     if (isCorrect) {
-      borderBgClass = 'bg-state-success/15 border-2 border-state-success text-optic-white shadow-[0_0_24px_rgba(34,211,238,0.45)]';
-      glowClass = 'glow-success';
+      borderBgClass = 'bg-state-success/15 border-2 border-state-success text-optic-white';
     } else if (isSelected && !isCorrect) {
-      borderBgClass = 'bg-state-warning-rose/15 border-2 border-state-warning-rose text-optic-white shadow-[0_0_24px_rgba(225,29,72,0.45)]';
-      glowClass = 'glow-miss';
+      borderBgClass = 'bg-state-warning-rose/15 border-2 border-state-warning-rose text-optic-white';
     } else {
-      borderBgClass = 'bg-surface-onyx/60 border border-white/5 text-text-muted-slate opacity-60';
+      borderBgClass = 'bg-surface-onyx/60 border border-border-subtle text-text-muted-slate opacity-50';
     }
   } else if (isSelected) {
     if (isTeamA) {
-      borderBgClass = 'bg-team-a-core/15 border-2 border-team-a-core text-optic-white shadow-[0_0_20px_rgba(139,92,246,0.35)]';
+      borderBgClass = 'bg-team-a-core/15 border-2 border-team-a-core text-optic-white';
     } else {
-      borderBgClass = 'bg-team-b-cyan/15 border-2 border-team-b-cyan text-optic-white shadow-[0_0_20px_rgba(6,182,212,0.35)]';
+      borderBgClass = 'bg-team-b-cyan/15 border-2 border-team-b-cyan text-optic-white';
     }
   }
 
@@ -55,22 +52,22 @@ export function OptionCard({
           onSelect();
         }
       }}
-      className={`relative p-5 md:p-6 rounded-xl transition-all duration-200 flex items-center gap-4 cursor-pointer select-none ${borderBgClass} ${glowClass} ${
+      className={`relative p-5 md:p-6 rounded-xl transition-all duration-150 flex items-center gap-4 cursor-pointer select-none ${borderBgClass} ${
         disabled ? 'cursor-not-allowed opacity-50' : 'active:scale-[0.99]'
       }`}
     >
       {/* Letter Indicator */}
       <div
-        className={`w-9 h-9 md:w-11 md:h-11 rounded-lg flex items-center justify-center font-mono text-base md:text-lg font-bold shrink-0 transition-colors ${
+        className={`w-9 h-9 md:w-11 md:h-11 rounded-lg flex items-center justify-center font-sans text-base md:text-lg font-bold shrink-0 transition-colors ${
           isSubmitted && isCorrect
-            ? 'bg-state-success text-surface-obsidian'
+            ? 'bg-state-success text-white'
             : isSubmitted && isSelected && !isCorrect
-            ? 'bg-state-warning-rose text-surface-obsidian'
+            ? 'bg-state-warning-rose text-white'
             : isSelected
             ? isTeamA
-              ? 'bg-team-a-core text-surface-obsidian'
-              : 'bg-team-b-cyan text-surface-obsidian'
-            : 'bg-surface-obsidian border border-white/20 text-text-bright-slate'
+              ? 'bg-team-a-core text-white'
+              : 'bg-team-b-cyan text-white'
+            : 'bg-surface-onyx border border-border-medium text-text-bright-slate'
         }`}
       >
         {letter}
@@ -78,7 +75,7 @@ export function OptionCard({
 
       {/* Option Text */}
       <div className="flex-1">
-        <p className="text-body-xl font-semibold tracking-wide leading-relaxed">
+        <p className="text-body-xl font-medium tracking-normal leading-relaxed">
           {text}
         </p>
       </div>
@@ -87,9 +84,9 @@ export function OptionCard({
       {isSubmitted && (
         <div className="shrink-0">
           {isCorrect ? (
-            <CheckCircle2 className="w-6 h-6 text-state-success animate-in zoom-in-50 duration-300" />
+            <CheckCircle2 className="w-6 h-6 text-state-success animate-in zoom-in-50 duration-200" />
           ) : isSelected ? (
-            <XCircle className="w-6 h-6 text-state-warning-rose animate-in zoom-in-50 duration-300" />
+            <XCircle className="w-6 h-6 text-state-warning-rose animate-in zoom-in-50 duration-200" />
           ) : null}
         </div>
       )}

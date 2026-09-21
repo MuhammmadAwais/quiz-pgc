@@ -1,122 +1,84 @@
-# UI Tokens
+# UI Tokens — Dual-Theme Architecture
 
-Design tokens for **PGC Arena** extracted from the **Electric Obsidian Arena** specification (`DESIGN.md`). Use these exact values throughout the codebase — never hardcode raw hex values or arbitrary utility colors in components.
-
----
-
-## How to Use
-
-This project uses **Tailwind CSS v4**. All design tokens are defined using the `@theme` directive in `app/globals.css`. No `tailwind.config.ts` file is used.
-
-Tailwind v4 automatically maps `--color-*` variables to utility classes:
-
-- `--color-surface-obsidian` → `bg-surface-obsidian`, `text-surface-obsidian`
-- `--color-surface-onyx` → `bg-surface-onyx`, `border-surface-onyx`
-- `--color-surface-carbon` → `bg-surface-carbon`, `border-surface-carbon`
-- `--color-surface-interactive` → `bg-surface-interactive`
-- `--color-team-a-core` → `bg-team-a-core`, `text-team-a-core`, `border-team-a-core`
-- `--color-team-b-cyan` → `bg-team-b-cyan`, `text-team-b-cyan`, `border-team-b-cyan`
-- `--color-state-success` → `text-state-success`, `border-state-success`
-- `--color-state-warning-rose` → `text-state-warning-rose`, `border-state-warning-rose`
-
-```tsx
-// Correct — uses generated utility tokens
-<div className="bg-surface-carbon border border-white/10 text-optic-white rounded-lg p-6">
-  <span className="text-team-a-core font-mono text-sm tracking-wider">TEAM A</span>
-</div>
-
-// Never — hardcoded hex values or generic colors
-<div className="bg-[#1B1A26] text-purple-500 border-red-500">
-```
+Design tokens for **PGC Arena** supporting a high-fidelity **Dual-Theme Mode** (Dark Mode: *Deep Slate & Petroleum Matrix* and Light Mode: *Indigo Periwinkle High-Contrast*). Configured with **Tailwind CSS v4** `@theme` tokens mapped to dynamic CSS variables in `app/globals.css`.
 
 ---
 
-## globals.css — Complete Token Definition
+## Typography Standards
 
-```css
-@import "tailwindcss";
+All UI elements uniformly use **Plus Jakarta Sans** with OpenType numerical figures enabled for zero-jitter telemetry and scoreboards:
 
-@theme {
-  /* Typography */
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
-
-  /* Surfaces & Substrates */
-  --color-surface-obsidian: #0A0A0F;
-  --color-surface-onyx: #12111A;
-  --color-surface-carbon: #1B1A26;
-  --color-surface-interactive: #262436;
-
-  /* Text Tiers */
-  --color-text-optic-white: #FFFFFF;
-  --color-text-bright-slate: #F1F5F9;
-  --color-text-high-contrast: #E2E8F0;
-  --color-text-muted-slate: #94A3B8;
-
-  /* Team A — Electric Violet */
-  --color-team-a-core: #8B5CF6;
-  --color-team-a-bright: #A78BFA;
-  --color-team-a-deep: #7C3AED;
-
-  /* Team B — Bright Cyan & Coral Accent */
-  --color-team-b-cyan: #06B6D4;
-  --color-team-b-ice: #38BDF8;
-  --color-team-b-coral: #FB923C;
-
-  /* Status Architecture (Zero Green, Red, Yellow) */
-  --color-state-success: #22D3EE;
-  --color-state-success-indigo: #818CF8;
-  --color-state-warning-rose: #E11D48;
-  --color-state-warning-plum: #BE185D;
-
-  /* Projector Edge Boundaries */
-  --color-border-subtle: rgba(255, 255, 255, 0.08);
-  --color-border-medium: rgba(255, 255, 255, 0.16);
-  --color-border-bright: rgba(255, 255, 255, 0.35);
-
-  /* Radius */
-  --radius-sm: 0.125rem;  /* 2px */
-  --radius-md: 0.25rem;   /* 4px - standard buttons/inputs */
-  --radius-lg: 0.5rem;    /* 8px - modules/question bays */
-  --radius-full: 9999px;  /* pills & indicators */
-}
-
-/* Custom Stage Volumetric Shadows & Glows */
-.glow-team-a {
-  box-shadow: 0 0 36px -4px rgba(139, 92, 246, 0.45);
-}
-
-.glow-team-b {
-  box-shadow: 0 0 36px -4px rgba(6, 182, 212, 0.45);
-}
-
-.glow-success {
-  box-shadow: 0 0 36px -4px rgba(34, 211, 238, 0.45);
-}
-
-.glow-miss {
-  box-shadow: 0 0 36px -4px rgba(225, 29, 72, 0.45);
-}
-```
+- **Font Family:** `Plus Jakarta Sans`, `-apple-system`, `BlinkMacSystemFont`, `sans-serif`
+- **Numerical Telemetry:** OpenType `font-feature-settings: 'cv01' on, 'tnum' on;` for scoreboards, clocks, question counters, and timers.
+- **Hierarchy:**
+  - Display / Big Scores: `text-4xl` to `text-6xl`, font-extrabold (`700`/`800`)
+  - Headings / Section titles: `text-lg` to `text-2xl`, font-bold (`600`/`700`)
+  - Body copy & MCQ options: `text-sm` to `text-base`, font-normal / font-medium (`400`/`500`)
+  - Telemetry chips & tags: `text-xs` / `text-[11px]`, font-mono / font-bold (`600`)
 
 ---
 
-## Token Reference Table
+## Dual-Theme Color Palettes
 
-| Category | Token Variable | Value | Role |
-|---|---|---|---|
-| Surface | `--color-surface-obsidian` | `#0A0A0F` | Baseline canvas absorbing ambient venue light |
-| Surface | `--color-surface-onyx` | `#12111A` | Structural arena bays and team podium backdrops |
-| Surface | `--color-surface-carbon` | `#1B1A26` | Elevated question bay & interactive option cards |
-| Surface | `--color-surface-interactive`| `#262436` | Hovered cards, input slots, focused wells |
-| Text | `--color-text-optic-white` | `#FFFFFF` | Primary headers, active question prompts, scores |
-| Text | `--color-text-bright-slate` | `#F1F5F9` | Option descriptions, subtitle copy |
-| Text | `--color-text-high-contrast`| `#E2E8F0` | Telemetry tags, chips, secondary labels |
-| Team A | `--color-team-a-core` | `#8B5CF6` | Team A indicator, active lockout banner, primary button |
-| Team A | `--color-team-a-bright` | `#A78BFA` | Team A border highlight, hover glow |
-| Team B | `--color-team-b-cyan` | `#06B6D4` | Team B indicator, active lockout banner, cyan button |
-| Team B | `--color-team-b-ice` | `#38BDF8` | Team B border highlight, hover glow |
-| Status | `--color-state-success` | `#22D3EE` | Correct answer validation, point awards |
-| Status | `--color-state-warning-rose`| `#E11D48` | Miss state, time expiry, incorrect selection |
-| Border | `border-white/10` | `rgba(255,255,255,0.1)` | Structural card boundaries |
-| Border | `border-white/20` | `rgba(255,255,255,0.2)` | Interactive control boundaries |
+### 1. Dark Mode: "Deep Slate & Petroleum Matrix" (`dark-theme-deisgn.md`)
+Engineered for stage auditorium projectors and low-light venue environments. Replaces saturated neon glows with deep petroleum cyan accents, mineral sage borders, and soft charcoal-slate surfaces.
+
+| Token Variable | Hex Value | Semantic Role |
+|---|---|---|
+| `--color-surface-obsidian` | `#0B141B` | Deep Slate venue stage canvas |
+| `--color-surface-onyx` | `#141D23` | Structural bays & toolbar backdrops |
+| `--color-surface-carbon` | `#182127` | Elevated question bay & card substrates |
+| `--color-surface-interactive` | `#213038` | Hovered wells, chip substrates, active buttons |
+| `--color-text-optic-white` | `#DAE4ED` | On-surface high-contrast text, question prompts, scores |
+| `--color-text-bright-slate` | `#BAC8D3` | Option descriptions, card body text |
+| `--color-text-high-contrast` | `#E1EBF5` | High-emphasis labels and display metrics |
+| `--color-text-muted-slate` | `#748D92` | Mineral sage secondary labels and metadata |
+| `--color-team-a-core` | `#8B5CF6` | Team A Electric Violet indicator & action |
+| `--color-team-b-cyan` | `#124E66` | Petroleum Cyan primary brand accent & Team B |
+| `--color-team-b-ice` | `#2E869B` | High-candela ice teal border and badge highlight |
+| `--color-state-success` | `#1A6B72` | Deep Emerald Teal for correct answer validation |
+| `--color-state-warning-rose`| `#7C3B3F` | Subdued Venetian Wine for errors and misses |
+| `--color-border-subtle` | `#213038` | Subtle card dividers and module edges |
+| `--color-border-medium` | `#354A54` | Defined perimeter borders |
+| `--color-border-bright` | `#748D92` | High-emphasis mineral sage borders |
+
+---
+
+### 2. Light Mode: "Indigo Periwinkle High-Contrast" (`light-theme-design.md`)
+Engineered for bright daylight admin office displays and well-lit staging setups. Clean, crisp white cards against a soft periwinkle mist canvas with deep royal indigo typography.
+
+| Token Variable | Hex Value | Semantic Role |
+|---|---|---|
+| `--color-surface-obsidian` | `#EDE8F5` | Soft Periwinkle Mist page canvas |
+| `--color-surface-onyx` | `#F1ECF9` | Structural toolbars and header strips |
+| `--color-surface-carbon` | `#FFFFFF` | Crisp pure white cards and elevated dialogs |
+| `--color-surface-interactive` | `#E4DEF2` | Interactive hover wells and input backdrops |
+| `--color-text-optic-white` | `#1B254B` | Midnight Deep Indigo high-contrast text |
+| `--color-text-bright-slate` | `#2D3A6B` | Option body copy and card descriptions |
+| `--color-text-high-contrast` | `#0F172A` | Primary heading and score numerals |
+| `--color-text-muted-slate` | `#6B7280` | Muted cool slate metadata and secondary labels |
+| `--color-team-a-core` | `#6366F1` | Team A Indigo Violet indicator |
+| `--color-team-b-cyan` | `#3D52A0` | Royal Indigo primary brand accent & Team B |
+| `--color-team-b-ice` | `#7091E6` | Periwinkle secondary highlight and pill active states |
+| `--color-state-success` | `#0E7490` | Ocean Cyan for verified correct answers |
+| `--color-state-warning-rose`| `#BA1A1A` | Deep Crimson for errors and penalties |
+| `--color-border-subtle` | `#C5D2E8` | Periwinkle Mist subtle card dividers |
+| `--color-border-medium` | `#ADBBDA` | Defined slate borders |
+| `--color-border-bright` | `#7091E6` | Active high-emphasis periwinkle borders |
+
+---
+
+## Anti-AI Slop Invariants
+
+1. **Zero Raw Glowing Shadows:**
+   - No `box-shadow: 0 0 36px rgba(...)` or neon halo effects.
+   - All component elevations use crisp, tactile drop shadows (`shadow-sm`, `shadow-md`, `shadow-lg`) or subtle 1px border contrast.
+2. **Zero Harsh 90% Black Drop Shadows:**
+   - Dark mode cards float with mineral borders (`#213038` / `#354A54`) rather than muddy black halos.
+   - Light mode cards use soft, diffuse shadows with periwinkle tint (`rgba(27, 37, 75, 0.06)`).
+3. **Zero Unprofessional Gradients:**
+   - Gradients are limited to smooth subtle telemetry shimmers (`.skeleton-shimmer`) that dynamically adjust between dark and light modes.
+   - No multi-stop rainbow gradients or generic template badges.
+4. **Zero Hardcoded Hex in Markup:**
+   - All components use semantic Tailwind tokens (`bg-surface-obsidian`, `bg-surface-carbon`, `text-optic-white`, `border-border-subtle`, `border-border-medium`, `text-team-a-core`, `text-team-b-cyan`, etc.).
+   - Switching between dark and light mode automatically re-skins 100% of UI elements with zero layout shift.

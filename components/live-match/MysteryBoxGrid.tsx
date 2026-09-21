@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { HelpCircle, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 interface MysteryBoxGridProps {
   onSelectBox: (index: number) => void;
@@ -19,17 +19,17 @@ export function MysteryBoxGrid({
   const boxes = [1, 2, 3, 4, 5, 6];
 
   return (
-    <div className="w-full max-w-3xl mx-auto text-center space-y-6 animate-in fade-in zoom-in-95 duration-300">
+    <div className="w-full max-w-3xl mx-auto text-center space-y-6 animate-in fade-in zoom-in-95 duration-200">
       <div className="space-y-2">
         <span className="font-mono text-xs font-bold uppercase tracking-widest text-state-warning-rose flex items-center justify-center gap-2">
           <Sparkles className="w-4 h-4" />
           <span>SUPER OVER TIE-BREAKER</span>
           <Sparkles className="w-4 h-4" />
         </span>
-        <h2 className="text-2xl md:text-3xl font-extrabold text-optic-white">
+        <h2 className="text-2xl md:text-3xl font-extrabold text-optic-white font-sans">
           {activeTeamName}: Pick a Mystery Box
         </h2>
-        <p className="text-sm text-text-muted-slate">
+        <p className="text-sm text-text-muted-slate font-sans">
           Each box conceals an unused question from a surprise category. Sudden-death rules apply!
         </p>
       </div>
@@ -46,21 +46,21 @@ export function MysteryBoxGrid({
                   onSelectBox(idx);
                 }
               }}
-              className={`h-36 rounded-xl border-2 flex flex-col items-center justify-center p-6 cursor-pointer transition-all duration-300 select-none ${
+              className={`h-36 rounded-xl border-2 flex flex-col items-center justify-center p-6 cursor-pointer transition-all duration-200 select-none ${
                 isPicked
                   ? isTeamA
-                    ? 'bg-team-a-core/20 border-team-a-bright glow-team-a scale-105'
-                    : 'bg-team-b-cyan/20 border-team-b-ice glow-team-b scale-105'
-                  : 'bg-surface-carbon border-white/15 hover:border-white/40 hover:scale-105 hover:bg-surface-interactive shadow-[0_12px_24px_rgba(0,0,0,0.6)]'
+                    ? 'bg-team-a-core/15 border-team-a-bright scale-105'
+                    : 'bg-team-b-cyan/15 border-team-b-ice scale-105'
+                  : 'bg-surface-carbon border-border-medium hover:border-border-bright hover:scale-102 hover:bg-surface-interactive shadow-sm'
               }`}
             >
               <div
-                className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 font-mono text-xl font-extrabold ${
+                className={`w-12 h-12 rounded-lg flex items-center justify-center mb-2 font-mono text-xl font-extrabold ${
                   isPicked
                     ? isTeamA
-                      ? 'bg-team-a-core text-surface-obsidian'
-                      : 'bg-team-b-cyan text-surface-obsidian'
-                    : 'bg-surface-obsidian border border-white/20 text-optic-white'
+                      ? 'bg-team-a-core text-white'
+                      : 'bg-team-b-cyan text-white'
+                    : 'bg-surface-onyx border border-border-subtle text-optic-white'
                 }`}
               >
                 {num}

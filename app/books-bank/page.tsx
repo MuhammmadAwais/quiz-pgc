@@ -265,7 +265,7 @@ export default function BooksBankPage() {
   return (
     <div className="min-h-screen bg-surface-obsidian flex flex-col font-sans">
       {/* Top Action Header */}
-      <div className="bg-surface-onyx border-b border-white/10 px-6 py-4">
+      <div className="bg-surface-onyx border-b border-border-subtle px-6 py-4">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
@@ -294,7 +294,7 @@ export default function BooksBankPage() {
               size="sm"
               onClick={() => refreshRepo()}
               disabled={isSyncing || isLoading}
-              className="h-10 px-3 rounded-xl flex items-center gap-1.5 border-white/20 hover:border-team-b-cyan/50 text-xs text-text-bright-slate hover:text-optic-white cursor-pointer"
+              className="h-10 px-3 rounded-xl flex items-center gap-1.5 border-border-medium hover:border-team-b-cyan/50 text-xs text-text-bright-slate hover:text-optic-white cursor-pointer"
               title="Synchronize textbooks from database"
             >
               <RotateCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-team-b-cyan' : 'text-text-muted-slate'}`} />
@@ -308,7 +308,7 @@ export default function BooksBankPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search by title or tag..."
-                className="w-full h-10 bg-surface-carbon border border-white/15 rounded-xl pl-9 pr-3 text-xs text-optic-white placeholder-text-muted-slate focus:outline-none focus:border-team-b-cyan"
+                className="w-full h-10 bg-surface-carbon border border-border-medium rounded-xl pl-9 pr-3 text-xs text-optic-white placeholder-text-muted-slate focus:outline-none focus:border-team-b-cyan"
               />
             </div>
 
@@ -336,7 +336,7 @@ export default function BooksBankPage() {
               className={`px-3 py-1.5 rounded-full text-xs font-mono transition-colors shrink-0 cursor-pointer ${
                 selectedTag === null
                   ? 'bg-team-b-cyan text-surface-obsidian font-bold shadow-sm'
-                  : 'bg-surface-carbon border border-white/10 text-text-muted-slate hover:text-optic-white'
+                  : 'bg-surface-carbon border border-border-subtle text-text-muted-slate hover:text-optic-white'
               }`}
             >
               All Textbooks ({books.length})
@@ -353,7 +353,7 @@ export default function BooksBankPage() {
                   className={`px-3 py-1.5 rounded-full text-xs font-mono transition-colors shrink-0 flex items-center gap-1.5 cursor-pointer ${
                     isSelected
                       ? 'bg-team-b-cyan text-surface-obsidian font-bold shadow-sm'
-                      : 'bg-surface-carbon border border-white/10 text-text-bright-slate hover:text-optic-white'
+                      : 'bg-surface-carbon border border-border-subtle text-text-bright-slate hover:text-optic-white'
                   }`}
                 >
                   <Tag className="w-3 h-3" />
@@ -373,7 +373,7 @@ export default function BooksBankPage() {
             ))}
           </div>
         ) : filteredBooks.length === 0 ? (
-          <div className="text-center py-20 border border-dashed border-white/10 rounded-2xl p-8 space-y-4 max-w-lg mx-auto">
+          <div className="text-center py-20 border border-dashed border-border-subtle rounded-2xl p-8 space-y-4 max-w-lg mx-auto">
             <BookOpen className="w-12 h-12 text-text-muted-slate mx-auto opacity-40" />
             <div className="space-y-1">
               <h3 className="text-base font-bold text-optic-white">
@@ -406,7 +406,7 @@ export default function BooksBankPage() {
                 <div className="space-y-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-xl bg-surface-onyx border border-white/10 flex items-center justify-center text-team-b-cyan shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-surface-onyx border border-border-subtle flex items-center justify-center text-team-b-cyan shrink-0">
                         <FileText className="w-5 h-5" />
                       </div>
                       <div className="min-w-0">
@@ -453,7 +453,7 @@ export default function BooksBankPage() {
                         <span
                           key={tIdx}
                           onClick={() => setSelectedTag(tag)}
-                          className="px-2.5 py-0.5 rounded-md bg-surface-onyx border border-white/10 text-[10px] font-mono text-text-bright-slate hover:text-team-b-cyan cursor-pointer transition-colors"
+                          className="px-2.5 py-0.5 rounded-md bg-surface-onyx border border-border-subtle text-[10px] font-mono text-text-bright-slate hover:text-team-b-cyan cursor-pointer transition-colors"
                         >
                           {tag}
                         </span>
@@ -472,7 +472,7 @@ export default function BooksBankPage() {
                 </div>
 
                 {/* Card Actions */}
-                <div className="pt-3 border-t border-white/5 flex items-center justify-between gap-3">
+                <div className="pt-3 border-t border-border-subtle/50 flex items-center justify-between gap-3">
                   <a
                     href={`/api/library/proxy?url=${encodeURIComponent(book.file_url)}`}
                     target="_blank"
@@ -502,7 +502,7 @@ export default function BooksBankPage() {
 
         {/* Pagination Controls */}
         {filteredBooks.length > BOOKS_PER_PAGE && (
-          <div className="pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+          <div className="pt-4 border-t border-border-subtle flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
             <span className="text-text-muted-slate text-[11px]">
               Showing {(currentPage - 1) * BOOKS_PER_PAGE + 1}–
               {Math.min(currentPage * BOOKS_PER_PAGE, filteredBooks.length)} of{' '}
@@ -574,7 +574,7 @@ export default function BooksBankPage() {
           {/* Drag & Drop Surface */}
           <div
             onClick={() => fileInputRef.current?.click()}
-            className="border-2 border-dashed border-white/15 hover:border-team-b-cyan/50 rounded-2xl p-6 text-center cursor-pointer transition-all bg-surface-onyx/50 hover:bg-surface-onyx"
+            className="border-2 border-dashed border-border-medium hover:border-team-b-cyan/50 rounded-2xl p-6 text-center cursor-pointer transition-all bg-surface-onyx/50 hover:bg-surface-onyx"
           >
             <input
               ref={fileInputRef}
@@ -623,7 +623,7 @@ export default function BooksBankPage() {
             onChange={(e) => setTagsInput(e.target.value)}
           />
 
-          <div className="flex justify-end gap-3 pt-3 border-t border-white/10">
+          <div className="flex justify-end gap-3 pt-3 border-t border-border-subtle">
             <Button
               type="button"
               variant="console"
@@ -670,7 +670,7 @@ export default function BooksBankPage() {
           )}
 
           {editingBook && (
-            <div className="p-3 rounded-xl bg-surface-onyx border border-white/10 text-xs text-text-muted-slate flex items-center justify-between">
+            <div className="p-3 rounded-xl bg-surface-onyx border border-border-subtle text-xs text-text-muted-slate flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <FileText className="w-4 h-4 text-team-b-cyan" />
                 <span className="font-mono text-optic-white font-bold">{editingBook.page_count} pages</span>
@@ -698,7 +698,7 @@ export default function BooksBankPage() {
             </label>
 
             {/* Current Tag Chips */}
-            <div className="flex items-center gap-1.5 flex-wrap min-h-[40px] p-2.5 rounded-xl bg-surface-onyx border border-white/10">
+            <div className="flex items-center gap-1.5 flex-wrap min-h-[40px] p-2.5 rounded-xl bg-surface-onyx border border-border-subtle">
               {editTags.length === 0 ? (
                 <span className="text-xs text-text-muted-slate italic">
                   No tags attached. Type a tag below and press Enter or Add.
@@ -707,7 +707,7 @@ export default function BooksBankPage() {
                 editTags.map((tag, tIdx) => (
                   <span
                     key={tIdx}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-interactive border border-white/10 text-xs font-mono text-team-b-cyan"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-interactive border border-border-subtle text-xs font-mono text-team-b-cyan"
                   >
                     <span>{tag}</span>
                     <button
@@ -736,12 +736,12 @@ export default function BooksBankPage() {
                   }
                 }}
                 placeholder="Type tag (e.g. Mechanics, Computer Science, Class 11)..."
-                className="flex-1 h-9 bg-surface-carbon border border-white/15 rounded-xl px-3 text-xs text-optic-white placeholder-text-muted-slate focus:outline-none focus:border-team-b-cyan font-mono"
+                className="flex-1 h-9 bg-surface-carbon border border-border-medium rounded-xl px-3 text-xs text-optic-white placeholder-text-muted-slate focus:outline-none focus:border-team-b-cyan font-mono"
               />
               <button
                 type="button"
                 onClick={() => handleAddTag()}
-                className="h-9 px-3.5 rounded-xl bg-surface-interactive hover:bg-white/10 border border-white/15 text-xs text-optic-white font-semibold cursor-pointer transition-colors"
+                className="h-9 px-3.5 rounded-xl bg-surface-interactive hover:bg-surface-interactive/80 border border-border-medium text-xs text-optic-white font-semibold cursor-pointer transition-colors"
               >
                 + Add Tag
               </button>
@@ -762,7 +762,7 @@ export default function BooksBankPage() {
                         key={tag}
                         type="button"
                         onClick={() => handleAddTag(tag)}
-                        className="px-2 py-0.5 rounded-md bg-surface-onyx border border-white/10 text-[10px] font-mono text-text-bright-slate hover:text-team-b-cyan hover:border-team-b-cyan/40 transition-colors cursor-pointer"
+                        className="px-2 py-0.5 rounded-md bg-surface-onyx border border-border-subtle text-[10px] font-mono text-text-bright-slate hover:text-team-b-cyan hover:border-team-b-cyan/40 transition-colors cursor-pointer"
                       >
                         + {tag}
                       </button>
@@ -773,7 +773,7 @@ export default function BooksBankPage() {
           </div>
 
           {/* Modal Actions */}
-          <div className="flex justify-end gap-2.5 pt-3 border-t border-white/10">
+          <div className="flex justify-end gap-2.5 pt-3 border-t border-border-subtle">
             <Button
               type="button"
               variant="console"

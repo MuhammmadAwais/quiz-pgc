@@ -31,17 +31,17 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-surface-obsidian/85 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
       {/* Modal Dialog */}
-      <div className="relative w-full max-w-lg bg-surface-carbon border border-border-medium rounded-xl shadow-modal-dialog p-6 z-10 animate-fade-in">
-        <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
-          <h2 className="text-lg font-bold text-optic-white tracking-tight">{title}</h2>
+      <div className="relative w-full max-w-lg bg-surface-carbon border border-border-medium rounded-2xl shadow-modal-dialog p-6 z-10 animate-fade-in">
+        <div className="flex items-center justify-between pb-4 border-b border-border-subtle mb-5">
+          <h2 className="text-lg font-bold text-optic-white tracking-tight font-sans">{title}</h2>
           <button
             onClick={onClose}
-            className="text-text-muted-slate hover:text-optic-white transition-colors p-1 rounded hover:bg-surface-interactive"
+            className="text-text-muted-slate hover:text-optic-white transition-colors p-1.5 rounded-lg hover:bg-surface-interactive cursor-pointer"
             aria-label="Close dialog"
           >
             <X className="w-5 h-5" />
