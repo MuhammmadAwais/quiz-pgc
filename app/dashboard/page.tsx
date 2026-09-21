@@ -10,6 +10,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { getContestStats, getContestHistory } from '@/lib/actions/contests';
 import { ContestLedger } from '@/components/dashboard/ContestLedger';
+import { ResumeMatchBanner } from '@/components/dashboard/ResumeMatchBanner';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,6 +22,9 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-surface-obsidian p-6 md:p-10 max-w-7xl mx-auto space-y-8 transition-colors duration-200">
+      {/* Resume Postponed Match Banner if active */}
+      <ResumeMatchBanner />
+
       {/* Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border-subtle">
         <div className="min-w-0">

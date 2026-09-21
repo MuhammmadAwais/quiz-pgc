@@ -10,7 +10,7 @@ import {
   Minimize2,
   CheckCircle2,
   ArrowRight,
-  AlertTriangle,
+  PauseCircle,
 } from 'lucide-react';
 import { useTournamentStore } from '@/lib/store/tournament-store';
 import { StageHeader } from '@/components/live-match/StageHeader';
@@ -31,6 +31,7 @@ export default function LiveMatchPage() {
   const router = useRouter();
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [exitModalOpen, setExitModalOpen] = useState(false);
+  const [postponeModalOpen, setPostponeModalOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -152,12 +153,18 @@ export default function LiveMatchPage() {
     router.push('/dashboard');
   };
 
+  const handlePostponeMatch = () => {
+    pauseTimer();
+    setPostponeModalOpen(false);
+    router.push('/dashboard');
+  };
+
   const currentSubjectQuota =
     config.subjectQuestionCounts?.[activeSubject?.id] || config.mcqsPerSubject || 2;
 
   // Split teams symmetrically into Left and Right flanks
-  // Left: Teams 1, 3, 5... (0, 2, 4...)
-  // Right: Teams 2, 4, 6... (1, 3, 5...)
+  // Left Flank: Teams 1, 3, 5, 7, 9, 11 (0, 2, 4, 6...)
+  // Right Flank: Teams 2, 4, 6, 8, 10, 12 (1, 3, 5, 7...)
   const leftFlankTeams: { team: typeof teams[0]; index: number }[] = [];
   const rightFlankTeams: { team: typeof teams[0]; index: number }[] = [];
 
@@ -172,9 +179,9 @@ export default function LiveMatchPage() {
   const questionDirProps = getTextDirectionProps(currentQuestion?.text);
 
   return (
-    <div className="min-h-screen w-full bg-surface-obsidian text-optic-white flex flex-col justify-between projector-safe-margin select-none overflow-y-auto relative py-6 px-4 md:px-8 transition-colors duration-200">
+    <div className="min-h-screen w-full bg-surface-obsidian text-optic-white flex flex-col justify-between projector-safe-margin select-none overflow-y-auto relative py-4 px-3 sm:px-6 md:px-8 transition-colors duration-200">
       {/* 1. Top Stage Header (Subject, Round, Active Turn Banner, Sound Toggle) */}
-      <div className="w-full z-10">
+      <div className="w-full max-w-[1720px] mx-auto z-10">
         <StageHeader
           subjectName={activeSubject?.name || 'Tournament Subject'}
           currentQuestionIndex={currentQuestionIndex}
@@ -192,7 +199,7 @@ export default function LiveMatchPage() {
         {/* Verbal Answer Submitted or Time Expired Status Banner */}
         {isAnswerSubmitted && (
           <div
-            className={`w-full max-w-5xl mx-auto mt-3 px-6 py-2.5 rounded-xl border shadow-sm flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-200 ${
+            className={`w-full max-w-5xl mx-auto mt-2.5 px-6 py-2 rounded-xl border shadow-sm flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-200 ${
               isTimeExpired
                 ? 'bg-surface-carbon border-state-warning-rose/60'
                 : 'bg-surface-carbon border-state-success/40'
@@ -227,11 +234,11 @@ export default function LiveMatchPage() {
         )}
       </div>
 
-      {/* 2. Top Full-Width Question Bar */}
-      <div className="w-full max-w-7xl mx-auto my-4 z-10">
+      {/* 2. Top Full-Width Question Bar (Spanning Full Projector Width) */}
+      <div className="w-full max-w-[1720px] mx-auto my-3 z-10">
         {!isQuestionRevealed ? (
           /* Unrevealed Question Placeholder Banner */
-          <div className="w-full py-8 px-6 rounded-2xl bg-surface-carbon border border-border-medium flex flex-col md:flex-row items-center justify-between gap-6 shadow-modal-dialog transition-all">
+          <div className="w-full py-7 px-6 rounded-2xl bg-surface-carbon border border-border-medium flex flex-col md:flex-row items-center justify-between gap-6 shadow-modal-dialog transition-all">
             <div className="flex items-center gap-4 text-left">
               <div
                 style={{
@@ -239,16 +246,16 @@ export default function LiveMatchPage() {
                   borderColor: activeTeamColor,
                   color: activeTeamColor,
                 }}
-                className="w-14 h-14 rounded-2xl border flex items-center justify-center shrink-0 shadow-sm"
+                className="w-13 h-13 rounded-2xl border flex items-center justify-center shrink-0 shadow-sm"
               >
-                <Eye className="w-7 h-7" />
+                <Eye className="w-6 h-6" />
               </div>
               <div className="space-y-1">
                 <h3 className="text-xl md:text-2xl font-bold text-optic-white font-sans">
                   {activeTeamName}&apos;s Question Ready
                 </h3>
                 <p className="text-xs text-text-muted-slate font-mono uppercase tracking-wide">
-                  Question is hidden. Click Reveal when contestants are ready.
+                  Question hidden on stage. Click Reveal when contestants are ready.
                 </p>
               </div>
             </div>
@@ -264,7 +271,7 @@ export default function LiveMatchPage() {
                 backgroundColor: activeTeamColor,
                 color: '#FFFFFF',
               }}
-              className="font-bold text-sm tracking-wider px-8 whitespace-nowrap shadow-sm hover:brightness-110"
+              className="font-bold text-sm tracking-wider px-8 whitespace-nowrap shadow-sm hover:brightness-110 cursor-pointer"
             >
               <Eye className="w-4 h-4 mr-2" />
               REVEAL QUESTION & OPTIONS
@@ -273,7 +280,7 @@ export default function LiveMatchPage() {
         ) : currentQuestion ? (
           /* Full-Width Revealed Question Prompt Card (with RTL & Math support) */
           <div
-            className="w-full p-6 md:p-8 rounded-2xl bg-surface-carbon border-2 shadow-modal-dialog animate-in fade-in zoom-in-95 duration-200 transition-all"
+            className="w-full p-5 md:p-7 rounded-2xl bg-surface-carbon border-2 shadow-modal-dialog animate-in fade-in zoom-in-95 duration-200 transition-all"
             style={{ borderColor: `${activeTeamColor}40` }}
             dir={questionDirProps.dir}
           >
@@ -282,7 +289,7 @@ export default function LiveMatchPage() {
                 QUESTION {currentQuestionIndex + 1} OF {currentSubjectQuota}
               </span>
               <span
-                className="font-mono text-xs font-bold uppercase px-2.5 py-0.5 rounded"
+                className="font-mono text-xs font-bold uppercase px-2.5 py-0.5 rounded shadow-sm"
                 style={{
                   backgroundColor: `${activeTeamColor}20`,
                   color: activeTeamColor,
@@ -305,15 +312,15 @@ export default function LiveMatchPage() {
         )}
       </div>
 
-      {/* 3. Tri-Zone Middle Arena (Left Teams | Center Options + Timer | Right Teams) */}
-      <div className="flex-1 w-full max-w-7xl mx-auto my-2 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start z-10">
-        {/* Left Flank: Teams 1, 3, 5... (3 cols on desktop) */}
-        <div className="lg:col-span-3 flex flex-col justify-center order-2 lg:order-1">
+      {/* 3. 4-Column Stadium Arena (Left 2 Team Columns | Center Options + Stage Clock | Right 2 Team Columns) */}
+      <div className="flex-1 w-full max-w-[1720px] mx-auto my-1 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start z-10">
+        {/* Left Flank: 2 Columns of Teams (lg:col-span-4 on widescreen) */}
+        <div className="lg:col-span-4 flex flex-col justify-center order-2 lg:order-1">
           <TeamFlank teams={leftFlankTeams} activeTeamIndex={activeTeamIndex} />
         </div>
 
-        {/* Center Bay: Options Grid & Resilient Timer (6 cols on desktop) */}
-        <div className="lg:col-span-6 flex flex-col justify-center space-y-4 order-1 lg:order-2">
+        {/* Center Bay: Massive Projector Timer & 2x2 Option Cards (lg:col-span-4) */}
+        <div className="lg:col-span-4 flex flex-col justify-center space-y-3 order-1 lg:order-2">
           {isTieBreaker && selectedMysteryBox === null ? (
             /* Super Over Mystery Box Grid */
             <MysteryBoxGrid
@@ -327,8 +334,8 @@ export default function LiveMatchPage() {
               isTeamA={activeTeamIndex % 2 === 0}
             />
           ) : isQuestionRevealed && currentQuestion ? (
-            <div className="w-full space-y-4 animate-in fade-in zoom-in-95 duration-200">
-              {/* Resilient Wall-Clock Timer Bar */}
+            <div className="w-full space-y-3 animate-in fade-in zoom-in-95 duration-200">
+              {/* Massive Projector Stage Clock (30-Foot Visibility with Huge Digits) */}
               {config.timeLimitSeconds > 0 && (
                 <TimerBar
                   timeLimitSeconds={config.timeLimitSeconds}
@@ -336,6 +343,7 @@ export default function LiveMatchPage() {
                   isPaused={isTimerPaused}
                   isAnswerSubmitted={isAnswerSubmitted}
                   isExpired={isTimeExpired}
+                  variant="hero"
                   onExpire={expireTimer}
                   onTogglePause={() => {
                     if (isTimerPaused) {
@@ -348,7 +356,7 @@ export default function LiveMatchPage() {
               )}
 
               {/* 4 Options Grid (2x2) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {currentQuestion.options.map((optionText, idx) => {
                   const letter = ['A', 'B', 'C', 'D'][idx];
                   const isSelected = selectedOptionIndex === idx;
@@ -374,7 +382,7 @@ export default function LiveMatchPage() {
 
               {/* Confirm Answer Button */}
               {!isAnswerSubmitted && selectedOptionIndex !== null && (
-                <div className="flex justify-center pt-2">
+                <div className="flex justify-center pt-1">
                   <Button
                     variant="team-a"
                     size="lg"
@@ -393,7 +401,7 @@ export default function LiveMatchPage() {
                       backgroundColor: activeTeamColor,
                       color: '#FFFFFF',
                     }}
-                    className="font-bold text-base px-10 shadow-sm hover:brightness-110"
+                    className="font-bold text-base px-10 shadow-sm hover:brightness-110 cursor-pointer"
                   >
                     <CheckCircle2 className="w-5 h-5 mr-2" />
                     CONFIRM VERBAL RESPONSE
@@ -403,7 +411,7 @@ export default function LiveMatchPage() {
 
               {/* Proceed to Next Turn Button */}
               {isAnswerSubmitted && (
-                <div className="flex justify-center pt-2 animate-in fade-in zoom-in-95 duration-200">
+                <div className="flex justify-center pt-1 animate-in fade-in zoom-in-95 duration-200">
                   <Button
                     variant="team-a"
                     size="lg"
@@ -418,21 +426,21 @@ export default function LiveMatchPage() {
             </div>
           ) : (
             /* Awaiting Reveal Center State */
-            <div className="w-full h-48 rounded-2xl bg-surface-carbon/50 border border-dashed border-border-subtle flex items-center justify-center p-6 text-center text-text-muted-slate font-mono text-xs">
-              Options will appear here when the question is revealed.
+            <div className="w-full h-44 rounded-2xl bg-surface-carbon/50 border border-dashed border-border-subtle flex items-center justify-center p-6 text-center text-text-muted-slate font-mono text-xs">
+              Options and stage clock will activate when the question is revealed.
             </div>
           )}
         </div>
 
-        {/* Right Flank: Teams 2, 4, 6... (3 cols on desktop) */}
-        <div className="lg:col-span-3 flex flex-col justify-center order-3">
+        {/* Right Flank: 2 Columns of Teams (lg:col-span-4 on widescreen) */}
+        <div className="lg:col-span-4 flex flex-col justify-center order-3">
           <TeamFlank teams={rightFlankTeams} activeTeamIndex={activeTeamIndex} />
         </div>
       </div>
 
       {/* 4. Floating Unobtrusive Operator Control Bar */}
-      <div className="w-full max-w-7xl mx-auto flex items-center justify-between pt-4 border-t border-border-subtle z-20">
-        <div className="flex items-center gap-3">
+      <div className="w-full max-w-[1720px] mx-auto flex items-center justify-between pt-3 border-t border-border-subtle z-20">
+        <div className="flex items-center gap-2.5">
           {/* Undo Action Button */}
           <Button
             variant="console"
@@ -444,6 +452,18 @@ export default function LiveMatchPage() {
           >
             <RotateCcw className="w-3.5 h-3.5 mr-1" />
             <span>UNDO ({historyStack.length})</span>
+          </Button>
+
+          {/* Dedicated Postpone Match Button */}
+          <Button
+            variant="console"
+            size="sm"
+            onClick={() => setPostponeModalOpen(true)}
+            className="text-xs font-mono"
+            title="Safely pause and postpone tournament to resume later"
+          >
+            <PauseCircle className="w-3.5 h-3.5 mr-1 text-team-b-cyan" />
+            <span>POSTPONE MATCH</span>
           </Button>
 
           {/* Quick Proceed button in control bar */}
@@ -476,7 +496,7 @@ export default function LiveMatchPage() {
           )}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           {/* Dual Theme Switcher */}
           <ThemeToggle />
 
@@ -516,6 +536,28 @@ export default function LiveMatchPage() {
           }}
         />
       )}
+
+      {/* Postpone Match Modal */}
+      <Modal
+        isOpen={postponeModalOpen}
+        onClose={() => setPostponeModalOpen(false)}
+        title="Postpone Live Match?"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-text-muted-slate font-sans leading-relaxed">
+            Current match scores, round progress, and team standings will be securely saved in local storage.
+            You can safely resume this exact match at any time from the Match Setup console or Dashboard.
+          </p>
+          <div className="flex justify-end gap-3 pt-3 border-t border-border-subtle">
+            <Button variant="console" size="sm" onClick={() => setPostponeModalOpen(false)}>
+              Continue Match
+            </Button>
+            <Button variant="team-a" size="sm" onClick={handlePostponeMatch} className="font-bold">
+              Postpone &amp; Save
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       {/* Exit Match Confirmation Modal */}
       <Modal

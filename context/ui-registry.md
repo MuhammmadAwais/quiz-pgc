@@ -254,3 +254,45 @@ Last updated: 2026-09-21
 **Pattern notes:**
 Two rendering modes based on breakpoint. Below `md`, each contest renders as a score card with team names, scores, winner badge, and question count. Above `md`, the full table with 5 columns is shown. Pagination controls are the same across both views.
 
+---
+
+### TeamFlank (4-Column Multi-Team Stadium Layout)
+File: `components/live-match/TeamFlank.tsx`
+Last updated: 2026-09-21
+
+| Property | Class |
+|---|---|
+| Background | `bg-surface-carbon` (active turn), `bg-surface-onyx` (inactive) |
+| Border | `border-2 border-[teamColor]` (active), `border border-border-subtle opacity-75` (inactive) |
+| Border radius | `rounded-xl` |
+| Text — primary | `text-optic-white font-bold font-sans truncate` |
+| Text — score | `font-mono font-black tabular-nums text-xl md:text-3xl` |
+| Text — label | `label-caps text-text-muted-slate text-[9px]` |
+| Spacing | `p-3 min-h-[96px]` (compact) to `p-3.5 min-h-[110px]` |
+| Grid layout | `grid grid-cols-1 sm:grid-cols-2 gap-2.5` (when ≥2 teams per flank) |
+| Active halo | `box-shadow: 0 0 16px [teamColor]35` with `animate-badge-spring` |
+
+**Pattern notes:**
+When a tournament has 4 to 12 teams, each flank (Left & Right) automatically arranges teams into a 2-column grid (`grid-cols-2`). Combined with the Center Bay, this creates a clean 4-column stadium layout across the entire 16:9 projector screen (`max-w-[1720px]`), eliminating vertical scrolling and utilizing wide hall displays efficiently.
+
+---
+
+### TimerBar (Hero Projector Stage Clock)
+File: `components/live-match/TimerBar.tsx`
+Last updated: 2026-09-21
+
+| Property | Class |
+|---|---|
+| Background | `bg-surface-carbon border border-border-medium rounded-2xl shadow-modal-dialog` |
+| Readout font | `font-mono font-black text-4xl md:text-6xl tabular-nums tracking-tight` |
+| Phase 1 (>50%) | `text-team-b-cyan bg-team-b-cyan shadow-[0_0_20px_rgba(6,182,212,0.45)]` |
+| Phase 2 (25-50%) | `text-amber-400 bg-amber-400 shadow-[0_0_18px_rgba(245,158,11,0.45)]` |
+| Phase 3 (<25%) | `text-state-warning-rose bg-state-warning-rose shadow-[0_0_24px_rgba(225,29,72,0.7)] animate-pulse` |
+| Progress rail | `h-3 rounded-full bg-surface-recessed overflow-hidden border border-border-subtle` |
+| Spacing | `p-4 md:p-5 space-y-3` |
+| Controls | `Pause`/`Play` button for stage operator |
+
+**Pattern notes:**
+Projector-first countdown clock designed for 30-foot auditorium visibility. Powered strictly by `requestAnimationFrame` with `Date.now() - timerStartedAt` wall-clock timestamps, rendering it immune to tab throttling, CPU lag, and network drops. Features synchronized audio cues (10s ticks, 5s urgent alerts, 0s buzzer) and automatically triggers a 0-point miss state when time expires.
+
+

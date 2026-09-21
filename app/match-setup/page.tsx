@@ -186,16 +186,26 @@ export default function MatchSetupPage() {
       (id) => (poolBreakdown[id] || 0) >= (subjectQuestionCounts[id] || 2) * teams.length
     );
 
-  // Detect duplicate colors among teams
-  const duplicateColorFound = (() => {
-    const seen = new Set<string>();
-    for (const t of teams) {
+  // Find which specific teams conflict with each other
+  const colorConflicts = React.useMemo(() => {
+    const map: Record<string, { numbers: number[]; names: string[] }> = {};
+    teams.forEach((t, i) => {
       const hex = t.color.toLowerCase();
-      if (seen.has(hex)) return true;
-      seen.add(hex);
-    }
-    return false;
-  })();
+      if (!map[hex]) {
+        map[hex] = { numbers: [], names: [] };
+      }
+      map[hex].numbers.push(i + 1);
+      map[hex].names.push(t.name.trim() || `Team #${i + 1}`);
+    });
+
+    return Object.entries(map)
+      .filter(([_, group]) => group.numbers.length > 1)
+      .map(([hex, group]) => ({
+        hex,
+        teamNumbers: group.numbers,
+        description: group.names.map((n, idx) => `${n} (Team #${group.numbers[idx]})`).join(' and '),
+      }));
+  }, [teams]);
 
   const handleStartMatch = async () => {
     if (!isPoolSufficient || launching) return;
@@ -296,7 +306,7 @@ export default function MatchSetupPage() {
               onClick={() => router.push('/live-match')}
               className="font-mono text-xs font-bold"
             >
-              RESUME ACTIVE MATCH ({activeMatchTeams.length} TEAMS) →
+              RESUME POSTPONED MATCH ({activeMatchTeams.length} TEAMS) →
             </Button>
           )}
         </div>
@@ -326,32 +336,61 @@ export default function MatchSetupPage() {
               </Button>
             </div>
 
-            {duplicateColorFound && (
-              <div className="p-2.5 rounded-xl bg-state-warning-rose/15 border border-state-warning-rose/30 text-state-warning-rose text-xs flex items-center gap-2">
-                <ShieldAlert className="w-4 h-4 shrink-0" />
-                <span>Some teams currently share the same color. Please choose distinct colors for stage visual clarity.</span>
+            {/* Detailed Color Conflicts Banner */}
+            {colorConflicts.length > 0 && (
+              <div className="p-3.5 rounded-xl bg-state-warning-rose/15 border border-state-warning-rose/40 text-state-warning-rose text-xs space-y-2">
+                <div className="flex items-center gap-2 font-bold font-mono">
+                  <ShieldAlert className="w-4 h-4 shrink-0" />
+                  <span>Color Conflict Detected</span>
+                </div>
+                <div className="space-y-1.5 pl-6">
+                  {colorConflicts.map((c) => (
+                    <div key={c.hex} className="flex items-center gap-2 text-[11px] font-mono leading-relaxed">
+                      <span
+                        className="w-3 h-3 rounded-full shrink-0 border border-white/40 shadow-sm"
+                        style={{ backgroundColor: c.hex }}
+                      />
+                      <span>
+                        <strong>{c.description}</strong> share the same color ({c.hex.toUpperCase()}). Please change one for visual clarity.
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
             <div className="space-y-3">
               {teams.map((team, idx) => {
                 const safety = getAccessibleTeamColor(team.color, isDarkMode);
+                const conflictGroup = colorConflicts.find((c) => c.teamNumbers.includes(idx + 1));
+
                 return (
                   <div
                     key={team.id}
-                    className="p-3.5 rounded-xl bg-surface-onyx border border-border-subtle space-y-2.5 transition-all"
+                    className={`p-3.5 rounded-xl bg-surface-onyx border space-y-2.5 transition-all ${
+                      conflictGroup ? 'border-state-warning-rose/60' : 'border-border-subtle'
+                    }`}
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <span
-                        className="text-[11px] font-mono font-bold flex items-center gap-1.5"
-                        style={{ color: safety.safeColor }}
-                      >
+                      <div className="flex items-center gap-2">
                         <span
-                          className="w-2.5 h-2.5 rounded-full"
-                          style={{ backgroundColor: safety.safeColor }}
-                        />
-                        TEAM #{idx + 1}
-                      </span>
+                          className="text-[11px] font-mono font-bold flex items-center gap-1.5"
+                          style={{ color: safety.safeColor }}
+                        >
+                          <span
+                            className="w-2.5 h-2.5 rounded-full"
+                            style={{ backgroundColor: safety.safeColor }}
+                          />
+                          TEAM #{idx + 1}
+                        </span>
+
+                        {conflictGroup && (
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-state-warning-rose/20 text-state-warning-rose border border-state-warning-rose/50 font-bold flex items-center gap-1">
+                            <ShieldAlert className="w-3 h-3" />
+                            Same color as Team #{conflictGroup.teamNumbers.filter((n) => n !== idx + 1).join(', #')}
+                          </span>
+                        )}
+                      </div>
 
                       {teams.length > 2 && (
                         <button
@@ -436,10 +475,6 @@ export default function MatchSetupPage() {
                 {timeLimitSeconds === 0 ? 'Untimed (No Limit)' : `${timeLimitSeconds}s Limit`}
               </span>
             </div>
-
-            <p className="text-xs text-text-muted-slate">
-              Withstands tab reloads, hardware sleep, and network disconnects. Switches colors through 3 phases with audio cues.
-            </p>
 
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1">
               {TIMER_PRESETS.map((preset) => {
