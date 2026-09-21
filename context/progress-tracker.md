@@ -6,14 +6,22 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ## Current Status
 
-**Phase:** Phase 9 — Dual-Theme Architecture & Anti-AI-Slop Design System (Complete)  
-**Last completed:** Dual-theme engine (`ThemeProvider`, `ThemeToggle`, `app/globals.css` `@theme` tokens, Plus Jakarta Sans typography, anti-FOUC hydration script, removal of all harsh shadows, neon glow blurs, and border-white classes)  
-**Next:** User stage testing and match rehearsal
-
+**Phase:** Phase 10 — High-Efficiency Math Rendering & Stage UX Refinements (Complete)  
+**Last completed:** Multi-tier memoized KaTeX math engine, OptionCard layout fix (full-width text + dedicated status footer), Dashboard contest ledger pagination & search, Match Setup presets layout & toggle knob fixes  
+**Next:** User stage testing and live tournament rehearsal
 
 ---
 
 ## Progress
+
+### Phase 10 — High-Efficiency Math Rendering & Stage UX Refinements
+
+- [x] 41 Multi-Tier Memoized KaTeX Math Engine (`components/ui/MathRenderer.tsx` with 2,500-item LRU-bounded full-string and snippet caches for 0ms repeat overhead)
+- [x] 42 Live Match Math Integration (`app/live-match/page.tsx` question prompt card, `components/live-match/OptionCard.tsx` option stems)
+- [x] 43 Authoring Studio Live Formula Previews (`QuestionModal.tsx`, `ReviewCardEditMode.tsx` real-time KaTeX preview on `$`)
+- [x] 44 Match Setup UI/UX Fixes (`app/match-setup/page.tsx` wrapped presets layout eliminating horizontal scrollbar, `bg-white shadow-md` tactile toggle knob)
+- [x] 45 OptionCard Text Collision & Squish Resolution (`components/live-match/OptionCard.tsx` flex-col full-width text container with dedicated bottom telemetry badge row)
+- [x] 46 Dashboard Contest Ledger Pagination & Search (`components/dashboard/ContestLedger.tsx` with 8 matches per page, instant team/winner filter, page pill navigation)
 
 ### Phase 9 — Dual-Theme Architecture & Anti-AI-Slop Redesign
 

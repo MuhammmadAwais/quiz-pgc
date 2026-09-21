@@ -74,11 +74,11 @@ export function OptionCard({
         }
       }}
       style={inlineStyle}
-      className={`relative p-5 md:p-6 rounded-xl transition-all duration-150 flex items-center justify-between gap-4 cursor-pointer select-none ${borderBgClass} ${animationClass} ${
+      className={`relative p-4 sm:p-5 rounded-xl transition-all duration-150 flex flex-col justify-between min-h-[96px] cursor-pointer select-none ${borderBgClass} ${animationClass} ${
         disabled ? 'cursor-not-allowed' : 'active:scale-[0.99]'
       }`}
     >
-      <div className="flex items-center gap-4 flex-1 min-w-0">
+      <div className="flex items-start gap-3.5 w-full flex-1 min-w-0">
         {/* Letter Indicator */}
         <div
           style={
@@ -86,7 +86,7 @@ export function OptionCard({
               ? { backgroundColor: effectiveTeamColor, color: teamTextColor }
               : undefined
           }
-          className={`w-9 h-9 md:w-11 md:h-11 rounded-lg flex items-center justify-center font-sans text-base md:text-lg font-bold shrink-0 transition-colors ${
+          className={`w-9 h-9 md:w-10 md:h-10 rounded-lg flex items-center justify-center font-sans text-base md:text-lg font-bold shrink-0 mt-0.5 transition-colors ${
             isSubmitted && isCorrect
               ? 'bg-state-success text-white'
               : isSubmitted && isSelected && !isCorrect
@@ -100,16 +100,16 @@ export function OptionCard({
         </div>
 
         {/* Option Text */}
-        <div className="flex-1 min-w-0">
-          <p className="text-body-xl font-medium tracking-normal leading-relaxed truncate-3-lines">
+        <div className="flex-1 min-w-0 pt-0.5">
+          <p className="text-base sm:text-lg md:text-xl font-medium tracking-normal leading-relaxed break-words">
             <MathRenderer content={text} inline />
           </p>
         </div>
       </div>
 
-      {/* Result Telemetry Badge & Icons */}
+      {/* Result Telemetry Badge & Icons (Dedicated Status Row) */}
       {isSubmitted && (
-        <div className="shrink-0 flex items-center gap-2">
+        <div className="flex items-center justify-end gap-2 pt-2.5 mt-2 border-t border-border-subtle/40 w-full animate-in fade-in duration-200">
           {isCorrect && isSelected && (
             <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-state-success text-surface-obsidian text-xs font-mono font-bold animate-badge-spring shadow-sm">
               <Award className="w-3.5 h-3.5" />
