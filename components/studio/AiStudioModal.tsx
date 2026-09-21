@@ -156,52 +156,54 @@ export function AiStudioModal({
       {/* Modal Container */}
       <div className="relative w-full max-w-5xl bg-surface-carbon border border-border-medium rounded-2xl shadow-modal-dialog flex flex-col max-h-[92vh] z-10 animate-fade-in overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-4 bg-surface-onyx border-b border-border-subtle flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-team-a-core/15 border border-team-a-core/30 flex items-center justify-center text-team-a-bright">
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-surface-onyx border-b border-border-subtle flex items-center justify-between gap-3 shrink-0 min-w-0">
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+            <div className="w-8 h-8 rounded-lg bg-team-a-core/15 border border-team-a-core/30 flex items-center justify-center text-team-a-bright shrink-0">
               <Sparkles className="w-4 h-4" />
             </div>
-            <div>
-              <h2 className="text-base font-bold font-sans uppercase tracking-wider text-optic-white flex items-center gap-2">
-                <span>Create Questions with AI</span>
+            <div className="min-w-0">
+              <h2 className="text-sm font-bold font-sans uppercase tracking-wider text-optic-white truncate">
+                Create Questions with AI
               </h2>
-              <p className="text-xs text-text-muted-slate font-sans">
+              <p className="text-xs text-text-muted-slate font-sans hidden sm:block">
                 Generate multiple-choice questions directly from your textbooks
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 shrink-0">
             {/* Nav Tabs */}
             <div className="flex items-center bg-surface-interactive border border-border-subtle rounded-lg p-1 text-xs font-sans">
               <button
                 type="button"
                 onClick={() => setActiveTab('SETUP')}
-                className={`px-3 py-1 rounded-md transition-colors cursor-pointer ${
+                className={`px-2.5 sm:px-3 py-1 rounded-md transition-colors cursor-pointer text-[11px] sm:text-xs ${
                   activeTab === 'SETUP'
                     ? 'bg-team-a-core text-white font-bold'
                     : 'text-text-muted-slate hover:text-optic-white'
                 }`}
               >
-                1. Settings
+                <span className="hidden sm:inline">1. Settings</span>
+                <span className="sm:hidden">Setup</span>
               </button>
               <button
                 type="button"
                 onClick={() => setActiveTab('REVIEW')}
                 disabled={stagedQuestions.length === 0}
-                className={`px-3 py-1 rounded-md transition-colors cursor-pointer disabled:opacity-30 ${
+                className={`px-2.5 sm:px-3 py-1 rounded-md transition-colors cursor-pointer disabled:opacity-30 text-[11px] sm:text-xs ${
                   activeTab === 'REVIEW'
                     ? 'bg-team-a-core text-white font-bold'
                     : 'text-text-muted-slate hover:text-optic-white'
                 }`}
               >
-                2. Review Questions ({stagedQuestions.length})
+                <span className="hidden sm:inline">2. Review ({stagedQuestions.length})</span>
+                <span className="sm:hidden">Review ({stagedQuestions.length})</span>
               </button>
             </div>
 
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-text-muted-slate hover:text-optic-white hover:bg-surface-interactive transition-colors"
+              className="p-1.5 rounded-lg text-text-muted-slate hover:text-optic-white hover:bg-surface-interactive transition-colors shrink-0"
               aria-label="Close"
             >
               <X className="w-5 h-5" />

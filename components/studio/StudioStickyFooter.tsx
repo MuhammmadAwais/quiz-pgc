@@ -8,6 +8,7 @@ import {
   Trash2,
   Loader2,
   BookmarkCheck,
+  ChevronDown,
 } from 'lucide-react';
 import { Subject, Chapter } from '@/lib/types/tournament';
 import { useAiStudioStore } from '@/lib/store/useAiStudioStore';
@@ -82,104 +83,140 @@ export function StudioStickyFooter({
     }
   };
 
+  const canSave = accepted.length > 0 && !!config.targetSubjectId && !!config.targetChapterId;
+
   return (
-    <div className="sticky bottom-0 z-30 w-full bg-surface-onyx/95 border-t border-border-subtle backdrop-blur-xl p-3.5 sm:p-4 shadow-modal-dialog flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-3.5 sm:gap-4 mt-6">
-      {/* Left: Summary Counters */}
-      <div className="flex items-center gap-3 sm:gap-4 flex-wrap shrink-0">
-        <div className="flex items-center gap-1.5 text-xs font-semibold whitespace-nowrap">
-          <Inbox className="w-4 h-4 text-text-muted-slate" />
-          <span className="text-text-muted-slate font-sans">Needs Review:</span>
-          <span className="font-mono font-bold text-optic-white">{pending.length}</span>
+    <div className="sticky bottom-0 z-30 w-full bg-surface-onyx/97 border-t border-border-subtle backdrop-blur-xl shadow-modal-dialog mt-6">
+      {/* Top row: Stats + Destination */}
+      <div className="px-4 sm:px-5 pt-3 pb-2 flex flex-col sm:flex-row sm:items-center gap-3">
+        {/* Left: Summary Counters */}
+        <div className="flex items-center gap-3 sm:gap-4 flex-wrap shrink-0">
+          <div className="flex items-center gap-1.5 text-xs font-semibold whitespace-nowrap">
+            <Inbox className="w-3.5 h-3.5 text-text-muted-slate shrink-0" />
+            <span className="text-text-muted-slate font-sans">Needs Review:</span>
+            <span className="font-mono font-bold text-optic-white">{pending.length}</span>
+          </div>
+
+          <span className="text-text-muted-slate/30">•</span>
+
+          <div className="flex items-center gap-1.5 text-xs font-semibold whitespace-nowrap">
+            <CheckCircle2 className="w-3.5 h-3.5 text-state-success shrink-0" />
+            <span className="text-text-muted-slate font-sans">Accepted:</span>
+            <span className="font-mono font-bold text-state-success">{accepted.length}</span>
+          </div>
+
+          <span className="text-text-muted-slate/30">•</span>
+
+          <div className="flex items-center gap-1.5 text-xs font-semibold whitespace-nowrap">
+            <XCircle className="w-3.5 h-3.5 text-state-warning-rose shrink-0" />
+            <span className="text-text-muted-slate font-sans">Rejected:</span>
+            <span className="font-mono font-bold text-state-warning-rose">{rejected.length}</span>
+          </div>
         </div>
 
-        <span className="text-text-muted-slate/30">•</span>
+        {/* Destination Dropdowns */}
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          {/* Subject dropdown */}
+          <div className="relative flex-1 min-w-0">
+            <select
+              value={config.targetSubjectId || ''}
+              onChange={(e) => {
+                const newSubId = e.target.value || null;
+                const subChaps = chapters.filter((c) => c.subject_id === newSubId);
+                setConfig({
+                  targetSubjectId: newSubId,
+                  targetChapterId: subChaps.length > 0 ? subChaps[0].id : null,
+                });
+              }}
+              className="w-full h-9 appearance-none bg-surface-carbon border border-border-medium rounded-lg pl-3 pr-7 text-xs text-optic-white focus:outline-none focus:border-brand-secondary font-sans"
+            >
+              <option value="">Choose Subject...</option>
+              {subjects.map((sub) => (
+                <option key={sub.id} value={sub.id}>
+                  {sub.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="w-3.5 h-3.5 text-text-muted-slate absolute right-2 top-2.5 pointer-events-none" />
+          </div>
 
-        <div className="flex items-center gap-1.5 text-xs font-semibold whitespace-nowrap">
-          <CheckCircle2 className="w-4 h-4 text-state-success" />
-          <span className="text-text-muted-slate font-sans">Accepted:</span>
-          <span className="font-mono font-bold text-state-success">{accepted.length}</span>
-        </div>
-
-        <span className="text-text-muted-slate/30">•</span>
-
-        <div className="flex items-center gap-1.5 text-xs font-semibold whitespace-nowrap">
-          <XCircle className="w-4 h-4 text-state-warning-rose" />
-          <span className="text-text-muted-slate font-sans">Rejected:</span>
-          <span className="font-mono font-bold text-state-warning-rose">{rejected.length}</span>
+          {/* Chapter dropdown */}
+          <div className="relative flex-1 min-w-0">
+            <select
+              value={config.targetChapterId || ''}
+              onChange={(e) => setConfig({ targetChapterId: e.target.value || null })}
+              disabled={!config.targetSubjectId || filteredChapters.length === 0}
+              className="w-full h-9 appearance-none bg-surface-carbon border border-border-medium rounded-lg pl-3 pr-7 text-xs text-optic-white focus:outline-none focus:border-brand-secondary disabled:opacity-40 font-sans"
+            >
+              <option value="">Choose Topic...</option>
+              {filteredChapters.map((chap) => (
+                <option key={chap.id} value={chap.id}>
+                  {chap.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="w-3.5 h-3.5 text-text-muted-slate absolute right-2 top-2.5 pointer-events-none" />
+          </div>
         </div>
       </div>
 
-      {/* Center: Destination Subject & Topic Dropdowns */}
-      <div className="flex items-center gap-2 flex-1 max-w-xl min-w-0">
-        <select
-          value={config.targetSubjectId || ''}
-          onChange={(e) => {
-            const newSubId = e.target.value || null;
-            const subChaps = chapters.filter((c) => c.subject_id === newSubId);
-            setConfig({
-              targetSubjectId: newSubId,
-              targetChapterId: subChaps.length > 0 ? subChaps[0].id : null,
-            });
-          }}
-          className="h-10 flex-1 min-w-[130px] bg-surface-carbon border border-border-medium rounded-xl px-3 text-xs text-optic-white focus:outline-none focus:border-brand-secondary font-sans truncate"
-        >
-          <option value="">Choose Subject...</option>
-          {subjects.map((sub) => (
-            <option key={sub.id} value={sub.id}>
-              {sub.name}
-            </option>
-          ))}
-        </select>
+      {/* Bottom row: Actions */}
+      <div className="px-4 sm:px-5 pb-3 flex items-center justify-between gap-3">
+        {/* Hint text when no accepted questions */}
+        {accepted.length === 0 ? (
+          <p className="text-[11px] font-mono text-text-muted-slate italic">
+            Accept questions above to enable save
+          </p>
+        ) : (
+          <p className="text-[11px] font-mono text-state-success">
+            {accepted.length} question{accepted.length !== 1 ? 's' : ''} ready to commit
+          </p>
+        )}
 
-        <select
-          value={config.targetChapterId || ''}
-          onChange={(e) => setConfig({ targetChapterId: e.target.value || null })}
-          disabled={!config.targetSubjectId || filteredChapters.length === 0}
-          className="h-10 flex-1 min-w-[130px] bg-surface-carbon border border-border-medium rounded-xl px-3 text-xs text-optic-white focus:outline-none focus:border-brand-secondary disabled:opacity-40 font-sans truncate"
-        >
-          <option value="">Choose Topic...</option>
-          {filteredChapters.map((chap) => (
-            <option key={chap.id} value={chap.id}>
-              {chap.name}
-            </option>
-          ))}
-        </select>
-      </div>
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Clear All */}
+          <button
+            type="button"
+            onClick={() => {
+              if (confirm('Are you sure you want to clear all questions in this review?')) {
+                clearSession();
+              }
+            }}
+            disabled={isSaving}
+            className="h-9 px-3 rounded-lg bg-surface-interactive hover:bg-state-warning-rose/15 hover:border-state-warning-rose/30 hover:text-state-warning-rose border border-border-subtle text-xs font-semibold text-text-muted-slate transition-all cursor-pointer flex items-center gap-1.5 font-sans whitespace-nowrap"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Clear All</span>
+          </button>
 
-      {/* Right: Actions */}
-      <div className="flex items-center gap-2.5 shrink-0 justify-end flex-wrap sm:flex-nowrap">
-        <button
-          type="button"
-          onClick={() => {
-            if (confirm('Are you sure you want to clear all questions in this review?')) {
-              clearSession();
-            }
-          }}
-          disabled={isSaving}
-          className="h-10 px-3.5 rounded-xl bg-surface-interactive hover:bg-state-warning-rose/15 hover:border-state-warning-rose/30 hover:text-state-warning-rose border border-border-subtle text-xs font-semibold text-text-muted-slate transition-all cursor-pointer flex items-center gap-1.5 font-sans whitespace-nowrap shrink-0"
-        >
-          <Trash2 className="w-3.5 h-3.5" />
-          <span>Clear All</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={handleSave}
-          disabled={isSaving || accepted.length === 0}
-          className="h-10 px-4 sm:px-5 rounded-xl bg-team-b-cyan hover:brightness-105 disabled:opacity-40 text-white text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-sm hover:scale-[1.01] font-sans whitespace-nowrap shrink-0"
-        >
-          {isSaving ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Saving {accepted.length} Questions...</span>
-            </>
-          ) : (
-            <>
-              <BookmarkCheck className="w-4 h-4 stroke-[2.5]" />
-              <span>Save {accepted.length} Accepted to Question Bank</span>
-            </>
-          )}
-        </button>
+          {/* Save to Question Bank */}
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={isSaving || !canSave}
+            className={`h-9 px-4 rounded-lg text-xs font-bold flex items-center gap-2 transition-all cursor-pointer font-sans whitespace-nowrap ${
+              canSave
+                ? 'bg-team-b-cyan hover:brightness-105 text-surface-obsidian shadow-sm hover:scale-[1.01]'
+                : 'bg-surface-interactive border border-border-medium text-text-muted-slate opacity-60 cursor-not-allowed'
+            } disabled:opacity-40`}
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span>Saving {accepted.length}...</span>
+              </>
+            ) : (
+              <>
+                <BookmarkCheck className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>
+                  {accepted.length === 0
+                    ? 'Save to Question Bank'
+                    : `Save ${accepted.length} to Question Bank`}
+                </span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

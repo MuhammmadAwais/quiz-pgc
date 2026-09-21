@@ -198,26 +198,27 @@ export default function QuestionBankPage() {
   return (
     <div className="min-h-screen bg-surface-obsidian flex flex-col">
       {/* Top Action Header */}
-      <div className="bg-surface-onyx border-b border-border-subtle px-6 py-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-xl font-bold font-sans tracking-tight text-optic-white flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-team-a-bright" />
+      <div className="bg-surface-onyx border-b border-border-subtle px-4 sm:px-6 py-4">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-base sm:text-xl font-bold font-sans tracking-tight text-optic-white flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-team-a-bright shrink-0" />
               <span>QUESTION BANK MANAGEMENT</span>
             </h1>
-            <p className="text-xs text-text-muted-slate mt-0.5 font-sans">
+            <p className="text-xs text-text-muted-slate mt-0.5 font-sans hidden sm:block">
               Hierarchical bank: Subjects → Chapters / Topics → Multiple Choice Questions
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5 flex-wrap">
+          {/* Scrollable action button row — prevents page-level horizontal overflow on mobile */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-0.5 shrink-0 max-w-full">
             {/* Reload / Sync Button */}
             <Button
               variant="console"
               size="sm"
               onClick={() => refreshRepo()}
               disabled={isSyncing || isLoading}
-              className="flex items-center gap-1.5 border-border-medium hover:border-border-bright text-xs text-text-bright-slate hover:text-optic-white"
+              className="flex items-center gap-1.5 border-border-medium hover:border-border-bright text-xs text-text-bright-slate hover:text-optic-white shrink-0 whitespace-nowrap"
               title="Synchronize question bank from database"
             >
               <RotateCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin text-team-b-cyan' : 'text-text-muted-slate'}`} />
@@ -225,11 +226,11 @@ export default function QuestionBankPage() {
             </Button>
 
             {/* Books Bank Dedicated Page Link */}
-            <Link href="/books-bank">
+            <Link href="/books-bank" className="shrink-0">
               <Button
                 variant="console"
                 size="sm"
-                className="flex items-center gap-1.5"
+                className="flex items-center gap-1.5 whitespace-nowrap"
               >
                 <Library className="w-4 h-4 text-team-b-cyan" />
                 <span>Books Bank ({books.length})</span>
@@ -244,7 +245,7 @@ export default function QuestionBankPage() {
                 setSelectedBookForAi(null);
                 setIsAiStudioOpen(true);
               }}
-              className="flex items-center gap-1.5 shadow-sm hover:scale-[1.02] transition-transform"
+              className="flex items-center gap-1.5 shadow-sm hover:scale-[1.02] transition-transform shrink-0 whitespace-nowrap"
             >
               <Sparkles className="w-4 h-4" />
               <span>Generate with AI</span>
@@ -271,7 +272,7 @@ export default function QuestionBankPage() {
                 setIsQuestionModalOpen(true);
               }}
               disabled={subjects.length === 0}
-              className="flex items-center gap-1.5 shadow-sm font-bold"
+              className="flex items-center gap-1.5 shadow-sm font-bold shrink-0 whitespace-nowrap"
             >
               <Plus className="w-4 h-4" />
               <span>New Question</span>
