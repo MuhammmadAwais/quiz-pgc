@@ -98,60 +98,59 @@ export function RapidReviewDeck({
   return (
     <section className="space-y-4 font-sans animate-fade-in">
       {/* Top Banner & Quick Actions */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-surface-onyx border border-white/10 p-4 rounded-2xl">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-team-b-cyan/15 border border-team-b-cyan/30 flex items-center justify-center text-team-b-cyan">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 bg-surface-onyx border border-white/10 p-4 rounded-2xl">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-team-b-cyan/15 border border-team-b-cyan/30 flex items-center justify-center text-team-b-cyan shrink-0">
             <Sparkles className="w-4 h-4" />
           </div>
           <div>
-            <h2 className="text-sm font-bold font-mono uppercase tracking-wider text-optic-white">
-              Review Generated Questions ({stagedQuestions.length})
+            <h2 className="text-sm font-bold font-mono tracking-wider text-optic-white flex items-center gap-2">
+              <span>Review Generated Questions</span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-surface-interactive border border-white/10 text-team-b-cyan font-bold">
+                {stagedQuestions.length}
+              </span>
             </h2>
-            <p className="text-xs text-text-muted-slate font-sans">
-              Accept good questions, reject or edit any that look off, then save them to your Question Bank.
+            <p className="text-xs text-text-muted-slate mt-0.5">
+              Accept good questions, reject or edit any that look off, then save them to Question Bank.
             </p>
           </div>
         </div>
 
-        {/* Shortcuts & Bulk Accept/Reject Actions */}
-        <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end flex-wrap">
-          <div className="hidden md:flex items-center gap-2 text-[11px] text-text-muted-slate font-mono mr-1">
-            <span>Shortcuts:</span>
-            <span className="px-1.5 py-0.5 rounded bg-surface-interactive text-text-bright-slate font-bold">
-              ↵ Accept
-            </span>
-            <span className="px-1.5 py-0.5 rounded bg-surface-interactive text-text-bright-slate font-bold">
-              ⌫ Reject
-            </span>
-            <span className="px-1.5 py-0.5 rounded bg-surface-interactive text-text-bright-slate font-bold">
-              E Edit
-            </span>
+        {/* Shortcuts & Bulk Actions */}
+        <div className="flex items-center gap-2.5 w-full md:w-auto justify-end flex-wrap sm:flex-nowrap">
+          <div className="hidden lg:flex items-center gap-1.5 text-[11px] text-text-muted-slate font-mono mr-1">
+            <span className="opacity-70">Shortcuts:</span>
+            <span className="px-1.5 py-0.5 rounded bg-surface-interactive text-text-bright-slate font-bold">↵ Accept</span>
+            <span className="px-1.5 py-0.5 rounded bg-surface-interactive text-text-bright-slate font-bold">⌫ Reject</span>
+            <span className="px-1.5 py-0.5 rounded bg-surface-interactive text-text-bright-slate font-bold">E Edit</span>
           </div>
 
-          <button
-            type="button"
-            onClick={rejectAll}
-            className="px-3.5 py-2 rounded-xl bg-state-warning-rose/15 hover:bg-state-warning-rose/25 border border-state-warning-rose/30 text-state-warning-rose text-xs font-bold font-mono uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
-            title="Reject all questions in this batch"
-          >
-            <XCircle className="w-4 h-4" />
-            <span>Reject All</span>
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={rejectAll}
+              className="h-9 px-3.5 rounded-xl bg-surface-interactive hover:bg-state-warning-rose/20 border border-white/10 hover:border-state-warning-rose/40 text-text-muted-slate hover:text-state-warning-rose text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+              title="Reject all questions in this batch"
+            >
+              <XCircle className="w-4 h-4" />
+              <span>Reject All</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={acceptAll}
-            className="px-4 py-2 rounded-xl bg-state-success/15 hover:bg-state-success/25 border border-state-success/30 text-state-success text-xs font-bold font-mono uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02]"
-            title="Accept all questions at once"
-          >
-            <CheckCheck className="w-4 h-4" />
-            <span>Accept All ({stagedQuestions.length})</span>
-          </button>
+            <button
+              type="button"
+              onClick={acceptAll}
+              className="h-9 px-4 rounded-xl bg-state-success/20 hover:bg-state-success/30 border border-state-success/40 text-state-success text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer hover:scale-[1.02]"
+              title="Accept all questions at once"
+            >
+              <CheckCheck className="w-4 h-4 stroke-[2.5]" />
+              <span>Accept All ({stagedQuestions.length})</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* 2-Column: Left (Progress Rail) | Right (Active Card) */}
-      <div className="flex flex-col lg:flex-row gap-5 items-start">
+      <div className="flex flex-col lg:flex-row gap-5 items-start pb-24">
         <ReviewProgressRail />
 
         <div className="flex-1 min-w-0 w-full space-y-4">
@@ -171,20 +170,20 @@ export function RapidReviewDeck({
               )}
 
               {/* Card Action Controls Bar */}
-              <div className="p-3 rounded-2xl bg-surface-onyx border border-white/10 flex flex-wrap items-center justify-between gap-3 shadow-lg">
+              <div className="p-2.5 rounded-2xl bg-surface-onyx border border-white/10 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 shadow-lg">
                 {/* Steppers */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <button
                     type="button"
                     onClick={() => setActiveCardIndex(activeCardIndex - 1)}
                     disabled={activeCardIndex === 0}
-                    className="px-3 py-2 rounded-xl bg-surface-interactive hover:bg-white/10 disabled:opacity-40 text-xs font-semibold text-optic-white flex items-center gap-1 transition-all cursor-pointer"
+                    className="h-9 px-3 rounded-xl bg-surface-interactive hover:bg-white/10 disabled:opacity-30 text-xs font-semibold text-optic-white flex items-center gap-1 transition-all cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />
-                    <span>Previous</span>
+                    <span className="hidden sm:inline">Previous</span>
                   </button>
 
-                  <span className="text-xs font-mono font-bold text-text-muted-slate px-1">
+                  <span className="text-xs font-mono font-bold text-text-muted-slate px-2">
                     {activeCardIndex + 1} / {stagedQuestions.length}
                   </span>
 
@@ -192,20 +191,20 @@ export function RapidReviewDeck({
                     type="button"
                     onClick={() => setActiveCardIndex(activeCardIndex + 1)}
                     disabled={activeCardIndex === stagedQuestions.length - 1}
-                    className="px-3 py-2 rounded-xl bg-surface-interactive hover:bg-white/10 disabled:opacity-40 text-xs font-semibold text-optic-white flex items-center gap-1 transition-all cursor-pointer"
+                    className="h-9 px-3 rounded-xl bg-surface-interactive hover:bg-white/10 disabled:opacity-30 text-xs font-semibold text-optic-white flex items-center gap-1 transition-all cursor-pointer"
                   >
-                    <span>Next</span>
+                    <span className="hidden sm:inline">Next</span>
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
 
-                {/* Status Toggles: Reset, Reject, Edit, Accept */}
+                {/* Status Actions */}
                 <div className="flex items-center gap-2 flex-wrap">
                   {activeQuestion.reviewStatus !== 'PENDING' && (
                     <button
                       type="button"
                       onClick={() => resetQuestion(activeQuestion.id)}
-                      className="px-3 py-2 rounded-xl bg-surface-interactive hover:bg-white/10 text-xs font-semibold text-text-muted-slate hover:text-optic-white flex items-center gap-1 transition-colors cursor-pointer"
+                      className="h-9 px-3 rounded-xl bg-surface-interactive hover:bg-white/10 text-xs font-semibold text-text-muted-slate hover:text-optic-white flex items-center gap-1.5 transition-colors cursor-pointer"
                       title="Reset status back to Needs Review"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
@@ -216,7 +215,7 @@ export function RapidReviewDeck({
                   <button
                     type="button"
                     onClick={() => rejectQuestion(activeQuestion.id)}
-                    className="px-3.5 py-2 rounded-xl bg-state-warning-rose/15 hover:bg-state-warning-rose/25 border border-state-warning-rose/30 text-state-warning-rose text-xs font-bold font-mono uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
+                    className="h-9 px-3.5 rounded-xl bg-state-warning-rose/15 hover:bg-state-warning-rose/25 border border-state-warning-rose/30 text-state-warning-rose text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                     <span>Reject (⌫)</span>
@@ -229,7 +228,7 @@ export function RapidReviewDeck({
                         editingQuestionId === activeQuestion.id ? null : activeQuestion.id
                       )
                     }
-                    className="px-3.5 py-2 rounded-xl bg-surface-interactive hover:bg-white/10 border border-white/10 text-optic-white text-xs font-bold font-mono uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
+                    className="h-9 px-3.5 rounded-xl bg-surface-interactive hover:bg-white/10 border border-white/10 text-optic-white text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
                   >
                     <Edit2 className="w-3.5 h-3.5 text-team-b-cyan" />
                     <span>
@@ -240,7 +239,7 @@ export function RapidReviewDeck({
                   <button
                     type="button"
                     onClick={() => acceptQuestion(activeQuestion.id)}
-                    className="px-5 py-2 rounded-xl bg-state-success hover:bg-state-success/90 text-surface-obsidian text-xs font-bold font-mono uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-state-success/20 transition-all cursor-pointer hover:scale-[1.02]"
+                    className="h-9 px-4 rounded-xl bg-state-success hover:bg-state-success/90 text-surface-obsidian text-xs font-bold flex items-center gap-1.5 shadow-md shadow-state-success/20 transition-all cursor-pointer hover:scale-[1.02]"
                   >
                     <Check className="w-4 h-4 stroke-[3]" />
                     <span>Accept &amp; Next (↵)</span>

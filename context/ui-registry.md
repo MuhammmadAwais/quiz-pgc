@@ -46,7 +46,7 @@ Last updated: 2026-09-21
 |---|---|
 | Background | `bg-surface-obsidian` (page), `bg-surface-onyx` (top bar), `bg-surface-carbon` (cards) |
 | Border | `border-border-subtle`, `border-white/10`, `border-team-b-cyan/50` (hover) |
-| Border radius | `rounded-2xl` (book cards), `rounded-full` (tag pills) |
+| Border radius | `rounded-2xl` (book cards), `rounded-xl` (inputs/buttons), `rounded-full` (tag pills) |
 | Text — primary | `text-optic-white` |
 | Text — secondary | `text-text-muted-slate`, `text-text-bright-slate` |
 | Spacing | `p-4 sm:p-6` (page), `p-5` (cards), `gap-5` (shelf grid) |
@@ -55,7 +55,7 @@ Last updated: 2026-09-21
 | Accent usage | `text-team-b-cyan`, `bg-team-b-cyan` |
 
 **Pattern notes:**
-Dedicated repository view for curriculum textbooks. Uses 3-column responsive grid with tag filter pills, file metadata badges, and direct PDF proxy preview link.
+Dedicated repository view for curriculum textbooks. Uses 3-column responsive grid with tag filter pills, file metadata badges, direct PDF proxy preview link, and an Edit Modal (`Edit2` button) allowing operators to update textbook title and add/remove subject tags with quick-add pills.
 
 ---
 
@@ -66,16 +66,16 @@ Last updated: 2026-09-21
 | Property | Class |
 |---|---|
 | Background | `bg-surface-onyx` (top banner & quick action controls) |
-| Border | `border-white/10`, `border-state-warning-rose/30`, `border-state-success/30` |
-| Border radius | `rounded-2xl` |
+| Border | `border-white/10`, `border-state-warning-rose/30`, `border-state-success/40` |
+| Border radius | `rounded-2xl` (banner & cards), `rounded-xl` (buttons) |
 | Text — primary | `text-optic-white` |
 | Text — secondary | `text-text-muted-slate`, `text-text-bright-slate` |
-| Spacing | `p-4` (banner), `space-y-4` (vertical rhythm) |
+| Spacing | `p-4` (banner), `space-y-4` (vertical rhythm), `pb-24` (clearance for sticky footer) |
 | Hover state | `hover:scale-[1.02]`, `hover:bg-state-success/90`, `hover:bg-state-warning-rose/25` |
-| Accent usage | `bg-state-success` (Accept All), `bg-state-warning-rose/15` (Reject All) |
+| Accent usage | `bg-state-success/20` (Accept All), `bg-surface-interactive` (Reject All), `bg-team-b-cyan` |
 
 **Pattern notes:**
-Designed for non-technical users and teachers. Uses intuitive Plain-English actions ("Accept", "Reject", "Edit", "Reset") and bulk actions ("Accept All", "Reject All") with matching keyboard hotkeys (`Enter`, `Backspace`, `E`).
+Designed for non-technical users and teachers. All action buttons standardized to `h-9` height with clear, centered icons. Bulk actions grouped in an inline flex cluster (`Accept All`, `Reject All`) to eliminate awkward wrapping. Includes `pb-24` clearance to ensure card navigation controls are never obscured by the sticky footer.
 
 ---
 
@@ -107,14 +107,15 @@ Last updated: 2026-09-21
 |---|---|
 | Background | `bg-surface-onyx/95 backdrop-blur-xl` |
 | Border | `border-t border-white/10` |
-| Border radius | `rounded-xl` (action buttons), `rounded-lg` (dropdowns) |
+| Border radius | `rounded-xl` (all controls uniform) |
 | Text — primary | `text-optic-white`, `text-state-success` (accepted count), `text-state-warning-rose` (rejected count) |
 | Text — secondary | `text-text-muted-slate` |
 | Spacing | `p-4 mt-6`, `gap-4` |
-| Hover state | `hover:scale-[1.02]`, `hover:bg-state-success/90` |
-| Shadow | `shadow-2xl`, `shadow-state-success/20` |
-| Accent usage | `bg-state-success` (Save Accepted to Question Bank CTA) |
+| Hover state | `hover:scale-[1.01]`, `hover:bg-team-b-cyan/90` |
+| Shadow | `shadow-2xl`, `shadow-team-b-cyan/20` |
+| Accent usage | `bg-team-b-cyan` (Save Accepted to Question Bank CTA) |
 
 **Pattern notes:**
-Sticky footer pinned to the bottom of the review modal. Provides counters for review state, target Subject/Topic selectors, and single primary button saving only `{ subject_id, chapter_id, text, options, correct_index }` to the database.
+Sticky footer pinned to the bottom of the review modal. All controls standardized to `h-10` with matching `rounded-xl` borders: Subject/Topic dropdowns, `Clear All`, and primary Save CTA. Submits directly to `/api/ai/save` REST endpoint.
+
 

@@ -120,6 +120,53 @@ export async function deleteBook(
   return { success: true };
 }
 
+export async function updateBookRecord(
+  id: string,
+  data: {
+    title?: string;
+    subject_tags?: string[];
+  }
+): Promise<{ success: boolean; book?: Book; error?: string }> {
+  if (data.title !== undefined && !data.title.trim()) {
+    return { success: false, error: 'Book title cannot be empty.' };
+  }
+
+  const supabase = await createClient();
+
+  const updatePayload: Record<string, any> = {};
+  if (data.title !== undefined) updatePayload.title = data.title.trim();
+  if (data.subject_tags !== undefined) updatePayload.subject_tags = data.subject_tags;
+
+  const { data: updated, error } = await supabase
+    .from('books')
+    .update(updatePayload)
+    .eq('id', id)
+    .select('*')
+    .single();
+
+  if (error) {
+    console.error('Error updating book record:', error);
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath('/question-bank');
+  revalidatePath('/books-bank');
+  return {
+    success: true,
+    book: {
+      id: updated.id,
+      title: updated.title,
+      subject_tags: updated.subject_tags || [],
+      file_url: updated.file_url,
+      file_key: updated.file_key,
+      page_count: updated.page_count,
+      file_size_bytes: updated.file_size_bytes,
+      thumbnail_url: updated.thumbnail_url,
+      created_at: updated.created_at,
+    },
+  };
+}
+
 export async function saveAcceptedQuestions(
   subjectId: string,
   chapterId: string,

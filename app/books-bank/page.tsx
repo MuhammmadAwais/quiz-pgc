@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useTransition, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
   Library,
@@ -8,6 +8,7 @@ import {
   UploadCloud,
   FileText,
   Trash2,
+  Edit2,
   Sparkles,
   Search,
   Tag,
@@ -16,6 +17,8 @@ import {
   CheckCircle2,
   AlertCircle,
   X,
+  ExternalLink,
+  Plus,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -24,7 +27,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Badge } from '@/components/ui/Badge';
 import { Book } from '@/lib/types/books';
 import { Subject, Chapter } from '@/lib/types/tournament';
-import { getBooks, createBookRecord, deleteBook } from '@/lib/actions/books';
+import { getBooks, createBookRecord, updateBookRecord, deleteBook } from '@/lib/actions/books';
 import { getSubjects } from '@/lib/actions/subjects';
 import { getChapters } from '@/lib/actions/chapters';
 import { AiStudioModal } from '@/components/studio/AiStudioModal';
@@ -50,6 +53,15 @@ export default function BooksBankPage() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Edit Book & Tags Modal State
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingBook, setEditingBook] = useState<Book | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editTags, setEditTags] = useState<string[]>([]);
+  const [tagInputValue, setTagInputValue] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
 
   const loadData = async () => {
     setLoading(true);
@@ -177,6 +189,67 @@ export default function BooksBankPage() {
     }
   };
 
+  const handleOpenEditModal = (book: Book) => {
+    setEditingBook(book);
+    setEditTitle(book.title);
+    setEditTags([...(book.subject_tags || [])]);
+    setTagInputValue('');
+    setEditError(null);
+    setIsEditModalOpen(true);
+  };
+
+  const handleAddTag = (tagToAdd?: string) => {
+    const raw = (tagToAdd ?? tagInputValue).trim();
+    if (!raw) return;
+    const cleaned = raw.replace(/^#/, '').trim();
+    if (cleaned && !editTags.some((t) => t.toLowerCase() === cleaned.toLowerCase())) {
+      setEditTags([...editTags, cleaned]);
+    }
+    if (!tagToAdd) {
+      setTagInputValue('');
+    }
+  };
+
+  const handleRemoveTag = (indexToRemove: number) => {
+    setEditTags(editTags.filter((_, idx) => idx !== indexToRemove));
+  };
+
+  const handleUpdateBook = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingBook) return;
+    if (!editTitle.trim()) {
+      setEditError('Book title cannot be empty.');
+      return;
+    }
+
+    setIsUpdating(true);
+    setEditError(null);
+
+    try {
+      const res = await updateBookRecord(editingBook.id, {
+        title: editTitle.trim(),
+        subject_tags: editTags,
+      });
+
+      if (!res.success || !res.book) {
+        throw new Error(res.error || 'Failed to update textbook details.');
+      }
+
+      // Update in local state immediately
+      setBooks((prev) =>
+        prev.map((b) => (b.id === res.book!.id ? res.book! : b))
+      );
+
+      setIsEditModalOpen(false);
+      setEditingBook(null);
+    } catch (err: any) {
+      console.error('Update failed:', err);
+      setEditError(err?.message || 'Failed to update textbook.');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-surface-obsidian flex flex-col font-sans">
       {/* Top Action Header */}
@@ -186,31 +259,31 @@ export default function BooksBankPage() {
             <div className="flex items-center gap-2 mb-1">
               <Link
                 href="/question-bank"
-                className="text-xs text-text-muted-slate hover:text-optic-white flex items-center gap-1 transition-colors"
+                className="text-xs text-text-muted-slate hover:text-optic-white flex items-center gap-1.5 transition-colors font-medium"
               >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Question Bank</span>
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back to Question Bank</span>
               </Link>
             </div>
-            <h1 className="text-xl font-bold font-mono tracking-wider text-optic-white flex items-center gap-2">
+            <h1 className="text-xl font-bold font-mono tracking-wider text-optic-white flex items-center gap-2.5">
               <Library className="w-5 h-5 text-team-b-cyan" />
               <span>BOOKS BANK</span>
             </h1>
             <p className="text-xs text-text-muted-slate mt-0.5">
-              Digital textbook repository • Upload, inspect, and generate high-yield MCQs with AI
+              Curriculum textbook repository • Upload, manage tags, and generate syllabus-aligned MCQs
             </p>
           </div>
 
           {/* Search & Upload Action */}
           <div className="flex items-center gap-3 flex-wrap">
-            <div className="relative min-w-[240px]">
-              <Search className="w-4 h-4 absolute left-3 top-2.5 text-text-muted-slate" />
+            <div className="relative min-w-[260px]">
+              <Search className="w-4 h-4 absolute left-3 top-3 text-text-muted-slate" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search by title or tag..."
-                className="w-full bg-surface-carbon border border-white/15 rounded-md pl-9 pr-3 py-1.5 text-xs text-optic-white placeholder-text-muted-slate focus:outline-none focus:border-team-b-cyan"
+                className="w-full h-10 bg-surface-carbon border border-white/15 rounded-xl pl-9 pr-3 text-xs text-optic-white placeholder-text-muted-slate focus:outline-none focus:border-team-b-cyan"
               />
             </div>
 
@@ -218,10 +291,10 @@ export default function BooksBankPage() {
               variant="team-b"
               size="sm"
               onClick={() => setIsUploadModalOpen(true)}
-              className="flex items-center gap-1.5 shadow-sm"
+              className="h-10 px-4 rounded-xl flex items-center gap-2 shadow-sm cursor-pointer"
             >
               <UploadCloud className="w-4 h-4" />
-              <span>+ Upload Textbook</span>
+              <span>Upload Textbook</span>
             </Button>
           </div>
         </div>
@@ -235,7 +308,7 @@ export default function BooksBankPage() {
             <button
               type="button"
               onClick={() => setSelectedTag(null)}
-              className={`px-3 py-1 rounded-full text-xs font-mono transition-colors shrink-0 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-full text-xs font-mono transition-colors shrink-0 cursor-pointer ${
                 selectedTag === null
                   ? 'bg-team-b-cyan text-surface-obsidian font-bold shadow-sm'
                   : 'bg-surface-carbon border border-white/10 text-text-muted-slate hover:text-optic-white'
@@ -252,7 +325,7 @@ export default function BooksBankPage() {
                   key={tag}
                   type="button"
                   onClick={() => setSelectedTag(isSelected ? null : tag)}
-                  className={`px-3 py-1 rounded-full text-xs font-mono transition-colors shrink-0 flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-full text-xs font-mono transition-colors shrink-0 flex items-center gap-1.5 cursor-pointer ${
                     isSelected
                       ? 'bg-team-b-cyan text-surface-obsidian font-bold shadow-sm'
                       : 'bg-surface-carbon border border-white/10 text-text-bright-slate hover:text-optic-white'
@@ -290,7 +363,7 @@ export default function BooksBankPage() {
               variant="team-b"
               size="sm"
               onClick={() => setIsUploadModalOpen(true)}
-              className="inline-flex items-center gap-1.5"
+              className="inline-flex items-center gap-2"
             >
               <UploadCloud className="w-4 h-4" />
               <span>Upload Textbook PDF</span>
@@ -326,20 +399,31 @@ export default function BooksBankPage() {
                       </div>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(book)}
-                      className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-text-muted-slate hover:text-state-warning-rose hover:bg-state-warning-rose/10 transition-all cursor-pointer shrink-0"
-                      title="Delete Textbook"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEditModal(book)}
+                        className="p-1.5 rounded-lg text-text-muted-slate hover:text-team-b-cyan hover:bg-surface-interactive transition-all cursor-pointer"
+                        title="Edit Textbook & Tags"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(book)}
+                        className="p-1.5 rounded-lg text-text-muted-slate hover:text-state-warning-rose hover:bg-state-warning-rose/10 transition-all cursor-pointer"
+                        title="Delete Textbook"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
 
                   {/* Subject Tags */}
-                  {book.subject_tags && book.subject_tags.length > 0 && (
-                    <div className="flex items-center gap-1.5 flex-wrap pt-1">
-                      {book.subject_tags.map((tag, tIdx) => (
+                  <div className="flex items-center gap-1.5 flex-wrap pt-1 min-h-[26px]">
+                    {book.subject_tags && book.subject_tags.length > 0 ? (
+                      book.subject_tags.map((tag, tIdx) => (
                         <span
                           key={tIdx}
                           onClick={() => setSelectedTag(tag)}
@@ -347,9 +431,18 @@ export default function BooksBankPage() {
                         >
                           {tag}
                         </span>
-                      ))}
-                    </div>
-                  )}
+                      ))
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEditModal(book)}
+                        className="text-[10px] text-text-muted-slate hover:text-team-b-cyan font-mono cursor-pointer flex items-center gap-1"
+                      >
+                        <Plus className="w-3 h-3" />
+                        <span>Add tags...</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Card Actions */}
@@ -358,10 +451,10 @@ export default function BooksBankPage() {
                     href={`/api/library/proxy?url=${encodeURIComponent(book.file_url)}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-xs text-text-muted-slate hover:text-optic-white font-mono flex items-center gap-1 transition-colors"
+                    className="text-xs text-text-muted-slate hover:text-optic-white font-mono flex items-center gap-1.5 transition-colors"
                   >
                     <span>View PDF</span>
-                    <span>↗</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
                   </a>
 
                   <button
@@ -370,7 +463,7 @@ export default function BooksBankPage() {
                       setSelectedBookForAi(book);
                       setIsAiStudioOpen(true);
                     }}
-                    className="px-4 py-2 rounded-xl bg-team-b-cyan hover:bg-team-b-cyan/90 text-surface-obsidian text-xs font-bold font-mono uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-md shadow-team-b-cyan/20 cursor-pointer hover:scale-[1.02]"
+                    className="h-9 px-4 rounded-xl bg-team-b-cyan hover:bg-team-b-cyan/90 text-surface-obsidian text-xs font-bold flex items-center gap-1.5 transition-all shadow-md shadow-team-b-cyan/20 cursor-pointer hover:scale-[1.02]"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
                     <span>Generate MCQs</span>
@@ -481,6 +574,153 @@ export default function BooksBankPage() {
                   <UploadCloud className="w-4 h-4" />
                   <span>Upload to Books Bank</span>
                 </>
+              )}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Edit Textbook & Tags Modal */}
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        title="Edit Textbook Details & Tags"
+      >
+        <form onSubmit={handleUpdateBook} className="space-y-4 font-sans">
+          {editError && (
+            <div className="p-3 rounded-xl bg-state-warning-rose/15 border border-state-warning-rose/30 text-state-warning-rose text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{editError}</span>
+            </div>
+          )}
+
+          {editingBook && (
+            <div className="p-3 rounded-xl bg-surface-onyx border border-white/10 text-xs text-text-muted-slate flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-team-b-cyan" />
+                <span className="font-mono text-optic-white font-bold">{editingBook.page_count} pages</span>
+                {editingBook.file_size_bytes && (
+                  <span>• {(editingBook.file_size_bytes / (1024 * 1024)).toFixed(1)} MB</span>
+                )}
+              </div>
+              <span className="text-[11px] font-mono text-text-muted-slate">PDF Source</span>
+            </div>
+          )}
+
+          {/* Title Input */}
+          <Input
+            label="Textbook Title"
+            placeholder="e.g. Physics Class 11 (Punjab Textbook Board)"
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+            required
+          />
+
+          {/* Tags Editor */}
+          <div className="space-y-2">
+            <label className="text-xs font-mono font-bold uppercase tracking-wider text-optic-white">
+              Subject &amp; Syllabus Tags
+            </label>
+
+            {/* Current Tag Chips */}
+            <div className="flex items-center gap-1.5 flex-wrap min-h-[40px] p-2.5 rounded-xl bg-surface-onyx border border-white/10">
+              {editTags.length === 0 ? (
+                <span className="text-xs text-text-muted-slate italic">
+                  No tags attached. Type a tag below and press Enter or Add.
+                </span>
+              ) : (
+                editTags.map((tag, tIdx) => (
+                  <span
+                    key={tIdx}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-interactive border border-white/10 text-xs font-mono text-team-b-cyan"
+                  >
+                    <span>{tag}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTag(tIdx)}
+                      className="hover:text-state-warning-rose p-0.5 rounded transition-colors cursor-pointer"
+                      title="Remove tag"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))
+              )}
+            </div>
+
+            {/* Add New Tag Input */}
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={tagInputValue}
+                onChange={(e) => setTagInputValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAddTag();
+                  }
+                }}
+                placeholder="Type tag (e.g. Mechanics, Computer Science, Class 11)..."
+                className="flex-1 h-9 bg-surface-carbon border border-white/15 rounded-xl px-3 text-xs text-optic-white placeholder-text-muted-slate focus:outline-none focus:border-team-b-cyan font-mono"
+              />
+              <button
+                type="button"
+                onClick={() => handleAddTag()}
+                className="h-9 px-3.5 rounded-xl bg-surface-interactive hover:bg-white/10 border border-white/15 text-xs text-optic-white font-semibold cursor-pointer transition-colors"
+              >
+                + Add Tag
+              </button>
+            </div>
+
+            {/* Quick Suggestions from existing tags */}
+            {allTags.filter((t) => !editTags.includes(t)).length > 0 && (
+              <div className="space-y-1 pt-1">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-text-muted-slate block">
+                  Quick Add Existing Tags:
+                </span>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {allTags
+                    .filter((t) => !editTags.includes(t))
+                    .slice(0, 10)
+                    .map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => handleAddTag(tag)}
+                        className="px-2 py-0.5 rounded-md bg-surface-onyx border border-white/10 text-[10px] font-mono text-text-bright-slate hover:text-team-b-cyan hover:border-team-b-cyan/40 transition-colors cursor-pointer"
+                      >
+                        + {tag}
+                      </button>
+                    ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Modal Actions */}
+          <div className="flex justify-end gap-2.5 pt-3 border-t border-white/10">
+            <Button
+              type="button"
+              variant="console"
+              size="sm"
+              onClick={() => setIsEditModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="team-b"
+              size="sm"
+              disabled={isUpdating || !editTitle.trim()}
+              className="flex items-center gap-1.5"
+            >
+              {isUpdating ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Saving Changes...</span>
+                </>
+              ) : (
+                <span>Save Changes</span>
               )}
             </Button>
           </div>

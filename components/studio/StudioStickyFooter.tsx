@@ -121,7 +121,7 @@ export function StudioStickyFooter({
               targetChapterId: subChaps.length > 0 ? subChaps[0].id : null,
             });
           }}
-          className="bg-surface-carbon border border-white/15 rounded-lg px-3 py-1.5 text-xs text-optic-white focus:outline-none focus:border-team-a-core"
+          className="h-10 bg-surface-carbon border border-white/15 rounded-xl px-3 text-xs text-optic-white focus:outline-none focus:border-team-b-cyan"
         >
           <option value="">Choose Subject...</option>
           {subjects.map((sub) => (
@@ -135,7 +135,7 @@ export function StudioStickyFooter({
           value={config.targetChapterId || ''}
           onChange={(e) => setConfig({ targetChapterId: e.target.value || null })}
           disabled={!config.targetSubjectId || filteredChapters.length === 0}
-          className="bg-surface-carbon border border-white/15 rounded-lg px-3 py-1.5 text-xs text-optic-white focus:outline-none focus:border-team-a-core disabled:opacity-40"
+          className="h-10 bg-surface-carbon border border-white/15 rounded-xl px-3 text-xs text-optic-white focus:outline-none focus:border-team-b-cyan disabled:opacity-40"
         >
           <option value="">Choose Topic...</option>
           {filteredChapters.map((chap) => (
@@ -156,7 +156,7 @@ export function StudioStickyFooter({
             }
           }}
           disabled={isSaving}
-          className="px-3 py-2 rounded-xl bg-surface-interactive hover:bg-white/10 text-xs font-semibold text-text-muted-slate hover:text-optic-white transition-colors cursor-pointer flex items-center gap-1.5"
+          className="h-10 px-3.5 rounded-xl bg-surface-interactive hover:bg-state-warning-rose/15 hover:border-state-warning-rose/30 hover:text-state-warning-rose border border-white/10 text-xs font-semibold text-text-muted-slate transition-all cursor-pointer flex items-center gap-1.5"
         >
           <Trash2 className="w-3.5 h-3.5" />
           <span>Clear All</span>
@@ -166,7 +166,7 @@ export function StudioStickyFooter({
           type="button"
           onClick={handleSave}
           disabled={isSaving || accepted.length === 0}
-          className="px-5 py-2.5 rounded-xl bg-state-success hover:bg-state-success/90 disabled:opacity-40 text-surface-obsidian text-xs font-bold font-mono uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer shadow-lg shadow-state-success/20 hover:scale-[1.02]"
+          className="h-10 px-5 rounded-xl bg-team-b-cyan hover:bg-team-b-cyan/90 disabled:opacity-40 text-surface-obsidian text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-lg shadow-team-b-cyan/20 hover:scale-[1.01]"
         >
           {isSaving ? (
             <>
@@ -175,7 +175,7 @@ export function StudioStickyFooter({
             </>
           ) : (
             <>
-              <BookmarkCheck className="w-4 h-4" />
+              <BookmarkCheck className="w-4 h-4 stroke-[2.5]" />
               <span>Save {accepted.length} Accepted to Question Bank</span>
             </>
           )}
