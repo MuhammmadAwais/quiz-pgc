@@ -460,3 +460,16 @@ body {
 .animate-badge-spring {
   animation: badge-spring 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
+
+/* ==========================================================================
+   ISLAMIC ARABIC & URDU RTL TYPOGRAPHY
+   Proper diacritics (aerab/tashkeel), line-height isolation & font shaping
+   ========================================================================== */
+.font-rtl {
+  font-family: 'Noto Naskh Arabic', 'Noto Nastaliq Urdu', 'Amiri', 'Jameel Noori Nastaleeq', 'Urdu Typesetting', 'Arabic Typesetting', 'Traditional Arabic', 'Segoe UI Historic', system-ui, sans-serif;
+  unicode-bidi: plaintext;
+  text-rendering: optimizeLegibility;
+  line-height: 1.85 !important;
+  word-spacing: 0.1em;
+}
+

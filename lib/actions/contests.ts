@@ -82,15 +82,22 @@ export async function commitContestResult(payload: {
   team_b_score: number;
   winner_name: string | null;
   revealed_question_ids: string[];
+  teams?: { id: string; name: string; color: string; score: number }[];
 }): Promise<{ success: boolean; contestId?: string; error?: string }> {
   const supabase = await createClient();
+
+  // If more than 2 teams participated, summarize the opponent column
+  const effectiveTeamBName =
+    payload.teams && payload.teams.length > 2
+      ? `${payload.team_b_name} (+${payload.teams.length - 2} teams)`
+      : payload.team_b_name;
 
   // 1. Insert Contest
   const { data: contest, error: contestError } = await supabase
     .from('contests')
     .insert({
       team_a_name: payload.team_a_name,
-      team_b_name: payload.team_b_name,
+      team_b_name: effectiveTeamBName,
       team_a_score: payload.team_a_score,
       team_b_score: payload.team_b_score,
       winner_name: payload.winner_name,

@@ -9,13 +9,19 @@ import {
   Sparkles,
   CheckCircle2,
   AlertCircle,
+  Plus,
+  Trash2,
+  Clock,
+  Palette,
+  ShieldAlert,
+  Users,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { Skeleton, SubjectRowSkeleton } from '@/components/ui/Skeleton';
-import { Subject, TournamentConfig } from '@/lib/types/tournament';
+import { Subject, TournamentConfig, Team } from '@/lib/types/tournament';
 import { getSubjects } from '@/lib/actions/subjects';
 import { getPoolStats, fetchEligibleQuestions, seedSampleQuestions } from '@/lib/actions/questions';
 import { useTournamentStore } from '@/lib/store/tournament-store';
@@ -26,7 +32,20 @@ import {
   getAccessibleTeamColor,
   getTextContrastColor,
 } from '@/lib/utils/color';
-import { Palette, ShieldAlert } from 'lucide-react';
+
+interface TeamItem {
+  id: string;
+  name: string;
+  color: string;
+}
+
+const TIMER_PRESETS = [
+  { label: 'Untimed', value: 0 },
+  { label: '15s Blitz', value: 15 },
+  { label: '30s Standard', value: 30 },
+  { label: '45s Collegiate', value: 45 },
+  { label: '60s Deep-Dive', value: 60 },
+];
 
 export default function MatchSetupPage() {
   const router = useRouter();
@@ -40,19 +59,22 @@ export default function MatchSetupPage() {
 
   // Active in-progress match detection
   const activeMatch = useTournamentStore((s) => s.config);
+  const activeMatchTeams = useTournamentStore((s) => s.teams);
   const isMatchFinished = useTournamentStore((s) => s.isMatchFinished);
-  const teamAScore = useTournamentStore((s) => s.teamAScore);
-  const teamBScore = useTournamentStore((s) => s.teamBScore);
-  const resetMatch = useTournamentStore((s) => s.resetMatch);
 
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
 
-  // Form State
-  const [teamAName, setTeamAName] = useState('Alpha Titans');
-  const [teamBName, setTeamBName] = useState('Cyber Phoenix');
-  const [teamAColor, setTeamAColor] = useState('#8B5CF6');
-  const [teamBColor, setTeamBColor] = useState('#06B6D4');
+  // Multi-team Roster (2 to 12 teams)
+  const [teams, setTeams] = useState<TeamItem[]>([
+    { id: '1', name: 'Alpha Titans', color: '#8B5CF6' },
+    { id: '2', name: 'Cyber Phoenix', color: '#06B6D4' },
+  ]);
+
+  // Per-MCQ Timer state (0 = disabled)
+  const [timeLimitSeconds, setTimeLimitSeconds] = useState<number>(30);
+  const [customTimerInput, setCustomTimerInput] = useState<string>('');
+
   const [selectedSubjectIds, setSelectedSubjectIds] = useState<string[]>([]);
   const [subjectQuestionCounts, setSubjectQuestionCounts] = useState<Record<string, number>>({});
   const [pointsPerMcq, setPointsPerMcq] = useState(10);
@@ -88,7 +110,7 @@ export default function MatchSetupPage() {
     init();
   }, [repoSubjects]);
 
-  // Fetch pool stats for all available subjects so selections have immediate accurate stats
+  // Fetch pool stats for all available subjects
   useEffect(() => {
     async function validateAll() {
       if (subjects.length === 0) {
@@ -110,10 +132,28 @@ export default function MatchSetupPage() {
     validateAll();
   }, [subjects, includeUsedQuestions]);
 
-  const poolTotal = selectedSubjectIds.reduce(
-    (sum, id) => sum + (poolBreakdown[id] || 0),
-    0
-  );
+  const handleAddTeam = () => {
+    if (teams.length >= 12) return;
+    const nextIndex = teams.length + 1;
+    const preset = CURATED_TEAM_PRESETS[(nextIndex - 1) % CURATED_TEAM_PRESETS.length];
+    setTeams((prev) => [
+      ...prev,
+      {
+        id: String(Date.now()),
+        name: `Team ${String.fromCharCode(64 + nextIndex)}`,
+        color: preset?.hex || '#F59E0B',
+      },
+    ]);
+  };
+
+  const handleRemoveTeam = (id: string) => {
+    if (teams.length <= 2) return;
+    setTeams((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const handleUpdateTeam = (id: string, updates: Partial<TeamItem>) => {
+    setTeams((prev) => prev.map((t) => (t.id === id ? { ...t, ...updates } : t)));
+  };
 
   const toggleSubject = (id: string) => {
     if (selectedSubjectIds.includes(id)) {
@@ -138,27 +178,48 @@ export default function MatchSetupPage() {
     (sum, id) => sum + (subjectQuestionCounts[id] || 2),
     0
   );
-  const totalMatchQuestions = totalQuestionsPerTeam * 2;
+  const totalMatchQuestions = totalQuestionsPerTeam * teams.length;
 
   const isPoolSufficient =
     selectedSubjectIds.length > 0 &&
     selectedSubjectIds.every(
-      (id) => (poolBreakdown[id] || 0) >= (subjectQuestionCounts[id] || 2) * 2
+      (id) => (poolBreakdown[id] || 0) >= (subjectQuestionCounts[id] || 2) * teams.length
     );
+
+  // Detect duplicate colors among teams
+  const duplicateColorFound = (() => {
+    const seen = new Set<string>();
+    for (const t of teams) {
+      const hex = t.color.toLowerCase();
+      if (seen.has(hex)) return true;
+      seen.add(hex);
+    }
+    return false;
+  })();
 
   const handleStartMatch = async () => {
     if (!isPoolSufficient || launching) return;
 
     setLaunching(true);
     try {
-      const safetyA = getAccessibleTeamColor(teamAColor, isDarkMode);
-      const safetyB = getAccessibleTeamColor(teamBColor, isDarkMode);
+      // Validate all team colors for contrast against obsidian background
+      const validatedTeams: Team[] = teams.map((t) => {
+        const safety = getAccessibleTeamColor(t.color, isDarkMode);
+        return {
+          id: t.id,
+          name: t.name.trim() || `Team ${t.id}`,
+          color: safety.safeColor,
+          score: 0,
+        };
+      });
 
       const config: TournamentConfig = {
-        teamAName: teamAName.trim() || 'Team A',
-        teamBName: teamBName.trim() || 'Team B',
-        teamAColor: safetyA.safeColor,
-        teamBColor: safetyB.safeColor,
+        teams: validatedTeams,
+        timeLimitSeconds,
+        teamAName: validatedTeams[0].name,
+        teamBName: validatedTeams[1].name,
+        teamAColor: validatedTeams[0].color,
+        teamBColor: validatedTeams[1].color,
         selectedSubjectIds,
         subjectQuestionCounts,
         mcqsPerSubject: 2,
@@ -202,15 +263,16 @@ export default function MatchSetupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-obsidian p-4 sm:p-6 md:p-10 max-w-5xl mx-auto space-y-6">
+    <div className="min-h-screen bg-surface-obsidian p-4 sm:p-6 md:p-10 max-w-6xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-border-subtle">
         <div>
-          <h1 className="text-xl font-bold font-mono tracking-wide text-optic-white">
-            Match Setup
+          <h1 className="text-xl md:text-2xl font-bold font-mono tracking-wide text-optic-white flex items-center gap-2">
+            <Swords className="w-5 h-5 text-team-a-core" />
+            <span>Match Setup Console</span>
           </h1>
           <p className="text-xs text-text-muted-slate mt-0.5">
-            Configure teams, select subjects, and set question quotas
+            Configure 2 to 12 teams, set per-MCQ stage timers, and assign subject quotas
           </p>
         </div>
 
@@ -234,221 +296,197 @@ export default function MatchSetupPage() {
               onClick={() => router.push('/live-match')}
               className="font-mono text-xs font-bold"
             >
-              RESUME ACTIVE MATCH ({teamAScore} - {teamBScore}) →
+              RESUME ACTIVE MATCH ({activeMatchTeams.length} TEAMS) →
             </Button>
           )}
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-        {/* Left Column: Form (7 cols) */}
+        {/* Left Column: Configuration Forms (7 cols) */}
         <div className="lg:col-span-7 space-y-5 order-2 lg:order-1">
-          {/* 1. Teams & Custom Colors */}
+          {/* 1. Multi-Team Roster (2-12 Teams) */}
           <Card variant="carbon" className="p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted-slate block">
-                Teams &amp; Stage Identity
-              </span>
-              <span className="text-[11px] font-mono text-text-muted-slate flex items-center gap-1">
-                <Palette className="w-3.5 h-3.5" />
-                <span>Custom Color Wheel</span>
-              </span>
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-team-b-cyan" />
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted-slate">
+                  Team Roster ({teams.length} of 12)
+                </span>
+              </div>
+              <Button
+                variant="console"
+                size="sm"
+                onClick={handleAddTeam}
+                disabled={teams.length >= 12}
+                className="text-xs font-mono"
+              >
+                <Plus className="w-3.5 h-3.5 mr-1" />
+                <span>Add Team</span>
+              </Button>
             </div>
 
-            {/* Same-color Warning */}
-            {teamAColor.toLowerCase() === teamBColor.toLowerCase() && (
+            {duplicateColorFound && (
               <div className="p-2.5 rounded-xl bg-state-warning-rose/15 border border-state-warning-rose/30 text-state-warning-rose text-xs flex items-center gap-2">
                 <ShieldAlert className="w-4 h-4 shrink-0" />
-                <span>Both teams currently share the same color. Please choose distinct colors for stage visual clarity.</span>
+                <span>Some teams currently share the same color. Please choose distinct colors for stage visual clarity.</span>
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Team A Configuration */}
-              {(() => {
-                const safetyA = getAccessibleTeamColor(teamAColor, isDarkMode);
+            <div className="space-y-3">
+              {teams.map((team, idx) => {
+                const safety = getAccessibleTeamColor(team.color, isDarkMode);
                 return (
-                  <div className="p-4 rounded-xl bg-surface-onyx border border-border-subtle space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-mono font-semibold flex items-center gap-1.5" style={{ color: safetyA.safeColor }}>
-                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: safetyA.safeColor }} />
-                        Team Alpha (First Turn)
+                  <div
+                    key={team.id}
+                    className="p-3.5 rounded-xl bg-surface-onyx border border-border-subtle space-y-2.5 transition-all"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <span
+                        className="text-[11px] font-mono font-bold flex items-center gap-1.5"
+                        style={{ color: safety.safeColor }}
+                      >
+                        <span
+                          className="w-2.5 h-2.5 rounded-full"
+                          style={{ backgroundColor: safety.safeColor }}
+                        />
+                        TEAM #{idx + 1}
                       </span>
-                      {safetyA.isAdjusted && (
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-surface-interactive border border-border-medium text-text-muted-slate">
-                          Contrast Adjusted
-                        </span>
+
+                      {teams.length > 2 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveTeam(team.id)}
+                          className="p-1 rounded text-text-muted-slate hover:text-state-warning-rose hover:bg-state-warning-rose/10 transition-colors cursor-pointer"
+                          title="Remove team"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       )}
                     </div>
 
-                    <Input
-                      label="Team Name"
-                      value={teamAName}
-                      onChange={(e) => setTeamAName(e.target.value)}
-                      placeholder="Team A Name"
-                      className="text-sm font-semibold"
-                    />
-
-                    {/* Color Wheel & Swatch Selector */}
-                    <div className="space-y-2 pt-1">
-                      <div className="flex items-center justify-between">
-                        <label className="text-[10px] font-mono uppercase font-bold text-text-muted-slate block">
-                          Team Accent Color
-                        </label>
-                        <span className="text-[10px] font-mono text-text-muted-slate">
-                          Click swatch to open wheel
-                        </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                      <div className="sm:col-span-8">
+                        <Input
+                          value={team.name}
+                          onChange={(e) => handleUpdateTeam(team.id, { name: e.target.value })}
+                          placeholder={`Team ${idx + 1} Name`}
+                          className="text-xs font-semibold"
+                        />
                       </div>
 
-                      <div className="flex items-center gap-2.5">
-                        <label className="relative w-9 h-9 rounded-lg cursor-pointer shrink-0 border border-border-medium overflow-hidden shadow-sm hover:scale-105 transition-transform" title="Click to open color wheel">
+                      {/* Color Wheel & Swatch Selector */}
+                      <div className="sm:col-span-4 flex items-center gap-2">
+                        <label
+                          className="relative w-8 h-8 rounded-lg cursor-pointer shrink-0 border border-border-medium overflow-hidden shadow-sm hover:scale-105 transition-transform"
+                          title="Click to open color wheel"
+                        >
                           <input
                             type="color"
-                            value={teamAColor}
-                            onChange={(e) => setTeamAColor(e.target.value)}
+                            value={team.color}
+                            onChange={(e) => handleUpdateTeam(team.id, { color: e.target.value })}
                             className="absolute -top-4 -left-4 w-16 h-16 cursor-pointer opacity-0"
-                            title="Open Color Wheel"
                           />
-                          <div className="w-full h-full" style={{ backgroundColor: teamAColor }} />
+                          <div className="w-full h-full" style={{ backgroundColor: team.color }} />
                         </label>
 
                         <input
                           type="text"
-                          value={teamAColor.toUpperCase()}
-                          onChange={(e) => setTeamAColor(e.target.value)}
-                          placeholder="#8B5CF6"
+                          value={team.color.toUpperCase()}
+                          onChange={(e) => handleUpdateTeam(team.id, { color: e.target.value })}
                           maxLength={7}
-                          className="w-24 h-9 bg-surface-carbon border border-border-medium rounded-lg px-2.5 text-xs font-mono text-optic-white text-center focus:outline-none focus:border-brand-primary"
+                          className="w-20 h-8 bg-surface-carbon border border-border-medium rounded-lg px-2 text-[11px] font-mono text-optic-white text-center focus:outline-none"
                         />
                       </div>
+                    </div>
 
-                      {/* Presets Row without scrollbar */}
-                      <div className="space-y-1 pt-1 border-t border-border-subtle/50">
-                        <span className="text-[10px] font-mono text-text-muted-slate block">
-                          Quick Presets:
-                        </span>
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          {CURATED_TEAM_PRESETS.map((preset) => (
-                            <button
-                              key={preset.name}
-                              type="button"
-                              onClick={() => setTeamAColor(preset.hex)}
-                              className={`w-6 h-6 rounded-full border transition-all shrink-0 cursor-pointer ${
-                                teamAColor.toLowerCase() === preset.hex.toLowerCase()
-                                  ? 'ring-2 ring-brand-primary scale-110 border-white shadow-sm'
-                                  : 'border-border-subtle opacity-80 hover:opacity-100 hover:scale-110'
-                              }`}
-                              style={{ backgroundColor: preset.hex }}
-                              title={preset.name}
-                            />
-                          ))}
-                        </div>
-                      </div>
-
-                      {safetyA.isAdjusted && (
-                        <p className="text-[10px] font-mono text-text-muted-slate pt-1">
-                          Note: Displayed as <span className="font-bold" style={{ color: safetyA.safeColor }}>{safetyA.safeColor}</span> on stage to ensure readability against the background.
-                        </p>
-                      )}
+                    {/* Presets Row */}
+                    <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                      {CURATED_TEAM_PRESETS.map((preset) => (
+                        <button
+                          key={preset.name}
+                          type="button"
+                          onClick={() => handleUpdateTeam(team.id, { color: preset.hex })}
+                          className={`w-5 h-5 rounded-full border transition-all shrink-0 cursor-pointer ${
+                            team.color.toLowerCase() === preset.hex.toLowerCase()
+                              ? 'ring-2 ring-brand-primary scale-110 border-white shadow-sm'
+                              : 'border-border-subtle opacity-75 hover:opacity-100'
+                          }`}
+                          style={{ backgroundColor: preset.hex }}
+                          title={preset.name}
+                        />
+                      ))}
                     </div>
                   </div>
                 );
-              })()}
-
-              {/* Team B Configuration */}
-              {(() => {
-                const safetyB = getAccessibleTeamColor(teamBColor, isDarkMode);
-                return (
-                  <div className="p-4 rounded-xl bg-surface-onyx border border-border-subtle space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-mono font-semibold flex items-center gap-1.5" style={{ color: safetyB.safeColor }}>
-                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: safetyB.safeColor }} />
-                        Team Beta (Second Turn)
-                      </span>
-                      {safetyB.isAdjusted && (
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-surface-interactive border border-border-medium text-text-muted-slate">
-                          Contrast Adjusted
-                        </span>
-                      )}
-                    </div>
-
-                    <Input
-                      label="Team Name"
-                      value={teamBName}
-                      onChange={(e) => setTeamBName(e.target.value)}
-                      placeholder="Team B Name"
-                      className="text-sm font-semibold"
-                    />
-
-                    {/* Color Wheel & Swatch Selector */}
-                    <div className="space-y-2 pt-1">
-                      <div className="flex items-center justify-between">
-                        <label className="text-[10px] font-mono uppercase font-bold text-text-muted-slate block">
-                          Team Accent Color
-                        </label>
-                        <span className="text-[10px] font-mono text-text-muted-slate">
-                          Click swatch to open wheel
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-2.5">
-                        <label className="relative w-9 h-9 rounded-lg cursor-pointer shrink-0 border border-border-medium overflow-hidden shadow-sm hover:scale-105 transition-transform" title="Click to open color wheel">
-                          <input
-                            type="color"
-                            value={teamBColor}
-                            onChange={(e) => setTeamBColor(e.target.value)}
-                            className="absolute -top-4 -left-4 w-16 h-16 cursor-pointer opacity-0"
-                            title="Open Color Wheel"
-                          />
-                          <div className="w-full h-full" style={{ backgroundColor: teamBColor }} />
-                        </label>
-
-                        <input
-                          type="text"
-                          value={teamBColor.toUpperCase()}
-                          onChange={(e) => setTeamBColor(e.target.value)}
-                          placeholder="#06B6D4"
-                          maxLength={7}
-                          className="w-24 h-9 bg-surface-carbon border border-border-medium rounded-lg px-2.5 text-xs font-mono text-optic-white text-center focus:outline-none focus:border-brand-primary"
-                        />
-                      </div>
-
-                      {/* Presets Row without scrollbar */}
-                      <div className="space-y-1 pt-1 border-t border-border-subtle/50">
-                        <span className="text-[10px] font-mono text-text-muted-slate block">
-                          Quick Presets:
-                        </span>
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          {CURATED_TEAM_PRESETS.map((preset) => (
-                            <button
-                              key={preset.name}
-                              type="button"
-                              onClick={() => setTeamBColor(preset.hex)}
-                              className={`w-6 h-6 rounded-full border transition-all shrink-0 cursor-pointer ${
-                                teamBColor.toLowerCase() === preset.hex.toLowerCase()
-                                  ? 'ring-2 ring-brand-primary scale-110 border-white shadow-sm'
-                                  : 'border-border-subtle opacity-80 hover:opacity-100 hover:scale-110'
-                              }`}
-                              style={{ backgroundColor: preset.hex }}
-                              title={preset.name}
-                            />
-                          ))}
-                        </div>
-                      </div>
-
-                      {safetyB.isAdjusted && (
-                        <p className="text-[10px] font-mono text-text-muted-slate pt-1">
-                          Note: Displayed as <span className="font-bold" style={{ color: safetyB.safeColor }}>{safetyB.safeColor}</span> on stage to ensure readability against the background.
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                );
-              })()}
+              })}
             </div>
           </Card>
 
-          {/* 2. Subjects & Question Quotas (Clean Unified List) */}
+          {/* 2. Per-MCQ Stage Timer */}
+          <Card variant="carbon" className="p-5 space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-border-subtle">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-team-b-cyan" />
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted-slate">
+                  Per-MCQ Stage Clock
+                </span>
+              </div>
+              <span className="text-[11px] font-mono text-team-b-ice font-bold">
+                {timeLimitSeconds === 0 ? 'Untimed (No Limit)' : `${timeLimitSeconds}s Limit`}
+              </span>
+            </div>
+
+            <p className="text-xs text-text-muted-slate">
+              Withstands tab reloads, hardware sleep, and network disconnects. Switches colors through 3 phases with audio cues.
+            </p>
+
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1">
+              {TIMER_PRESETS.map((preset) => {
+                const isSelected = timeLimitSeconds === preset.value;
+                return (
+                  <button
+                    key={preset.value}
+                    type="button"
+                    onClick={() => {
+                      setTimeLimitSeconds(preset.value);
+                      setCustomTimerInput('');
+                    }}
+                    className={`py-2 px-2.5 rounded-xl border text-xs font-mono font-bold transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-team-b-cyan/20 border-team-b-cyan text-optic-white shadow-sm'
+                        : 'bg-surface-onyx border-border-subtle text-text-muted-slate hover:text-optic-white hover:border-border-medium'
+                    }`}
+                  >
+                    {preset.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Custom Seconds Input */}
+            <div className="flex items-center gap-3 pt-2">
+              <span className="text-xs font-mono text-text-muted-slate">Custom Seconds:</span>
+              <input
+                type="number"
+                min="5"
+                max="300"
+                value={customTimerInput}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setCustomTimerInput(val);
+                  const num = parseInt(val, 10);
+                  if (!isNaN(num) && num > 0) {
+                    setTimeLimitSeconds(num);
+                  }
+                }}
+                placeholder="e.g. 20"
+                className="w-24 h-8 bg-surface-onyx border border-border-medium rounded-lg px-2.5 text-xs font-mono text-optic-white focus:outline-none focus:border-brand-primary"
+              />
+            </div>
+          </Card>
+
+          {/* 3. Subjects & Question Quotas */}
           <Card variant="carbon" className="p-5 space-y-3">
             <div className="flex items-center justify-between pb-2 border-b border-border-subtle">
               <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted-slate">
@@ -475,7 +513,7 @@ export default function MatchSetupPage() {
                   const isSelected = selectedSubjectIds.includes(sub.id);
                   const count = subjectQuestionCounts[sub.id] || 2;
                   const available = poolBreakdown[sub.id] || 0;
-                  const needed = count * 2;
+                  const needed = count * teams.length;
                   const isShort = isSelected && available < needed;
 
                   return (
@@ -511,14 +549,14 @@ export default function MatchSetupPage() {
                                 <span className="text-[11px] font-mono text-state-warning-rose flex items-center gap-1">
                                   <AlertCircle className="w-3 h-3 shrink-0" />
                                   <span>
-                                    Short by {needed - available} (have {available}, need {needed})
+                                    Short by {needed - available} (bank: {available}, needs {count} × {teams.length} = {needed})
                                   </span>
                                 </span>
                               ) : (
                                 <span className="text-[11px] font-mono text-team-b-ice flex items-center gap-1">
                                   <CheckCircle2 className="w-3 h-3 shrink-0" />
                                   <span>
-                                    {available} available in bank (need {needed})
+                                    {available} in bank (needs {count} × {teams.length} = {needed})
                                   </span>
                                 </span>
                               )}
@@ -527,7 +565,7 @@ export default function MatchSetupPage() {
                         </div>
                       </div>
 
-                      {/* Stepper (only shown when selected) */}
+                      {/* Stepper */}
                       {isSelected && (
                         <div className="flex items-center gap-2 shrink-0">
                           <span className="text-xs font-mono text-text-muted-slate hidden sm:inline">
@@ -561,7 +599,7 @@ export default function MatchSetupPage() {
             )}
           </Card>
 
-          {/* 3. Scoring & Past Questions */}
+          {/* 4. Scoring & Rules */}
           <Card variant="carbon" className="p-5 space-y-4">
             <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted-slate block">
               Match Rules
@@ -573,44 +611,41 @@ export default function MatchSetupPage() {
                   Points per correct MCQ
                 </span>
                 <span className="text-[11px] text-text-muted-slate">
-                  Awarded immediately on correct answer
+                  Awarded immediately on verbal confirmation
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <input
                   type="number"
-                  min={1}
-                  max={50}
-                  step={5}
+                  min="1"
+                  max="100"
                   value={pointsPerMcq}
                   onChange={(e) => setPointsPerMcq(Math.max(1, parseInt(e.target.value) || 10))}
-                  className="w-16 bg-surface-obsidian border border-border-medium rounded-lg px-2.5 py-1.5 text-optic-white text-sm font-mono text-center focus:border-team-a-core focus:outline-none"
+                  className="w-16 h-8 bg-surface-onyx border border-border-medium rounded-lg px-2 text-xs font-mono text-optic-white text-center focus:outline-none"
                 />
-                <span className="text-xs font-mono text-text-muted-slate">pts</span>
+                <span className="text-xs font-mono text-text-muted-slate">PTS</span>
               </div>
             </div>
 
-            <div className="pt-3 border-t border-border-subtle flex items-center justify-between gap-4">
+            <div className="pt-3 border-t border-border-subtle flex items-center justify-between">
               <div>
                 <span className="text-xs font-mono font-semibold text-optic-white block">
-                  Allow questions from past matches
+                  Include previously used questions
                 </span>
                 <span className="text-[11px] text-text-muted-slate">
-                  Enable if your question bank is running low
+                  Disable for fresh questions strictly
                 </span>
               </div>
               <button
                 type="button"
-                role="switch"
-                aria-checked={includeUsedQuestions}
                 onClick={() => setIncludeUsedQuestions(!includeUsedQuestions)}
-                className={`w-12 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 p-0.5 flex items-center ${
-                  includeUsedQuestions ? 'bg-team-a-core' : 'bg-surface-interactive border border-border-medium'
+                className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${
+                  includeUsedQuestions ? 'bg-team-a-core' : 'bg-surface-recessed'
                 }`}
               >
                 <div
-                  className={`w-5 h-5 rounded-full bg-white shadow-md transition-transform duration-200 ease-in-out ${
-                    includeUsedQuestions ? 'translate-x-6' : 'translate-x-0'
+                  className={`w-4 h-4 rounded-full bg-white shadow-md absolute top-1 transition-transform ${
+                    includeUsedQuestions ? 'left-6' : 'left-1'
                   }`}
                 />
               </button>
@@ -618,103 +653,89 @@ export default function MatchSetupPage() {
           </Card>
         </div>
 
-        {/* Right Column: Match Summary & Launch (5 cols) */}
-        <div className="lg:col-span-5 order-1 lg:order-2">
-          <Card variant="carbon" className="p-5 space-y-4 lg:sticky lg:top-24">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted-slate block pb-2 border-b border-border-subtle">
-              Match Summary
-            </span>
+        {/* Right Column: Sticky Summary & Launch (5 cols) */}
+        <div className="lg:col-span-5 sticky top-6 space-y-4 order-1 lg:order-2">
+          <Card variant="carbon" className="p-5 space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-border-subtle">
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-text-muted-slate">
+                Match Summary
+              </span>
+              <Badge variant={isPoolSufficient ? 'success' : 'warning'} className="text-[10px] font-mono">
+                {isPoolSufficient ? 'READY TO LAUNCH' : 'INSUFFICIENT POOL'}
+              </Badge>
+            </div>
 
-            <div className="space-y-2.5">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-text-muted-slate">Selected Subjects</span>
-                <span className="font-mono font-bold text-optic-white">
-                  {selectedSubjectIds.length}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-text-muted-slate">Questions per Team</span>
-                <span className="font-mono font-bold text-optic-white">
-                  {totalQuestionsPerTeam} questions
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-text-muted-slate">Total Match Questions</span>
-                <span className="font-mono font-bold text-optic-white">
-                  {totalMatchQuestions} questions
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-text-muted-slate">Questions Available</span>
-                {validatingPool ? (
-                  <Skeleton className="w-20 h-4 rounded bg-surface-interactive/60" />
-                ) : (
-                  <span
-                    className={`font-mono font-bold ${
-                      isPoolSufficient ? 'text-state-success' : 'text-state-warning-rose'
-                    }`}
+            {/* Participating Teams List */}
+            <div className="space-y-2">
+              <span className="text-[11px] font-mono text-text-muted-slate block">
+                ROSTER ({teams.length} TEAMS)
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {teams.map((t, i) => (
+                  <div
+                    key={t.id}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-onyx border border-border-subtle text-xs font-mono"
                   >
-                    {poolTotal} available
-                  </span>
-                )}
+                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: t.color }} />
+                    <span className="font-bold text-optic-white truncate max-w-[120px]">{t.name}</span>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* Shortage Helper with 1-click resolve */}
-            {!isPoolSufficient && selectedSubjectIds.length > 0 && (
-              <div className="p-3 rounded-xl bg-state-warning-rose/10 border border-state-warning-rose/30 space-y-2">
-                <p className="text-xs text-state-warning-rose font-mono">
-                  Need {totalMatchQuestions - poolTotal} more questions.
+            {/* Metrics Breakdown */}
+            <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+              <div className="p-2.5 rounded-lg bg-surface-onyx border border-border-subtle">
+                <span className="text-text-muted-slate block text-[10px]">MCQs PER TEAM</span>
+                <span className="text-base font-bold text-optic-white">{totalQuestionsPerTeam}</span>
+              </div>
+              <div className="p-2.5 rounded-lg bg-surface-onyx border border-border-subtle">
+                <span className="text-text-muted-slate block text-[10px]">TOTAL QUESTIONS</span>
+                <span className="text-base font-bold text-optic-white">{totalMatchQuestions}</span>
+              </div>
+              <div className="p-2.5 rounded-lg bg-surface-onyx border border-border-subtle">
+                <span className="text-text-muted-slate block text-[10px]">STAGE TIMER</span>
+                <span className="text-base font-bold text-team-b-ice">
+                  {timeLimitSeconds === 0 ? 'Off' : `${timeLimitSeconds}s`}
+                </span>
+              </div>
+              <div className="p-2.5 rounded-lg bg-surface-onyx border border-border-subtle">
+                <span className="text-text-muted-slate block text-[10px]">POINTS PER MCQ</span>
+                <span className="text-base font-bold text-optic-white">{pointsPerMcq} PTS</span>
+              </div>
+            </div>
+
+            {/* Validation Banner */}
+            {!isPoolSufficient && (
+              <div className="p-3 rounded-xl bg-state-warning-rose/15 border border-state-warning-rose/30 text-state-warning-rose text-xs space-y-1">
+                <div className="flex items-center gap-2 font-bold font-mono">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>Question Bank Deficit</span>
+                </div>
+                <p className="text-[11px] leading-relaxed">
+                  The selected subjects don&apos;t have enough questions to supply {teams.length} teams.
+                  Reduce questions per team or seed more MCQs in the Question Bank.
                 </p>
-                {!includeUsedQuestions && (
-                  <Button
-                    variant="console"
-                    size="sm"
-                    onClick={() => setIncludeUsedQuestions(true)}
-                    className="w-full text-xs font-mono"
-                  >
-                    Allow Past Questions
-                  </Button>
-                )}
               </div>
             )}
 
-            {/* Start Match Button */}
-            <div className="pt-2 border-t border-border-subtle space-y-2">
-              <Button
-                variant="team-a"
-                size="lg"
-                onClick={handleStartMatch}
-                disabled={!isPoolSufficient || launching}
-                className="w-full font-bold text-sm tracking-wider py-3 shadow-md"
-              >
-                {launching ? (
-                  'Starting Match...'
-                ) : (
-                  <span className="flex items-center justify-center gap-2">
-                    <Play className="w-4 h-4 fill-current" />
-                    <span>START LIVE MATCH</span>
-                  </span>
-                )}
-              </Button>
-
-              {activeMatch && !isMatchFinished && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (confirm('Discard the current active match?')) {
-                      resetMatch();
-                    }
-                  }}
-                  className="w-full text-[11px] font-mono text-text-muted-slate hover:text-state-warning-rose py-1 text-center transition-colors"
-                >
-                  Discard Saved Match
-                </button>
+            {/* Launch Button */}
+            <Button
+              variant="team-a"
+              size="lg"
+              onClick={handleStartMatch}
+              disabled={!isPoolSufficient || launching}
+              className="w-full font-mono text-sm font-bold tracking-wider py-4 shadow-sm"
+            >
+              {launching ? (
+                <span>PREPARING ZERO-NETWORK STAGE...</span>
+              ) : (
+                <>
+                  <Play className="w-4 h-4 mr-2" />
+                  <span>LAUNCH LIVE ARENA MATCH</span>
+                </>
               )}
-            </div>
+            </Button>
           </Card>
         </div>
       </div>

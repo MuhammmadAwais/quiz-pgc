@@ -11,12 +11,16 @@ interface StageHeaderProps {
   totalQuestionsInSubject: number;
   subjectIndex?: number;
   totalSubjects?: number;
-  teamTurn: 'TEAM_A' | 'TEAM_B';
-  teamAName: string;
-  teamBName: string;
+  teamTurn?: string;
+  activeTeamName?: string;
+  activeTeamColor?: string;
+  teamAName?: string;
+  teamBName?: string;
   teamAColor?: string;
   teamBColor?: string;
   isTieBreaker: boolean;
+  totalTeams?: number;
+  activeTeamIndex?: number;
 }
 
 export function StageHeader({
@@ -25,18 +29,23 @@ export function StageHeader({
   totalQuestionsInSubject,
   subjectIndex = 0,
   totalSubjects = 1,
-  teamTurn,
-  teamAName,
-  teamBName,
+  teamTurn = 'TEAM_A',
+  activeTeamName: explicitActiveTeamName,
+  activeTeamColor: explicitActiveTeamColor,
+  teamAName = 'Team A',
+  teamBName = 'Team B',
   teamAColor,
   teamBColor,
   isTieBreaker,
+  totalTeams,
+  activeTeamIndex = 0,
 }: StageHeaderProps) {
   const isTeamA = teamTurn === 'TEAM_A';
-  const activeTeamName = isTeamA ? teamAName : teamBName;
-  const activeTeamColor = isTeamA
-    ? teamAColor || '#8B5CF6'
-    : teamBColor || '#06B6D4';
+  const effectiveActiveTeamName =
+    explicitActiveTeamName || (isTeamA ? teamAName : teamBName);
+  const effectiveActiveTeamColor =
+    explicitActiveTeamColor ||
+    (isTeamA ? teamAColor || '#8B5CF6' : teamBColor || '#06B6D4');
 
   const [soundOn, setSoundOn] = useState(true);
 
@@ -106,19 +115,19 @@ export function StageHeader({
       {/* Central High-Intensity Turn Banner with Custom Team Color */}
       <div
         style={{
-          backgroundColor: `${activeTeamColor}18`,
-          borderColor: activeTeamColor,
+          backgroundColor: `${effectiveActiveTeamColor}18`,
+          borderColor: effectiveActiveTeamColor,
         }}
         className="w-full text-center py-2.5 px-6 rounded-lg transition-all duration-300 shadow-sm border"
       >
         <span className="font-mono text-xs uppercase tracking-widest text-text-bright-slate mr-2">
-          ACTIVE TURN:
+          {totalTeams && totalTeams > 2 ? `TEAM ${activeTeamIndex + 1} OF ${totalTeams} • ACTIVE TURN:` : 'ACTIVE TURN:'}
         </span>
         <span
-          style={{ color: activeTeamColor }}
+          style={{ color: effectiveActiveTeamColor }}
           className="font-mono text-base md:text-lg font-extrabold uppercase tracking-wider"
         >
-          {activeTeamName}
+          {effectiveActiveTeamName}
         </span>
       </div>
     </div>

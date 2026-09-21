@@ -27,10 +27,12 @@ After building any component — run `/imprint` to record the component name, fi
 | `Input` | `components/ui/Input.tsx` | `bg-surface-obsidian border border-border-medium text-optic-white rounded-md px-4 py-2.5 focus:border-team-a-core` | Form text fields |
 | `Modal` | `components/ui/Modal.tsx` | `bg-surface-carbon border border-border-medium rounded-xl shadow-2xl p-6 animate-fade-in` | Telemetry dialog container |
 | `TeamPodium` | `components/live-match/TeamPodium.tsx` | `score-display label-caps bg-surface-carbon border-2 border-team-a-core shadow-md rounded-xl p-6` | Stage score displays |
-| `OptionCard` | `components/live-match/OptionCard.tsx` | `text-body-xl bg-surface-carbon border border-border-subtle hover:border-border-medium rounded-xl p-5 cursor-pointer` | Live MCQ option choice |
+| `OptionCard` | `components/live-match/OptionCard.tsx` | `text-body-xl bg-surface-carbon border border-border-subtle hover:border-border-medium rounded-xl p-5 cursor-pointer` | Live MCQ option choice with RTL & Math |
+| `TimerBar` | `components/live-match/TimerBar.tsx` | `bg-surface-carbon border border-border-medium rounded-xl p-3.5 shadow-sm font-mono` | Resilient wall-clock stage timer with 3 color phases |
+| `TeamFlank` | `components/live-match/TeamFlank.tsx` | `rounded-xl bg-surface-carbon border-2 shadow-sm font-mono` | Symmetrical multi-team podium cards (left & right flanks) |
 | `StageHeader` | `components/live-match/StageHeader.tsx` | `border-b border-border-subtle pb-6 px-10` | Active subject, round, and turn display |
 | `MysteryBoxGrid` | `components/live-match/MysteryBoxGrid.tsx` | `border-2 bg-surface-carbon hover:border-border-bright rounded-xl h-36` | Sudden-death mystery boxes |
-| `WinnerCelebration` | `components/live-match/WinnerCelebration.tsx` | `bg-surface-carbon border border-border-medium rounded-2xl shadow-2xl p-8 md:p-12` | Grand victory podium with confetti VFX |
+| `WinnerCelebration` | `components/live-match/WinnerCelebration.tsx` | `bg-surface-carbon border border-border-medium rounded-2xl shadow-2xl p-8 md:p-12` | Grand victory podium with multi-team ranked leaderboard |
 | `BooksBankPage` | `app/books-bank/page.tsx` | `bg-surface-obsidian text-optic-white border-border-subtle rounded-2xl p-5 hover:border-team-b-cyan/50` | Digital textbook repository page |
 | `AiStudioModal` | `components/studio/AiStudioModal.tsx` | `bg-surface-carbon border-border-medium rounded-2xl shadow-2xl max-w-5xl` | AI question generator studio modal |
 | `RapidReviewDeck` | `components/studio/RapidReviewDeck.tsx` | `bg-surface-onyx border-border-subtle rounded-2xl p-4 gap-5` | High-speed plain-English question review surface |

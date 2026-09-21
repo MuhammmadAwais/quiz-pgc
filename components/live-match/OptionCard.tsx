@@ -4,6 +4,7 @@ import React from 'react';
 import { CheckCircle2, XCircle, Award } from 'lucide-react';
 import { getTextContrastColor } from '@/lib/utils/color';
 import { MathRenderer } from '@/components/ui/MathRenderer';
+import { getTextDirectionProps } from '@/lib/utils/text';
 
 interface OptionCardProps {
   letter: string;
@@ -11,7 +12,7 @@ interface OptionCardProps {
   isSelected: boolean;
   isSubmitted: boolean;
   isCorrect: boolean;
-  teamTurn: 'TEAM_A' | 'TEAM_B';
+  teamTurn?: 'TEAM_A' | 'TEAM_B' | string;
   teamColor?: string;
   points?: number;
   onSelect: () => void;
@@ -100,11 +101,18 @@ export function OptionCard({
         </div>
 
         {/* Option Text */}
-        <div className="flex-1 min-w-0 pt-0.5">
-          <p className="text-base sm:text-lg md:text-xl font-medium tracking-normal leading-relaxed break-words">
-            <MathRenderer content={text} inline />
-          </p>
-        </div>
+        {(() => {
+          const dirProps = getTextDirectionProps(text);
+          return (
+            <div className="flex-1 min-w-0 pt-0.5" dir={dirProps.dir}>
+              <p
+                className={`text-base sm:text-lg md:text-xl font-medium tracking-normal leading-relaxed break-words ${dirProps.className}`}
+              >
+                <MathRenderer content={text} inline />
+              </p>
+            </div>
+          );
+        })()}
       </div>
 
       {/* Result Telemetry Badge & Icons (Dedicated Status Row) */}

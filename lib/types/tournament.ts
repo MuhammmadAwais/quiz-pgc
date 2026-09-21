@@ -1,4 +1,11 @@
-export type TeamTurn = 'TEAM_A' | 'TEAM_B';
+export type TeamTurn = string; // e.g. 'TEAM_A' | 'TEAM_B' or teamId
+
+export interface Team {
+  id: string;
+  name: string;
+  color: string;
+  score: number;
+}
 
 export interface Subject {
   id: string;
@@ -40,8 +47,10 @@ export interface Contest {
 }
 
 export interface TournamentConfig {
-  teamAName: string;
-  teamBName: string;
+  teams: Team[];
+  timeLimitSeconds: number; // 0 = untimed / disabled; or 15, 30, 45, 60, etc.
+  teamAName?: string;
+  teamBName?: string;
   teamAColor?: string;
   teamBColor?: string;
   selectedSubjectIds: string[];
@@ -52,11 +61,10 @@ export interface TournamentConfig {
 }
 
 export interface TurnSnapshot {
-  teamTurn: TeamTurn;
+  activeTeamIndex: number;
+  teams: Team[];
   subjectIndex: number;
   questionIndexInSubject: number;
-  teamAScore: number;
-  teamBScore: number;
   isQuestionRevealed: boolean;
   selectedOptionIndex: number | null;
   isAnswerSubmitted: boolean;
@@ -64,13 +72,22 @@ export interface TurnSnapshot {
   tieBreakerQuestionIndex: number;
   selectedMysteryBox?: number | null;
   revealedQuestionIds: string[];
+  timerStartedAt: number | null;
+  isTimeExpired: boolean;
+  // Backwards compatibility:
+  teamTurn?: TeamTurn;
+  teamAScore?: number;
+  teamBScore?: number;
 }
 
 export interface TournamentState {
   config: TournamentConfig | null;
+  teams: Team[];
+  activeTeamIndex: number;
   questionPool: Record<string, Question[]>; // Full pool for reference
-  teamAQuestionPool: Record<string, Question[]>; // Non-overlapping questions for Team A
-  teamBQuestionPool: Record<string, Question[]>; // Non-overlapping questions for Team B
+  teamQuestionPools: Record<string, Record<string, Question[]>>; // teamId -> subjectId -> Question[]
+  teamAQuestionPool: Record<string, Question[]>; // Legacy compatibility
+  teamBQuestionPool: Record<string, Question[]>; // Legacy compatibility
   subjects: Subject[];
   currentSubjectIndex: number;
   currentQuestionIndex: number;
@@ -89,6 +106,11 @@ export interface TournamentState {
   winnerName: string | null;
   historyStack: TurnSnapshot[];
 
+  // Timer State
+  timerStartedAt: number | null;
+  isTimerPaused: boolean;
+  isTimeExpired: boolean;
+
   // Actions
   initializeMatch: (config: TournamentConfig, questionsBySubject: Record<string, Question[]>, subjects: Subject[]) => void;
   revealQuestion: () => void;
@@ -99,4 +121,10 @@ export interface TournamentState {
   selectMysteryBox: (boxIndex: number) => void;
   finishMatch: () => void;
   resetMatch: () => void;
+
+  // Timer Actions
+  startTimer: () => void;
+  pauseTimer: () => void;
+  resumeTimer: () => void;
+  expireTimer: () => void;
 }
