@@ -14,6 +14,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
+import { Skeleton, SubjectRowSkeleton } from '@/components/ui/Skeleton';
 import { Subject, TournamentConfig } from '@/lib/types/tournament';
 import { getSubjects } from '@/lib/actions/subjects';
 import { getPoolStats, fetchEligibleQuestions, seedSampleQuestions } from '@/lib/actions/questions';
@@ -271,7 +272,13 @@ export default function MatchSetupPage() {
               </span>
             </div>
 
-            {subjects.length === 0 ? (
+            {loading ? (
+              <div className="space-y-2">
+                {[0, 1, 2, 3].map((i) => (
+                  <SubjectRowSkeleton key={i} />
+                ))}
+              </div>
+            ) : subjects.length === 0 ? (
               <p className="text-xs text-text-muted-slate py-4 text-center">
                 No subjects found in Question Bank. Click &quot;Seed Sample MCQs&quot; above to begin.
               </p>
@@ -453,13 +460,17 @@ export default function MatchSetupPage() {
 
               <div className="flex items-center justify-between text-xs">
                 <span className="text-text-muted-slate">Questions Available</span>
-                <span
-                  className={`font-mono font-bold ${
-                    isPoolSufficient ? 'text-state-success' : 'text-state-warning-rose'
-                  }`}
-                >
-                  {poolTotal} available
-                </span>
+                {validatingPool ? (
+                  <Skeleton className="w-20 h-4 rounded bg-surface-interactive/60" />
+                ) : (
+                  <span
+                    className={`font-mono font-bold ${
+                      isPoolSufficient ? 'text-state-success' : 'text-state-warning-rose'
+                    }`}
+                  >
+                    {poolTotal} available
+                  </span>
+                )}
               </div>
             </div>
 

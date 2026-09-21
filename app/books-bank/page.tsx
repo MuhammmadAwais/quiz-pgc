@@ -28,6 +28,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Badge } from '@/components/ui/Badge';
+import { BookCardSkeleton } from '@/components/ui/Skeleton';
 import { Book } from '@/lib/types/books';
 import { Subject, Chapter } from '@/lib/types/tournament';
 import { useRepositoryStore } from '@/lib/store/useRepositoryStore';
@@ -366,9 +367,10 @@ export default function BooksBankPage() {
 
         {/* Books Shelf Grid */}
         {isLoading && !isLoaded ? (
-          <div className="flex flex-col items-center justify-center py-24 space-y-3">
-            <Loader2 className="w-8 h-8 animate-spin text-team-b-cyan" />
-            <p className="text-xs text-text-muted-slate font-mono">Loading Books Bank repository...</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <BookCardSkeleton key={i} />
+            ))}
           </div>
         ) : filteredBooks.length === 0 ? (
           <div className="text-center py-20 border border-dashed border-white/10 rounded-2xl p-8 space-y-4 max-w-lg mx-auto">

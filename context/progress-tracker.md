@@ -6,8 +6,8 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ## Current Status
 
-**Phase:** Phase 8 — Architecture Optimization, Hybrid In-Memory Caching, Pagination & Match Setup Telemetry (Complete)  
-**Last completed:** Centralized Zustand repository store (`useRepositoryStore.ts`) for zero-roundtrip routing, client-side pagination for Question Bank (10/page) & Books Bank (6/page), login page demo autofill removal with password preview toggle, and match setup question pool telemetry fix  
+**Phase:** Phase 8 — Architecture Optimization, Hybrid In-Memory Caching, Pagination & Loading Skeletons (Complete)  
+**Last completed:** Universal Electric Obsidian Loading Skeletons (`components/ui/Skeleton.tsx`, `loading.tsx` routes, and in-page client skeletons across Question Bank, Books Bank, Match Setup, Dashboard & AI Studio)  
 **Next:** User stage testing and match rehearsal
 
 ---
@@ -22,6 +22,7 @@ Update this file after every completed feature. Any AI agent reading this should
 - [x] 29 Books Bank Pagination (6 textbooks per page, tag filter auto-reset, previous/next controls)
 - [x] 30 Login Console Overhaul (removed demo credentials autofill link, added inline `Eye`/`EyeOff` password preview toggle)
 - [x] 31 Match Setup Question Pool Telemetry Fix (removed confusing "0 in bank" label on unselected subjects, pre-validated all pools, precise requirement indicators)
+- [x] 32 Electric Obsidian Loading Skeletons (`Skeleton.tsx` family with specular shimmer, App Router `loading.tsx` boundaries, AI synthesis state)
 
 ### Phase 1 — Foundation, Schema & Tokens
 

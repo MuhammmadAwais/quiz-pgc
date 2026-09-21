@@ -34,7 +34,32 @@ After building any component — run `/imprint` to record the component name, fi
 | `AiStudioModal` | `components/studio/AiStudioModal.tsx` | `bg-surface-carbon border-border-medium rounded-2xl shadow-2xl max-w-5xl` | AI question generator studio modal |
 | `RapidReviewDeck` | `components/studio/RapidReviewDeck.tsx` | `bg-surface-onyx border-white/10 rounded-2xl p-4 gap-5` | High-speed plain-English question review surface |
 | `ReviewCard` | `components/studio/ReviewCard.tsx` | `bg-surface-carbon border-border-medium rounded-2xl p-6 2x2 grid` | Single question inspection card with LaTeX math |
-| `StudioStickyFooter` | `components/studio/StudioStickyFooter.tsx` | `bg-surface-onyx/95 border-t border-white/10 backdrop-blur-xl p-4 shadow-2xl` | Bottom sticky action bar with plain-English save |
+| `MetricCardSkeleton` | `components/ui/Skeleton.tsx` | `bg-surface-carbon border-border-subtle rounded-xl p-5 skeleton-shimmer` | Telemetry metric loader |
+| `QuestionCardSkeleton` | `components/ui/Skeleton.tsx` | `bg-surface-carbon border-border-subtle rounded-xl p-4 skeleton-shimmer` | MCQ card placeholder with 2x2 option grid |
+| `BookCardSkeleton` | `components/ui/Skeleton.tsx` | `bg-surface-carbon border-border-subtle rounded-2xl p-5 skeleton-shimmer` | Textbook shelf placeholder |
+| `SubjectRowSkeleton` | `components/ui/Skeleton.tsx` | `bg-surface-onyx/60 border-white/5 rounded-xl p-3.5 skeleton-shimmer` | List/row item placeholder |
+| `Skeleton` | `components/ui/Skeleton.tsx` | `bg-white/5 rounded-md skeleton-shimmer relative overflow-hidden` | Atomic shimmer loader primitive |
+
+---
+
+### Skeleton
+File: `components/ui/Skeleton.tsx`
+Last updated: 2026-09-21
+
+| Property | Class |
+|---|---|
+| Background | `bg-white/5`, `bg-surface-interactive/60` (substrate) |
+| Border | `border-white/5` (inner dividers), `border-border-subtle` (card boundaries) |
+| Border radius | `rounded-md` (atomic blocks), `rounded-xl` (rows/cards), `rounded-2xl` (book cards), `rounded-full` (pills/badges) |
+| Text — primary | None (geometric silhouette blocks) |
+| Text — secondary | None |
+| Spacing | Contextual; cards use `p-4` to `p-5`, inner options use `gap-2` to `gap-2.5` |
+| Hover state | None (non-interactive loading state) |
+| Shadow | `shadow-sm` |
+| Shimmer effect | `skeleton-shimmer` (`@keyframes skeleton-shimmer` moving specular gradient `rgba(255,255,255,0.03)` to `0.08`) |
+
+**Pattern notes:**
+The universal loading primitive for PGC Arena. Never use spinners or plain colored text for data fetching or page routing. Every view that takes even 1 second to load uses these structured, high-candela geometric silhouettes to maintain layout geometry and eliminate Cumulative Layout Shift (CLS). Integrated at both the Next.js App Router boundary level (`loading.tsx`) and client component state level (`isLoading && !isLoaded`).
 
 ---
 

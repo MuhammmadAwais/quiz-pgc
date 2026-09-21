@@ -17,6 +17,7 @@ import { Book } from '@/lib/types/books';
 import { useAiStudioStore } from '@/lib/store/useAiStudioStore';
 import { PdfPagePreviewCard } from './PdfPagePreviewCard';
 import { RapidReviewDeck } from './RapidReviewDeck';
+import { QuestionCardSkeleton } from '@/components/ui/Skeleton';
 
 interface AiStudioModalProps {
   isOpen: boolean;
@@ -226,7 +227,26 @@ export function AiStudioModal({
 
         {/* Modal Body */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {activeTab === 'SETUP' ? (
+          {isGenerating ? (
+            <div className="py-12 px-4 space-y-6 animate-fade-in text-center max-w-2xl mx-auto">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-team-a-core/15 border border-team-a-core/40 shadow-[0_0_32px_rgba(139,92,246,0.35)] mb-1">
+                <Sparkles className="w-8 h-8 text-team-a-bright animate-spin" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-base font-bold font-mono text-optic-white">
+                  Reading Textbook &amp; Synthesizing MCQs
+                </h3>
+                <p className="text-xs text-text-muted-slate font-mono max-w-md mx-auto leading-relaxed">
+                  Extracting pages {config.startPage}–{config.endPage} from {selectedBook?.title || 'textbook'} • Slicing PDF server-side and enforcing anti-hallucination validation...
+                </p>
+              </div>
+
+              <div className="space-y-3 text-left pt-2">
+                <QuestionCardSkeleton />
+                <QuestionCardSkeleton />
+              </div>
+            </div>
+          ) : activeTab === 'SETUP' ? (
             <form onSubmit={handleGenerate} className="space-y-6 max-w-4xl mx-auto">
               {/* Resumed Session Hint */}
               {stagedQuestions.length > 0 && (

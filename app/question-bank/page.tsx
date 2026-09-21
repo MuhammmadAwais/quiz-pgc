@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Badge } from '@/components/ui/Badge';
+import { QuestionCardSkeleton, SubjectRowSkeleton } from '@/components/ui/Skeleton';
 import { QuestionModal } from '@/components/question-bank/QuestionModal';
 import { AiStudioModal } from '@/components/studio/AiStudioModal';
 import { MathRenderer } from '@/components/ui/MathRenderer';
@@ -300,7 +301,13 @@ export default function QuestionBankPage() {
 
             {/* Subjects List */}
             <div className="space-y-1.5 overflow-y-auto max-h-[70vh] pr-1">
-              {subjects.length === 0 ? (
+              {isLoading && !isLoaded ? (
+                <div className="space-y-2">
+                  {[0, 1, 2, 3].map((i) => (
+                    <SubjectRowSkeleton key={i} />
+                  ))}
+                </div>
+              ) : subjects.length === 0 ? (
                 <p className="text-xs text-text-muted-slate p-3 text-center">
                   No subjects created yet.
                 </p>
@@ -368,7 +375,13 @@ export default function QuestionBankPage() {
 
             {/* Chapters List */}
             <div className="space-y-1.5 overflow-y-auto max-h-[70vh] pr-1">
-              {!selectedSubjectId ? (
+              {isLoading && !isLoaded ? (
+                <div className="space-y-2">
+                  {[0, 1, 2, 3].map((i) => (
+                    <SubjectRowSkeleton key={i} />
+                  ))}
+                </div>
+              ) : !selectedSubjectId ? (
                 <p className="text-xs text-text-muted-slate p-3 text-center">
                   Select a subject on the left.
                 </p>
@@ -474,7 +487,13 @@ export default function QuestionBankPage() {
 
             {/* Questions Scroll Area */}
             <div className="space-y-3 overflow-y-auto max-h-[66vh] pr-1">
-              {filteredQuestions.length === 0 ? (
+              {isLoading && !isLoaded ? (
+                <div className="space-y-3">
+                  {[0, 1, 2].map((i) => (
+                    <QuestionCardSkeleton key={i} />
+                  ))}
+                </div>
+              ) : filteredQuestions.length === 0 ? (
                 <div className="text-center p-8 border border-dashed border-white/10 rounded-lg">
                   <HelpCircle className="w-8 h-8 text-text-muted-slate mx-auto mb-2 opacity-50" />
                   <p className="text-xs text-text-muted-slate mb-3">
