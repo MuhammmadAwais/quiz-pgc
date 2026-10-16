@@ -86,6 +86,7 @@ export default function LoginPage() {
               <Input
                 label="Admin Email"
                 type="email"
+                autoComplete="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -98,6 +99,7 @@ export default function LoginPage() {
               <Input
                 label="Master Password"
                 type={showPassword ? 'text' : 'password'}
+                autoComplete="current-password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -143,10 +145,6 @@ export default function LoginPage() {
           </form>
         </div>
 
-        {/* Projector System Notice */}
-        <div className="mt-6 text-center text-xs font-mono text-text-muted-slate">
-          Zero-Network Live Loop active • 1080p/4K Projector Optimized
-        </div>
       </div>
     </div>
   );
