@@ -374,13 +374,27 @@ export const useTournamentStore = create<TournamentState>()(
         const nextQuestionIdx = state.currentQuestionIndex + 1;
 
         if (nextQuestionIdx < subjectQuota) {
-          // Active team still has questions remaining in this subject
+          // Active team still has questions remaining in this subject:
+          // AUTO-REVEAL for smooth continuous stream within the same team's block.
+          // The host only clicks 'Reveal' for Question 1; subsequent questions stream automatically.
+          const activeTeam = state.teams[state.activeTeamIndex];
+          const pool = activeTeam ? state.teamQuestionPools[activeTeam.id] : undefined;
+          const nextQ = pool?.[activeSub?.id]?.[nextQuestionIdx];
+
+          const newRevealedIds = nextQ?.id
+            ? Array.from(new Set([...state.revealedQuestionIds, nextQ.id]))
+            : state.revealedQuestionIds;
+
+          const timeLimit = state.config?.timeLimitSeconds || 0;
+          const now = timeLimit > 0 ? Date.now() : null;
+
           set({
             currentQuestionIndex: nextQuestionIdx,
-            isQuestionRevealed: false,
+            isQuestionRevealed: true,
             selectedOptionIndex: null,
             isAnswerSubmitted: false,
-            timerStartedAt: null,
+            revealedQuestionIds: newRevealedIds,
+            timerStartedAt: now,
             isTimerPaused: false,
             isTimeExpired: false,
           });

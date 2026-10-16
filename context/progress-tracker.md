@@ -6,15 +6,22 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ## Current Status
 
-**Phase:** Phase 12 — Multi-Team Live Arena (2-12 Teams), Resilient Wall-Clock Timer & Islamic Arabic/Urdu Typography (Complete)
-**Last completed:** Full-width top question bar layout, symmetrical flanking multi-team podiums, resilient requestAnimationFrame wall-clock timer with 3 color phases and Web Audio API feedback, multi-team turn progression store machine, Arabic & Urdu RTL detection with Noto Naskh/Nastaliq fallbacks, and multi-team ranked leaderboard.
-**Next:** User stage testing and live tournament rehearsal
+**Phase:** Phase 13 — Curriculum Chapter Seeding (432 MCQs, 4 Textbooks) & Continuous Live Match Reveal Stream (Complete)
+**Last completed:** Full database purge, registration and B2 upload of 4 board textbooks (Federal Board Math, Rawalpindi Board Math, Federal Board Biology, Rawalpindi Board Biology), synthesis and insertion of 432 conceptual no-calculator MCQs (108 per chapter across 4 distinct subjects), master admin credential verification, and continuous turn auto-stream within same-team blocks in tournament store.
+**Next:** User tournament rehearsal and live arena gameplay.
 
 ---
 
 ## Progress
 
-### Phase 12 — Multi-Team Arena (2-12 Teams), Resilient Timer & Arabic/Urdu Typography
+### Phase 13 — Curriculum Chapter Seeding (432 MCQs) & Continuous Turn Auto-Stream
+
+- [x] 57 Master Admin Authentication Update & Verification (`admin@pgc.edu` with master password `PGCarena2026!`).
+- [x] 58 Clean Database Purge (Zeroed legacy test MCQs, test PDFs, and contest records across Supabase).
+- [x] 59 Curriculum Architecture & 4 Textbook Ingestion (Uploaded all 4 chapter PDFs from `docs/` to Backblaze B2, registered with page counts and metadata in `public.books`).
+- [x] 60 432 Conceptual No-Calculator MCQs Generation & Seed (108 MCQs each for Federal Math Ch1, Rawalpindi Math Ch1, Federal Bio Ch1, Rawalpindi Bio Ch1; strictly conceptual, no pen/paper needed, verified random difficulty distribution).
+- [x] 61 Continuous Same-Team Turn Auto-Stream (`lib/store/tournament-store.ts` auto-reveals subsequent questions and restarts timer within a team's consecutive block, requiring only 1 click for Question 1 per team).
+- [x] 62 Production TypeScript Verification (`npm run build` compiled 13/13 routes with 0 errors).
 
 - [x] 47 Zero-Network Resilient Wall-Clock Timer (`components/live-match/TimerBar.tsx` powered by `Date.now() - timerStartedAt` via `requestAnimationFrame`, immune to tab throttling, CPU lag, and network drops, with 30-foot auditorium visibility, massive digits, Cyan -> Amber -> Rose color phases, Web Audio API tick/alert/buzzer/miss sounds, and automatic 0-point declaration on timeout)
 - [x] 48 Full-Width Top Question Bar Stage Layout (`app/live-match/page.tsx` top-spanning question banner with unrevealed placeholder state and revealed prompt)

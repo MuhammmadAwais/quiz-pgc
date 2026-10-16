@@ -546,7 +546,7 @@ export default function LiveMatchPage() {
       <Modal
         isOpen={postponeModalOpen}
         onClose={() => setPostponeModalOpen(false)}
-        title="Postpone Live Match?"
+         title="Postpone Live Match?"
       >
         <div className="space-y-4">
           <p className="text-sm text-text-muted-slate font-sans leading-relaxed">
