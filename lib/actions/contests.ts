@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { fetchAllPages } from '@/lib/supabase/paginate';
 import { revalidatePath } from 'next/cache';
 import { Contest } from '@/lib/types/tournament';
 
@@ -31,36 +32,45 @@ export async function getContestStats(): Promise<{
 export async function getContestHistory(): Promise<Contest[]> {
   const supabase = await createClient();
 
-  const { data: contests, error } = await supabase
-    .from('contests')
-    .select(`
-      id,
-      team_a_name,
-      team_b_name,
-      team_a_score,
-      team_b_score,
-      winner_name,
-      status,
-      created_at
-    `)
-    .order('created_at', { ascending: false });
+  const [{ data: contests, error }, { data: cqData }] = await Promise.all([
+    fetchAllPages<Omit<Contest, 'revealed_count'>>((from, to) =>
+      supabase
+        .from('contests')
+        .select(
+          `
+          id,
+          team_a_name,
+          team_b_name,
+          team_a_score,
+          team_b_score,
+          winner_name,
+          status,
+          created_at
+        `,
+          { count: 'exact' }
+        )
+        .order('created_at', { ascending: false })
+        .order('id', { ascending: true })
+        .range(from, to)
+    ),
+    fetchAllPages<{ contest_id: string }>((from, to) =>
+      supabase
+        .from('contest_questions')
+        .select('contest_id', { count: 'exact' })
+        .order('id', { ascending: true })
+        .range(from, to)
+    ),
+  ]);
 
-  if (error || !contests) {
-    console.error('Error fetching contest history:', error);
+  if (error || contests.length === 0) {
+    if (error) console.error('Error fetching contest history:', error);
     return [];
   }
 
-  // Fetch count of questions per contest
-  const { data: cqData } = await supabase
-    .from('contest_questions')
-    .select('contest_id');
-
   const countMap: Record<string, number> = {};
-  if (cqData) {
-    cqData.forEach((cq) => {
-      countMap[cq.contest_id] = (countMap[cq.contest_id] || 0) + 1;
-    });
-  }
+  cqData.forEach((cq) => {
+    countMap[cq.contest_id] = (countMap[cq.contest_id] || 0) + 1;
+  });
 
   return contests.map((c) => ({
     id: c.id,

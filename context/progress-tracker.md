@@ -6,13 +6,20 @@ Update this file after every completed feature. Any AI agent reading this should
 
 ## Current Status
 
-**Phase:** Phase 13 — Curriculum Chapter Seeding (432 MCQs, 4 Textbooks) & Continuous Live Match Reveal Stream (Complete)
-**Last completed:** Full database purge, registration and B2 upload of 4 board textbooks (Federal Board Math, Rawalpindi Board Math, Federal Board Biology, Rawalpindi Board Biology), synthesis and insertion of 432 conceptual no-calculator MCQs (108 per chapter across 4 distinct subjects), master admin credential verification, and continuous turn auto-stream within same-team blocks in tournament store.
-**Next:** User tournament rehearsal and live arena gameplay.
+**Phase:** Phase 14 — Multi-Textbook Chapter Manifest & 4,040 Conceptual MCQ Seed (Complete)
+**Last completed:** Scanned `D:\DisK\Academics\Class-12\Textbooks`, indexed 101 curriculum chapters across 8 textbooks (`scripts/build-textbook-manifest.js` & `scripts/textbook-manifest.json`), and seeded 4,040 mixed-difficulty, no-calculator MCQs (40 per chapter) into Supabase via `scripts/seed-all-textbooks.js`, bringing the bank to 11 subjects, 105 chapters, and 4,472 total MCQs while leaving `public.books` (4 rows) and local textbook files untouched.
+**Next:** User tournament rehearsal and live arena gameplay across the expanded multi-subject bank.
 
 ---
 
 ## Progress
+
+### Phase 14 — Full Class-12 Textbooks Bank Seeding (4,040 New MCQs across 101 Chapters)
+
+- [x] 63 Textbook Directory Inventory & Chapter Manifest (`scripts/build-textbook-manifest.js`, `scripts/textbook-manifest.json` covering 101 chapters across Rawalpindi Board Mathematics Units 2–11, Physics, English + Idioms, Urdu + Seerat, Computer Science, Chemistry, Pakistan Studies, and Tarjuma-tul-Quran Surahs).
+- [x] 64 Quota-Resilient Multi-Model Seeder & Quality Linter (`scripts/seed-all-textbooks.js` with structured JSON schema output, balanced difficulty, strict no-calculator rule, native Urdu/Arabic script for Urdu/PakStudy/THQ, `linter.ts`-aligned checks, and uniform A/B/C/D option shuffling).
+- [x] 65 Database Insertion & Verification (Inserted 4,040 new MCQs across 101 chapters; verified 11 subjects, 105 chapters, 4,472 total MCQs, min 40/chapter, 0 partial chapters, 0 schema/delimiter anomalies, and untouched `public.books`).
+- [x] 66 PostgREST 1,000-Row Limit Fix (`lib/supabase/paginate.ts`, `lib/actions/questions.ts`, `lib/actions/subjects.ts`, `lib/actions/chapters.ts`, `lib/actions/contests.ts` updated with deterministic `.range()` pagination via `fetchAllPages` + in-memory used-ID filtering so `/question-bank` and `/match-setup` load all 4,472 MCQs including Urdu, THQ, Pakistan Studies, Chemistry, Computer Science, English, Physics, Math, and Biology; verified with `npm run build`).
 
 ### Phase 13 — Curriculum Chapter Seeding (432 MCQs) & Continuous Turn Auto-Stream
 

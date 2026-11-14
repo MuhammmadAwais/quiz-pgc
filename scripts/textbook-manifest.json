@@ -1,0 +1,854 @@
+{
+  "generatedAt": "2026-11-13T17:36:02.077Z",
+  "subjects": [
+    {
+      "name": "Rawalpindi Board Mathematics",
+      "existingSubjectId": "22222222-2222-2222-2222-222222222222",
+      "chapters": [
+        {
+          "name": "Unit 02: Further Differentiation",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Mathematics\\Mathematics-Chapter-2.pdf",
+          "startPage": 1,
+          "endPage": 37,
+          "totalPages": 37
+        },
+        {
+          "name": "Unit 03: Integration",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Mathematics\\Mathematics-Chapter-3.pdf",
+          "startPage": 1,
+          "endPage": 53,
+          "totalPages": 53
+        },
+        {
+          "name": "Unit 04: Differential Equations",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Mathematics\\Mathematics-Chapter-4.pdf",
+          "startPage": 1,
+          "endPage": 16,
+          "totalPages": 16
+        },
+        {
+          "name": "Unit 05: Analytical Geometry",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Mathematics\\Mathematics-Chapter-5.pdf",
+          "startPage": 1,
+          "endPage": 23,
+          "totalPages": 23
+        },
+        {
+          "name": "Unit 06: Conics",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Mathematics\\Mathematics-Chapter-6.pdf",
+          "startPage": 1,
+          "endPage": 55,
+          "totalPages": 55
+        },
+        {
+          "name": "Unit 07: Kinematics of Motion in a Straight Line",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Mathematics\\Mathematics-Chapter-7.pdf",
+          "startPage": 1,
+          "endPage": 14,
+          "totalPages": 14
+        },
+        {
+          "name": "Unit 08: Numerical Solutions of Nonlinear Equations",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Mathematics\\Mathematics-Chapter-8.pdf",
+          "startPage": 1,
+          "endPage": 22,
+          "totalPages": 22
+        },
+        {
+          "name": "Unit 09: Inverse Trigonometric",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Mathematics\\Mathematics-Chapter-9.pdf",
+          "startPage": 1,
+          "endPage": 20,
+          "totalPages": 20
+        },
+        {
+          "name": "Unit 10: Solution of Trigonometric Equations",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Mathematics\\Mathematics-Chapter-10.pdf",
+          "startPage": 1,
+          "endPage": 12,
+          "totalPages": 12
+        },
+        {
+          "name": "Unit 11: Vector Valued Functions and Their Derivatives",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Mathematics\\Mathematics-Chapter-11.pdf",
+          "startPage": 1,
+          "endPage": 22,
+          "totalPages": 22
+        }
+      ]
+    },
+    {
+      "name": "Physics",
+      "chapters": [
+        {
+          "name": "Unit 1: Thermal Physics",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Physics\\Physics-Chapter-1.pdf",
+          "startPage": 4,
+          "endPage": 17,
+          "totalPages": 17
+        },
+        {
+          "name": "Unit 2: Simple Harmonic Motion",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Physics\\Physics-Chapter-2.pdf",
+          "startPage": 1,
+          "endPage": 27,
+          "totalPages": 27
+        },
+        {
+          "name": "Unit 3: Physical Optics",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Physics\\Physics-Chapter-3.pdf",
+          "startPage": 1,
+          "endPage": 16,
+          "totalPages": 16
+        },
+        {
+          "name": "Unit 4: Electrostatics",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Physics\\Physics-Chapter-4.pdf",
+          "startPage": 1,
+          "endPage": 24,
+          "totalPages": 24
+        },
+        {
+          "name": "Unit 5: Alternating Current",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Physics\\Physics-Chapter-5.pdf",
+          "startPage": 1,
+          "endPage": 33,
+          "totalPages": 33
+        },
+        {
+          "name": "Unit 6: Quantum Physics",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Physics\\Physics-Chapter-6.pdf",
+          "startPage": 1,
+          "endPage": 19,
+          "totalPages": 19
+        },
+        {
+          "name": "Unit 7: Nuclear and Particle Physics",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Physics\\Physics-Chapter-7.pdf",
+          "startPage": 1,
+          "endPage": 19,
+          "totalPages": 19
+        },
+        {
+          "name": "Unit 8: Medical Physics",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Physics\\Physics-Chapter-8.pdf",
+          "startPage": 1,
+          "endPage": 13,
+          "totalPages": 13
+        },
+        {
+          "name": "Unit 9: Space and Environment",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Physics\\Physics-Chapter-9.pdf",
+          "startPage": 1,
+          "endPage": 10,
+          "totalPages": 10
+        }
+      ]
+    },
+    {
+      "name": "English",
+      "chapters": [
+        {
+          "name": "Unit 1: Journey to Taif",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\English\\Chapters\\English-Chapter-1.pdf",
+          "startPage": 5,
+          "endPage": 11,
+          "totalPages": 11
+        },
+        {
+          "name": "Unit 2: The Last Lesson",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\English\\Chapters\\English-Chapter-2.pdf",
+          "startPage": 1,
+          "endPage": 9,
+          "totalPages": 9
+        },
+        {
+          "name": "Unit 3: On His Blindness",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\English\\Chapters\\English-Chapter-3.pdf",
+          "startPage": 1,
+          "endPage": 6,
+          "totalPages": 6
+        },
+        {
+          "name": "Unit 4: The Power of Digital Learning",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\English\\Chapters\\English-Chapter-4.pdf",
+          "startPage": 1,
+          "endPage": 10,
+          "totalPages": 10
+        },
+        {
+          "name": "Unit 5: The Giving Tree",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\English\\Chapters\\English-Chapter-5.pdf",
+          "startPage": 1,
+          "endPage": 6,
+          "totalPages": 6
+        },
+        {
+          "name": "Unit 6: The Fun They Had",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\English\\Chapters\\English-Chapter-6.pdf",
+          "startPage": 1,
+          "endPage": 6,
+          "totalPages": 6
+        },
+        {
+          "name": "Unit 7: Because I could Not Stop for Death",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\English\\Chapters\\English-Chapter-7.pdf",
+          "startPage": 1,
+          "endPage": 5,
+          "totalPages": 5
+        },
+        {
+          "name": "Unit 8: The Devoted Friend",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\English\\Chapters\\English-Chapter-8.pdf",
+          "startPage": 1,
+          "endPage": 12,
+          "totalPages": 12
+        },
+        {
+          "name": "Unit 9: The Doll's House",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\English\\Chapters\\English-Chapter-9.pdf",
+          "startPage": 1,
+          "endPage": 11,
+          "totalPages": 11
+        },
+        {
+          "name": "Unit 10: All the World’s a Stage",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\English\\Chapters\\English-Chapter-10.pdf",
+          "startPage": 1,
+          "endPage": 8,
+          "totalPages": 8
+        },
+        {
+          "name": "Unit 11: A Letter to God",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\English\\Chapters\\English-Chapter-11.pdf",
+          "startPage": 1,
+          "endPage": 7,
+          "totalPages": 7
+        },
+        {
+          "name": "Unit 12: A Visit to the Swat Valley",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\English\\Chapters\\English-Chapter-12.pdf",
+          "startPage": 1,
+          "endPage": 9,
+          "totalPages": 9
+        },
+        {
+          "name": "Unit 13: The Pearl",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\English\\Chapters\\English-Chapter-13.pdf",
+          "startPage": 1,
+          "endPage": 65,
+          "totalPages": 65
+        },
+        {
+          "name": "Idioms and Phrases",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\English\\Idioms\\Idioms.pdf",
+          "startPage": 1,
+          "endPage": 2,
+          "totalPages": 2
+        }
+      ]
+    },
+    {
+      "name": "Urdu",
+      "chapters": [
+        {
+          "name": "حمد — سید صبیح الدین رحمانی",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\Urdu-Chapter-1.pdf",
+          "startPage": 1,
+          "endPage": 6,
+          "totalPages": 6
+        },
+        {
+          "name": "نعت — افتخار عارف",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\Urdu-Chapter-2.pdf",
+          "startPage": 1,
+          "endPage": 4,
+          "totalPages": 4
+        },
+        {
+          "name": "سبق: ہجرتِ حبشہ — مولانا صفی الرحمن مبارکپوری",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\Urdu-Chapter-3.pdf",
+          "startPage": 1,
+          "endPage": 9,
+          "totalPages": 9
+        },
+        {
+          "name": "سبق: ماں جی — قدرت اللہ شہاب",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\Urdu-Chapter-4.pdf",
+          "startPage": 1,
+          "endPage": 8,
+          "totalPages": 8
+        },
+        {
+          "name": "سبق: کافی — مشتاق احمد یوسفی",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\Urdu-Chapter-5.pdf",
+          "startPage": 1,
+          "endPage": 9,
+          "totalPages": 9
+        },
+        {
+          "name": "سبق: رستم و سہراب — آغا حشر کاشمیری",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\Urdu-Chapter-6.pdf",
+          "startPage": 1,
+          "endPage": 10,
+          "totalPages": 10
+        },
+        {
+          "name": "سبق: محشر — غوث بہار",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\Urdu-Chapter-7.pdf",
+          "startPage": 1,
+          "endPage": 9,
+          "totalPages": 9
+        },
+        {
+          "name": "سبق: مینار — مختار مسعود",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\Urdu-Chapter-8.pdf",
+          "startPage": 1,
+          "endPage": 7,
+          "totalPages": 7
+        },
+        {
+          "name": "سبق: سیر دوسرے درویش کی — میر امن دہلوی",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\Urdu-Chapter-9.pdf",
+          "startPage": 1,
+          "endPage": 7,
+          "totalPages": 7
+        },
+        {
+          "name": "سبق: بہادر خان کی سرگزشت — پروفیسر انور رومان",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\Urdu-Chapter-10.pdf",
+          "startPage": 1,
+          "endPage": 8,
+          "totalPages": 8
+        },
+        {
+          "name": "سبق: حکیم احسن اللہ خان — شمس الرحمن فاروقی",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\Urdu-Chapter-11.pdf",
+          "startPage": 1,
+          "endPage": 9,
+          "totalPages": 9
+        },
+        {
+          "name": "سبق: نظریۂ پاکستان — ڈاکٹر غلام مصطفیٰ خان",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\Urdu-Chapter-12.pdf",
+          "startPage": 1,
+          "endPage": 7,
+          "totalPages": 7
+        },
+        {
+          "name": "نظم: انسان کامل کی برکات — حفیظ جالندھری",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\Urdu-Chapter-13.pdf",
+          "startPage": 1,
+          "endPage": 7,
+          "totalPages": 7
+        },
+        {
+          "name": "نظم: داستان تیاری میں باغ کی — میر حسن",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\Urdu-Chapter-14.pdf",
+          "startPage": 1,
+          "endPage": 4,
+          "totalPages": 4
+        },
+        {
+          "name": "نظم: نثار میں تیری گلیوں کے۔۔۔ — فیض احمد فیض",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\Urdu-Chapter-15.pdf",
+          "startPage": 1,
+          "endPage": 5,
+          "totalPages": 5
+        },
+        {
+          "name": "نظم: نئی نسل کا نوحہ — امجد اسلام امجد",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\Urdu-Chapter-16.pdf",
+          "startPage": 1,
+          "endPage": 4,
+          "totalPages": 4
+        },
+        {
+          "name": "نظم: میں روزے سے ہوں — سید ضمیر جعفری",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\Urdu-Chapter-17.pdf",
+          "startPage": 1,
+          "endPage": 4,
+          "totalPages": 4
+        },
+        {
+          "name": "غزل — خواجہ میر درد",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\Urdu-Chapter-18.pdf",
+          "startPage": 1,
+          "endPage": 5,
+          "totalPages": 5
+        },
+        {
+          "name": "غزل — مرزا اسد اللہ خاں غالب",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\Urdu-Chapter-19.pdf",
+          "startPage": 1,
+          "endPage": 4,
+          "totalPages": 4
+        },
+        {
+          "name": "غزل — علامہ محمد اقبال",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\Urdu-Chapter-20.pdf",
+          "startPage": 1,
+          "endPage": 5,
+          "totalPages": 5
+        },
+        {
+          "name": "غزل — ادا جعفری",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\Urdu-Chapter-21.pdf",
+          "startPage": 1,
+          "endPage": 4,
+          "totalPages": 4
+        },
+        {
+          "name": "غزل — محسن احسان",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\Urdu-Chapter-22.pdf",
+          "startPage": 1,
+          "endPage": 21,
+          "totalPages": 21
+        },
+        {
+          "name": "مضمون: سیرتِ طیبہ ﷺ",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Urdu\\سیرت طیبہ مضمون.pdf",
+          "startPage": 1,
+          "endPage": 5,
+          "totalPages": 5
+        }
+      ]
+    },
+    {
+      "name": "Computer Science",
+      "chapters": [
+        {
+          "name": "Chapter 1: Computer Networks",
+          "sourceType": "chapter-pdf",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Computer\\Computer-Chapter-1.pdf",
+          "startPage": 1,
+          "endPage": 19,
+          "totalPages": 19
+        },
+        {
+          "name": "Chapter 2: Computational Thinking & Algorithms",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Computer\\Computer-Full-Textbook.pdf",
+          "startPage": 25,
+          "endPage": 37,
+          "totalPages": 147
+        },
+        {
+          "name": "Chapter 3: Object Oriented Programming Using Python",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Computer\\Computer-Full-Textbook.pdf",
+          "startPage": 38,
+          "endPage": 49,
+          "totalPages": 147
+        },
+        {
+          "name": "Chapter 4: Development of Graphical User Interface (GUI)",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Computer\\Computer-Full-Textbook.pdf",
+          "startPage": 50,
+          "endPage": 64,
+          "totalPages": 147
+        },
+        {
+          "name": "Chapter 5: Code Testing and Debugging",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Computer\\Computer-Full-Textbook.pdf",
+          "startPage": 65,
+          "endPage": 76,
+          "totalPages": 147
+        },
+        {
+          "name": "Chapter 6: Data and Analysis",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Computer\\Computer-Full-Textbook.pdf",
+          "startPage": 77,
+          "endPage": 93,
+          "totalPages": 147
+        },
+        {
+          "name": "Chapter 7: Hypothesis Testing",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Computer\\Computer-Full-Textbook.pdf",
+          "startPage": 94,
+          "endPage": 107,
+          "totalPages": 147
+        },
+        {
+          "name": "Chapter 8: Applications of Computer Science",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Computer\\Computer-Full-Textbook.pdf",
+          "startPage": 108,
+          "endPage": 122,
+          "totalPages": 147
+        },
+        {
+          "name": "Chapter 9: Cybersecurity and Safe Digital Collaboration",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\Computer\\Computer-Full-Textbook.pdf",
+          "startPage": 123,
+          "endPage": 141,
+          "totalPages": 147
+        }
+      ]
+    },
+    {
+      "name": "Chemistry",
+      "chapters": [
+        {
+          "name": "Chapter 1: History of Chemistry",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\chemistry\\10 Chemistry Book FBISE (Study++).pdf",
+          "startPage": 7,
+          "endPage": 13,
+          "totalPages": 164
+        },
+        {
+          "name": "Chapter 2: Matter",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\chemistry\\10 Chemistry Book FBISE (Study++).pdf",
+          "startPage": 14,
+          "endPage": 25,
+          "totalPages": 164
+        },
+        {
+          "name": "Chapter 3: Stoichiometry",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\chemistry\\10 Chemistry Book FBISE (Study++).pdf",
+          "startPage": 26,
+          "endPage": 45,
+          "totalPages": 164
+        },
+        {
+          "name": "Chapter 4: Electrochemistry",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\chemistry\\10 Chemistry Book FBISE (Study++).pdf",
+          "startPage": 46,
+          "endPage": 62,
+          "totalPages": 164
+        },
+        {
+          "name": "Chapter 5: Reaction Kinetics",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\chemistry\\10 Chemistry Book FBISE (Study++).pdf",
+          "startPage": 63,
+          "endPage": 73,
+          "totalPages": 164
+        },
+        {
+          "name": "Chapter 6: Salts",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\chemistry\\10 Chemistry Book FBISE (Study++).pdf",
+          "startPage": 74,
+          "endPage": 81,
+          "totalPages": 164
+        },
+        {
+          "name": "Chapter 7: Nitrogen, Sulphur and Metals",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\chemistry\\10 Chemistry Book FBISE (Study++).pdf",
+          "startPage": 82,
+          "endPage": 94,
+          "totalPages": 164
+        },
+        {
+          "name": "Chapter 8: Organic Chemistry",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\chemistry\\10 Chemistry Book FBISE (Study++).pdf",
+          "startPage": 95,
+          "endPage": 108,
+          "totalPages": 164
+        },
+        {
+          "name": "Chapter 9: Hydrocarbons",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\chemistry\\10 Chemistry Book FBISE (Study++).pdf",
+          "startPage": 109,
+          "endPage": 122,
+          "totalPages": 164
+        },
+        {
+          "name": "Chapter 10: Hydroxy Compounds",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\chemistry\\10 Chemistry Book FBISE (Study++).pdf",
+          "startPage": 123,
+          "endPage": 128,
+          "totalPages": 164
+        },
+        {
+          "name": "Chapter 11: Carboxylic Compounds",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\chemistry\\10 Chemistry Book FBISE (Study++).pdf",
+          "startPage": 129,
+          "endPage": 136,
+          "totalPages": 164
+        },
+        {
+          "name": "Chapter 12: Polymers",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\chemistry\\10 Chemistry Book FBISE (Study++).pdf",
+          "startPage": 137,
+          "endPage": 146,
+          "totalPages": 164
+        },
+        {
+          "name": "Chapter 13: Biochemistry",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\chemistry\\10 Chemistry Book FBISE (Study++).pdf",
+          "startPage": 147,
+          "endPage": 161,
+          "totalPages": 164
+        }
+      ]
+    },
+    {
+      "name": "Pakistan Studies",
+      "chapters": [
+        {
+          "name": "اسلام اور پاکستان",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\PakStudy\\PakStudy-Full-Textbook.pdf",
+          "startPage": 3,
+          "endPage": 13,
+          "totalPages": 100
+        },
+        {
+          "name": "پاکستان میں آئینی اور سیاسی ترقی",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\PakStudy\\PakStudy-Full-Textbook.pdf",
+          "startPage": 14,
+          "endPage": 35,
+          "totalPages": 100
+        },
+        {
+          "name": "آئینی اور انتظامی نظام",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\PakStudy\\PakStudy-Full-Textbook.pdf",
+          "startPage": 36,
+          "endPage": 50,
+          "totalPages": 100
+        },
+        {
+          "name": "پاکستان اور بین الاقوامی امور",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\PakStudy\\PakStudy-Full-Textbook.pdf",
+          "startPage": 51,
+          "endPage": 63,
+          "totalPages": 100
+        },
+        {
+          "name": "پاکستان میں تعلیم، کھیل اور سیاحت",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\PakStudy\\PakStudy-Full-Textbook.pdf",
+          "startPage": 64,
+          "endPage": 78,
+          "totalPages": 100
+        },
+        {
+          "name": "پاکستان کے وسائل اور معاشی ترقی",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\PakStudy\\PakStudy-Full-Textbook.pdf",
+          "startPage": 79,
+          "endPage": 95,
+          "totalPages": 100
+        }
+      ]
+    },
+    {
+      "name": "Tarjuma-tul-Quran",
+      "chapters": [
+        {
+          "name": "سُوْرَةُ النِّسَاءِ",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\THQ\\THQ-Full-Texrtbook.pdf",
+          "startPage": 7,
+          "endPage": 40,
+          "totalPages": 188
+        },
+        {
+          "name": "سُوْرَةُ الْمَائِدَةِ",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\THQ\\THQ-Full-Texrtbook.pdf",
+          "startPage": 41,
+          "endPage": 68,
+          "totalPages": 188
+        },
+        {
+          "name": "سُوْرَةُ النُّورِ",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\THQ\\THQ-Full-Texrtbook.pdf",
+          "startPage": 69,
+          "endPage": 83,
+          "totalPages": 188
+        },
+        {
+          "name": "سُوْرَةُ الْأَحْزَابِ",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\THQ\\THQ-Full-Texrtbook.pdf",
+          "startPage": 84,
+          "endPage": 99,
+          "totalPages": 188
+        },
+        {
+          "name": "سُوْرَةُ مُحَمَّدٍ",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\THQ\\THQ-Full-Texrtbook.pdf",
+          "startPage": 100,
+          "endPage": 108,
+          "totalPages": 188
+        },
+        {
+          "name": "سُوْرَةُ الْفَتْحِ",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\THQ\\THQ-Full-Texrtbook.pdf",
+          "startPage": 109,
+          "endPage": 117,
+          "totalPages": 188
+        },
+        {
+          "name": "سُوْرَةُ الْحُجُرَاتِ",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\THQ\\THQ-Full-Texrtbook.pdf",
+          "startPage": 118,
+          "endPage": 123,
+          "totalPages": 188
+        },
+        {
+          "name": "سُوْرَةُ الْحَدِيدِ",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\THQ\\THQ-Full-Texrtbook.pdf",
+          "startPage": 124,
+          "endPage": 131,
+          "totalPages": 188
+        },
+        {
+          "name": "سُوْرَةُ الْمُجَادَلَةِ",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\THQ\\THQ-Full-Texrtbook.pdf",
+          "startPage": 132,
+          "endPage": 138,
+          "totalPages": 188
+        },
+        {
+          "name": "سُوْرَةُ الْحَشْرِ",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\THQ\\THQ-Full-Texrtbook.pdf",
+          "startPage": 139,
+          "endPage": 146,
+          "totalPages": 188
+        },
+        {
+          "name": "سُوْرَةُ الْمُمْتَحِنَةِ",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\THQ\\THQ-Full-Texrtbook.pdf",
+          "startPage": 147,
+          "endPage": 153,
+          "totalPages": 188
+        },
+        {
+          "name": "سُوْرَةُ الصَّفِّ",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\THQ\\THQ-Full-Texrtbook.pdf",
+          "startPage": 154,
+          "endPage": 158,
+          "totalPages": 188
+        },
+        {
+          "name": "سُوْرَةُ الْجُمُعَةِ",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\THQ\\THQ-Full-Texrtbook.pdf",
+          "startPage": 159,
+          "endPage": 162,
+          "totalPages": 188
+        },
+        {
+          "name": "سُوْرَةُ الْمُنَافِقُونَ",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\THQ\\THQ-Full-Texrtbook.pdf",
+          "startPage": 163,
+          "endPage": 167,
+          "totalPages": 188
+        },
+        {
+          "name": "سُوْرَةُ التَّغَابُنِ",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\THQ\\THQ-Full-Texrtbook.pdf",
+          "startPage": 168,
+          "endPage": 172,
+          "totalPages": 188
+        },
+        {
+          "name": "سُوْرَةُ الطَّلَاقِ",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\THQ\\THQ-Full-Texrtbook.pdf",
+          "startPage": 173,
+          "endPage": 177,
+          "totalPages": 188
+        },
+        {
+          "name": "سُوْرَةُ التَّحْرِيمِ",
+          "sourceType": "full-book-slice",
+          "filePath": "D:\\DisK\\Academics\\Class-12\\Textbooks\\THQ\\THQ-Full-Texrtbook.pdf",
+          "startPage": 178,
+          "endPage": 182,
+          "totalPages": 188
+        }
+      ]
+    }
+  ]
+}

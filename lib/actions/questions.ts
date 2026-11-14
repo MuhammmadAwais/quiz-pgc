@@ -1,45 +1,26 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { fetchAllPages } from '@/lib/supabase/paginate';
 import { revalidatePath } from 'next/cache';
 import { Question, TournamentConfig } from '@/lib/types/tournament';
 
-export async function getQuestions(
-  subjectId?: string,
-  chapterId?: string
-): Promise<Question[]> {
-  const supabase = await createClient();
+interface RawQuestionRow {
+  id: string;
+  subject_id: string;
+  chapter_id: string;
+  text: string;
+  options: string[];
+  correct_index: number;
+  created_at?: string;
+  subjects: { name: string } | { name: string }[] | null;
+  chapters: { name: string } | { name: string }[] | null;
+}
 
-  let query = supabase
-    .from('questions')
-    .select(`
-      id,
-      subject_id,
-      chapter_id,
-      text,
-      options,
-      correct_index,
-      created_at,
-      subjects ( name ),
-      chapters ( name )
-    `)
-    .order('created_at', { ascending: false });
-
-  if (subjectId) {
-    query = query.eq('subject_id', subjectId);
-  }
-  if (chapterId) {
-    query = query.eq('chapter_id', chapterId);
-  }
-
-  const { data, error } = await query;
-
-  if (error) {
-    console.error('Error fetching questions:', error);
-    return [];
-  }
-
-  return (data || []).map((q: any) => ({
+function mapRawQuestion(q: RawQuestionRow): Question {
+  const subName = Array.isArray(q.subjects) ? q.subjects[0]?.name : q.subjects?.name;
+  const chapName = Array.isArray(q.chapters) ? q.chapters[0]?.name : q.chapters?.name;
+  return {
     id: q.id,
     subject_id: q.subject_id,
     chapter_id: q.chapter_id,
@@ -47,9 +28,70 @@ export async function getQuestions(
     options: q.options as [string, string, string, string],
     correct_index: q.correct_index,
     created_at: q.created_at,
-    subject_name: q.subjects?.name,
-    chapter_name: q.chapters?.name,
-  }));
+    subject_name: subName,
+    chapter_name: chapName,
+  };
+}
+
+async function getUsedQuestionIdSet(
+  supabase: Awaited<ReturnType<typeof createClient>>
+): Promise<Set<string>> {
+  const { data: used } = await fetchAllPages<{ question_id: string | null }>((from, to) =>
+    supabase
+      .from('contest_questions')
+      .select('question_id', { count: 'exact' })
+      .order('id', { ascending: true })
+      .range(from, to)
+  );
+  return new Set(used.map((u) => u.question_id).filter((id): id is string => Boolean(id)));
+}
+
+export async function getQuestions(
+  subjectId?: string,
+  chapterId?: string
+): Promise<Question[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await fetchAllPages<RawQuestionRow>((from, to) => {
+    let query = supabase
+      .from('questions')
+      .select(
+        `
+        id,
+        subject_id,
+        chapter_id,
+        text,
+        options,
+        correct_index,
+        created_at,
+        subjects ( name ),
+        chapters ( name )
+      `,
+        { count: 'exact' }
+      )
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: true })
+      .range(from, to);
+
+    if (subjectId) {
+      query = query.eq('subject_id', subjectId);
+    }
+    if (chapterId) {
+      query = query.eq('chapter_id', chapterId);
+    }
+    return query as unknown as PromiseLike<{
+      data: RawQuestionRow[] | null;
+      error: { message: string } | null;
+      count?: number | null;
+    }>;
+  });
+
+  if (error) {
+    console.error('Error fetching questions:', error);
+    return [];
+  }
+
+  return data.map(mapRawQuestion);
 }
 
 export async function createQuestion(data: {
@@ -145,35 +187,32 @@ export async function getPoolStats(
 
   const supabase = await createClient();
 
-  let usedQuestionIds: string[] = [];
-  if (!includeUsed) {
-    const { data: used } = await supabase.from('contest_questions').select('question_id');
-    if (used && used.length > 0) {
-      usedQuestionIds = Array.from(new Set(used.map((u) => u.question_id).filter(Boolean)));
-    }
-  }
+  const [usedSet, { data, error }] = await Promise.all([
+    includeUsed ? Promise.resolve(new Set<string>()) : getUsedQuestionIdSet(supabase),
+    fetchAllPages<{ id: string; subject_id: string }>((from, to) =>
+      supabase
+        .from('questions')
+        .select('id, subject_id', { count: 'exact' })
+        .in('subject_id', selectedSubjectIds)
+        .order('id', { ascending: true })
+        .range(from, to)
+    ),
+  ]);
 
-  let query = supabase
-    .from('questions')
-    .select('id, subject_id')
-    .in('subject_id', selectedSubjectIds);
-
-  if (!includeUsed && usedQuestionIds.length > 0) {
-    query = query.not('id', 'in', `(${usedQuestionIds.join(',')})`);
-  }
-
-  const { data, error } = await query;
-  if (error || !data) {
+  if (error) {
     return { totalAvailable: 0, breakdown: {} };
   }
 
+  let totalAvailable = 0;
   const breakdown: Record<string, number> = {};
   data.forEach((q) => {
+    if (!includeUsed && usedSet.has(q.id)) return;
+    totalAvailable += 1;
     breakdown[q.subject_id] = (breakdown[q.subject_id] || 0) + 1;
   });
 
   return {
-    totalAvailable: data.length,
+    totalAvailable,
     breakdown,
   };
 }
@@ -183,91 +222,61 @@ export async function fetchEligibleQuestions(
 ): Promise<Record<string, Question[]>> {
   const supabase = await createClient();
 
-  let usedQuestionIds: string[] = [];
-  if (!config.includeUsedQuestions) {
-    const { data: used } = await supabase.from('contest_questions').select('question_id');
-    if (used && used.length > 0) {
-      usedQuestionIds = Array.from(new Set(used.map((u) => u.question_id).filter(Boolean)));
-    }
-  }
+  const [usedSet, { data: allRows, error }] = await Promise.all([
+    config.includeUsedQuestions ? Promise.resolve(new Set<string>()) : getUsedQuestionIdSet(supabase),
+    fetchAllPages<RawQuestionRow>((from, to) =>
+      supabase
+        .from('questions')
+        .select(
+          `
+          id,
+          subject_id,
+          chapter_id,
+          text,
+          options,
+          correct_index,
+          subjects ( name ),
+          chapters ( name )
+        `,
+          { count: 'exact' }
+        )
+        .in('subject_id', config.selectedSubjectIds)
+        .order('id', { ascending: true })
+        .range(from, to) as unknown as PromiseLike<{
+          data: RawQuestionRow[] | null;
+          error: { message: string } | null;
+          count?: number | null;
+        }>
+    ),
+  ]);
 
-  // 1. Fetch Primary Fresh Questions
-  let query = supabase
-    .from('questions')
-    .select(`
-      id,
-      subject_id,
-      chapter_id,
-      text,
-      options,
-      correct_index,
-      subjects ( name ),
-      chapters ( name )
-    `)
-    .in('subject_id', config.selectedSubjectIds);
-
-  if (!config.includeUsedQuestions && usedQuestionIds.length > 0) {
-    query = query.not('id', 'in', `(${usedQuestionIds.join(',')})`);
-  }
-
-  const { data: freshData, error } = await query;
-  if (error || !freshData) {
+  if (error) {
     console.error('Failed to load eligible questions:', error);
     return {};
   }
 
-  // Group by subject
+  // Group fresh questions first, appending previously used rows only as Super Over fallback reserve
   const grouped: Record<string, Question[]> = {};
-  freshData.forEach((item: any) => {
-    const q: Question = {
-      id: item.id,
-      subject_id: item.subject_id,
-      chapter_id: item.chapter_id,
-      text: item.text,
-      options: item.options as [string, string, string, string],
-      correct_index: item.correct_index,
-      subject_name: item.subjects?.name,
-      chapter_name: item.chapters?.name,
-    };
-    if (!grouped[item.subject_id]) {
-      grouped[item.subject_id] = [];
+  const reserveBySubject: Record<string, Question[]> = {};
+
+  allRows.forEach((item) => {
+    const q = mapRawQuestion(item);
+    if (!config.includeUsedQuestions && usedSet.has(q.id)) {
+      if (!reserveBySubject[q.subject_id]) reserveBySubject[q.subject_id] = [];
+      reserveBySubject[q.subject_id].push(q);
+      return;
     }
-    grouped[item.subject_id].push(q);
+    if (!grouped[q.subject_id]) {
+      grouped[q.subject_id] = [];
+    }
+    grouped[q.subject_id].push(q);
   });
 
-  // 2. Fallback for Super Over reserve if database has no fresh reserve questions
-  if (!config.includeUsedQuestions && usedQuestionIds.length > 0) {
-    const { data: fallbackData } = await supabase
-      .from('questions')
-      .select(`
-        id,
-        subject_id,
-        chapter_id,
-        text,
-        options,
-        correct_index,
-        subjects ( name ),
-        chapters ( name )
-      `)
-      .in('id', usedQuestionIds);
-
-    if (fallbackData) {
-      fallbackData.forEach((item: any) => {
-        const q: Question = {
-          id: item.id,
-          subject_id: item.subject_id,
-          chapter_id: item.chapter_id,
-          text: item.text,
-          options: item.options as [string, string, string, string],
-          correct_index: item.correct_index,
-          subject_name: item.subjects?.name,
-          chapter_name: item.chapters?.name,
-        };
-        // Append to grouped list so store can use as backup tie-breaker reserve
-        if (grouped[item.subject_id]) {
-          grouped[item.subject_id].push(q);
-        }
-      });
+  if (!config.includeUsedQuestions && usedSet.size > 0) {
+    for (const [subId, reserve] of Object.entries(reserveBySubject)) {
+      if (grouped[subId]) {
+        grouped[subId].push(...reserve);
+      }
     }
   }
 

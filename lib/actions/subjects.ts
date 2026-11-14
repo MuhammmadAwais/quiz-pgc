@@ -1,26 +1,38 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { fetchAllPages } from '@/lib/supabase/paginate';
 import { revalidatePath } from 'next/cache';
 import { Subject } from '@/lib/types/tournament';
 
 export async function getSubjects(): Promise<Subject[]> {
   const supabase = await createClient();
 
-  const { data: subjects, error } = await supabase
-    .from('subjects')
-    .select('id, name, created_at')
-    .order('name', { ascending: true });
+  const [
+    { data: subjects, error },
+    { data: questionCounts, error: countError },
+  ] = await Promise.all([
+    fetchAllPages<{ id: string; name: string; created_at: string }>((from, to) =>
+      supabase
+        .from('subjects')
+        .select('id, name, created_at', { count: 'exact' })
+        .order('name', { ascending: true })
+        .order('id', { ascending: true })
+        .range(from, to)
+    ),
+    fetchAllPages<{ subject_id: string }>((from, to) =>
+      supabase
+        .from('questions')
+        .select('subject_id', { count: 'exact' })
+        .order('id', { ascending: true })
+        .range(from, to)
+    ),
+  ]);
 
   if (error) {
     console.error('Error fetching subjects:', error);
     return [];
   }
-
-  // Count questions per subject
-  const { data: questionCounts, error: countError } = await supabase
-    .from('questions')
-    .select('subject_id');
 
   const countMap: Record<string, number> = {};
   if (!countError && questionCounts) {
@@ -29,7 +41,7 @@ export async function getSubjects(): Promise<Subject[]> {
     });
   }
 
-  return (subjects || []).map((s) => ({
+  return subjects.map((s) => ({
     ...s,
     question_count: countMap[s.id] || 0,
   }));
